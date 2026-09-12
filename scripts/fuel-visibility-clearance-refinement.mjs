@@ -81,15 +81,8 @@ source = source.replace(/\b5\.28\b/g, '5.40');
 const manifoldMatches = [...source.matchAll(/\b5\.44\b/g)].length;
 if (manifoldMatches < 2) throw new Error(`manifold refinement: expected 5.44 anchors, found ${manifoldMatches}`);
 source = source.replace(/\b5\.44\b/g, '5.56');
-
-source = replaceOnce(
-  source,
-  "    source = source.replace(\"hotspot.position.set(5.0, 10.25, -1.4);\", \"hotspot.position.set(5.26, 10.25, -1.4);\");",
-  "    source = source.replace(\"hotspot.position.set(5.0, 10.25, -1.4);\", \"hotspot.position.set(5.26, 10.25, -1.4);\");",
-  'noop guard'
-);
-
 source = source.replace("hotspot.position.set(5.26, 10.25, -1.4);", "hotspot.position.set(5.38, 10.25, -1.4);");
+
 source = replaceOnce(
   source,
   "    const outer = new THREE.Mesh(new THREE.ConeGeometry(0.72, 5.6, 42, 12, true), outerMat);",
