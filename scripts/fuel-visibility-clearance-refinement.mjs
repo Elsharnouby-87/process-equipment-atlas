@@ -12,18 +12,9 @@ function replaceRegex(source, pattern, replacement, label) {
   return source.replace(pattern, replacement);
 }
 
-// -----------------------------------------------------------------------------
-// CHECKPOINT 14 — FUEL VISIBILITY + CONSERVATIVE CAMERA + CLEARANCE POLISH
-// Runs after checkpoint-12 burner/camera/geometry refinement.
-// Visual teaching polish only — no new process model.
-// -----------------------------------------------------------------------------
-
 const heaterPath = 'src/Heater3D.tsx';
 let source = fs.readFileSync(heaterPath, 'utf8');
 
-// 1) Fuel teaching cue: same representative piping path, but rendered as a
-// visible tracer just outside the pipe skin. Bright core + soft halo keeps it
-// readable against copper/dark hardware without implying a literal CFD view.
 source = replaceOnce(
   source,
   "    const burnerFuelParticles: THREE.Mesh[] = [];\n    const burnerHotParticles: THREE.Mesh[] = [];",
@@ -40,13 +31,11 @@ source = replaceRegex(
 
 source = replaceRegex(
   source,
-  /    for \(let i = 0; i < 20; i \+= 1\) \{\n      const p = new THREE\.Mesh\(new THREE\.SphereGeometry\(0\.07, 8, 7\), burnerFuelMat\);\n      p\.userData\.t = i \/ 20;\n      p\.userData\.burnerFlow = 'fuel';\n      flowGroup\.add\(p\);\n      burnerFuelParticles\.push\(p\);\n    \}/,
+  /    for \(let i = 0; i < \d+; i \+= 1\) \{\n      const p = new THREE\.Mesh\(new THREE\.SphereGeometry\([^\n]+\), burnerFuelMat\);[\s\S]*?      burnerFuelParticles\.push\(p\);\n    \}/,
   `    for (let i = 0; i < 24; i += 1) {\n      const p = new THREE.Mesh(new THREE.SphereGeometry(0.085, 9, 8), burnerFuelMat);\n      p.userData.t = i / 24;\n      p.userData.burnerFlow = 'fuel';\n      p.renderOrder = 61;\n      flowGroup.add(p);\n      burnerFuelParticles.push(p);\n\n      const glow = new THREE.Mesh(new THREE.SphereGeometry(0.145, 9, 8), burnerFuelGlowMat);\n      glow.userData.t = i / 24;\n      glow.userData.burnerFlow = 'fuel';\n      glow.renderOrder = 60;\n      flowGroup.add(glow);\n      burnerFuelGlowParticles.push(glow);\n    }`,
   'fuel particle core + halo creation'
 );
 
-// Replace only the routing portion inside the existing fuel loop, preserving
-// the simulator's fuel-speed and fuel-demand scaling logic.
 source = replaceOnce(
   source,
   `        if (activeBurnerStudy === 'external') {\n          p.position.copy(heroFuelPath.getPoint(THREE.MathUtils.clamp(u, 0, 0.9999)));\n        } else if (activeBurnerStudy === 'pilot') {\n          p.position.set(-1.4 + u * 1.4, 5.72 + u * 0.82, -1.35);\n        } else {\n          p.position.set(-2.3 + u * 2.3, 3.45 + u * 3.05, -1.35 + Math.sin(u * Math.PI) * 0.12);\n        }`,
@@ -61,8 +50,6 @@ source = replaceOnce(
   'fuel glow animation loop'
 );
 
-// 2) Conservative camera polish: preserve current yaw/pitch control model and
-// stability, but give steep underheater inspection a slightly lower target.
 source = replaceOnce(
   source,
   "        lookTarget.y = THREE.MathUtils.lerp(o.target.y, Math.min(o.target.y, 5.6), assist);\n        if (camera.position.y < 0.72) camera.position.y = 0.72;",
@@ -77,8 +64,6 @@ source = replaceOnce(
   'conservative lower pitch extension'
 );
 
-// 3) More normal flame-to-tube breathing room, still within the representative
-// firebox envelope. Abnormal impingement logic remains intentionally available.
 const tubePlaneMatches = [...source.matchAll(/\b5\.28\b/g)].length;
 if (tubePlaneMatches < 8) throw new Error(`tube plane refinement: expected several 5.28 anchors, found ${tubePlaneMatches}`);
 source = source.replace(/\b5\.28\b/g, '5.40');
