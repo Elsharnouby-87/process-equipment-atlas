@@ -181,6 +181,7 @@ export function createDraftInstrumentation3D() {
   const tube = new THREE.MeshPhysicalMaterial({ color: '#aab8bf', metalness: 0.9, roughness: 0.25 });
   const orangeMat = new THREE.MeshBasicMaterial({ color: '#ff7a18', transparent: true, opacity: 0.94, depthWrite: false, blending: THREE.AdditiveBlending });
   const oxygenMat = new THREE.MeshBasicMaterial({ color: '#7be8ff', transparent: true, opacity: 0.64, depthWrite: false, blending: THREE.AdditiveBlending });
+  const leakMat = new THREE.MeshBasicMaterial({ color: '#ff9a45', transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending });
 
   // Arch / radiant-roof draft tap and local indicator.
   draftGroup.add(cylinderBetween(new THREE.Vector3(4.7, 16.9, 4.05), new THREE.Vector3(4.7, 16.9, 4.72), 0.075, tube, 14));
@@ -214,9 +215,10 @@ export function createDraftInstrumentation3D() {
   analyzerTag.scale.set(5.2, 0.74, 1);
   analyzerGroup.add(analyzerTag);
 
-  // A deliberately non-stoichiometric visual cue: 48 orange particles vs 8 cyan particles (~16.7% by count).
+  // Deliberately non-stoichiometric visual cue: 48 orange particles vs 8 cyan particles (~16.7% by count).
   const orangeParticles: THREE.Mesh[] = [];
   const oxygenParticles: THREE.Mesh[] = [];
+  const leakParticles: THREE.Mesh[] = [];
   for (let i = 0; i < 48; i += 1) {
     const p = createParticle(orangeMat, 0.115);
     p.userData.phase = i / 48;
@@ -228,8 +230,17 @@ export function createDraftInstrumentation3D() {
     const p = createParticle(oxygenMat, 0.085);
     p.userData.phase = i / 8;
     p.userData.seed = (i * 2.31) % 1;
+    p.userData.index = i;
     flowGroup.add(p);
     oxygenParticles.push(p);
+  }
+  for (let i = 0; i < 6; i += 1) {
+    const p = createParticle(leakMat, 0.08);
+    p.userData.phase = i / 6;
+    p.userData.seed = (i * 1.91) % 1;
+    p.visible = false;
+    flowGroup.add(p);
+    leakParticles.push(p);
   }
   flowGroup.visible = false;
 
@@ -240,6 +251,8 @@ export function createDraftInstrumentation3D() {
     drawGauge(gaugeData.canvas, gaugeData.texture, metrics.draftMmH2O);
     drawAnalyzerPanel(analyzerData.canvas, analyzerData.texture, damperRestriction);
     oxygenMat.opacity = metrics.blueParticleOpacity;
+    orangeMat.opacity = THREE.MathUtils.lerp(0.84, 0.98, metrics.damperOpening / 100);
+    leakMat.opacity = 0.72 * metrics.leakIntensity;
     lastRestriction = damperRestriction;
   };
   updateReadouts(50);
@@ -250,31 +263,77 @@ export function createDraftInstrumentation3D() {
     flowGroup.visible = showFlow;
     if (!showFlow) return;
 
+    const opening01 = metrics.damperOpening / 100;
+    const congestion = metrics.flowCongestion;
     const speed = 0.052 * metrics.flowSpeedScale;
+
     orangeParticles.forEach(p => {
       const phase = p.userData.phase as number;
       const seed = p.userData.seed as number;
-      const u = (phase + elapsed * speed) % 1;
+      const raw = (phase + elapsed * speed) % 1;
+      // When the damper is restricted, the visual spends more time below the damper instead of implying unchanged evacuation velocity.
+      const u = Math.pow(raw, 1 + congestion * 0.82);
       const lower = u < 0.34;
       const r = lower ? u / 0.34 : (u - 0.34) / 0.66;
-      const y = lower ? THREE.MathUtils.lerp(24.7, 29.5, r) : THREE.MathUtils.lerp(29.5, 39.0, r);
-      const width = lower ? THREE.MathUtils.lerp(2.55, 0.62, r) : 0.62;
+      let y = lower ? THREE.MathUtils.lerp(24.7, 29.5, r) : THREE.MathUtils.lerp(29.5, 39.0, r);
+      let width = lower ? THREE.MathUtils.lerp(2.55, 0.62, r) : 0.62;
+
+      if (lower) {
+        const nearDamper = THREE.MathUtils.smoothstep(r, 0.55, 1);
+        const pocket = congestion * nearDamper;
+        y -= pocket * (0.55 + Math.sin((r + seed) * Math.PI) * 0.45) * 1.15;
+        width += pocket * 0.72;
+      }
+
       const angle = (u * 8.5 + seed * 6.2) * Math.PI;
       p.position.set(Math.sin(angle) * width, y, Math.cos(angle * 0.82) * width * 0.72);
       const pulse = 0.88 + Math.sin(elapsed * 4.2 + phase * 12) * 0.12;
-      p.scale.setScalar(pulse);
+      const axialStretch = metrics.flowStretchScale * (0.86 + opening01 * 0.22);
+      p.scale.set(pulse * 0.92, pulse * axialStretch, pulse * 0.92);
     });
 
+    const visibleOxygenCount = Math.max(2, Math.round(oxygenParticles.length * metrics.oxygenParticleFraction));
     oxygenParticles.forEach(p => {
+      const index = p.userData.index as number;
+      p.visible = index < visibleOxygenCount;
+      if (!p.visible) return;
       const phase = p.userData.phase as number;
       const seed = p.userData.seed as number;
-      const u = (phase + elapsed * speed * 0.88) % 1;
+      const raw = (phase + elapsed * speed * 0.88) % 1;
+      const u = Math.pow(raw, 1 + congestion * 0.68);
       const lower = u < 0.34;
       const r = lower ? u / 0.34 : (u - 0.34) / 0.66;
-      const y = lower ? THREE.MathUtils.lerp(24.75, 29.55, r) : THREE.MathUtils.lerp(29.55, 39.0, r);
-      const width = lower ? THREE.MathUtils.lerp(2.75, 0.76, r) : 0.76;
+      let y = lower ? THREE.MathUtils.lerp(24.75, 29.55, r) : THREE.MathUtils.lerp(29.55, 39.0, r);
+      let width = lower ? THREE.MathUtils.lerp(2.75, 0.76, r) : 0.76;
+      if (lower) {
+        const nearDamper = THREE.MathUtils.smoothstep(r, 0.58, 1);
+        y -= congestion * nearDamper * 0.8;
+        width += congestion * nearDamper * 0.42;
+      }
       const angle = (u * 7.2 + seed * 7.1) * Math.PI;
       p.position.set(Math.cos(angle) * width, y, Math.sin(angle * 0.77) * width * 0.76);
+      const pulse = 0.9 + Math.sin(elapsed * 3.6 + phase * 9) * 0.1;
+      p.scale.set(pulse * 0.86, pulse * metrics.flowStretchScale, pulse * 0.86);
+    });
+
+    // Positive-pressure awareness only: a restrained outward hot-gas cue at the arch/casing reference region.
+    leakParticles.forEach(p => {
+      const phase = p.userData.phase as number;
+      const seed = p.userData.seed as number;
+      const active = metrics.leakIntensity > 0.02;
+      p.visible = active;
+      if (!active) return;
+      const u = (phase + elapsed * (0.12 + metrics.leakIntensity * 0.08)) % 1;
+      const baseX = 5.35;
+      const baseY = 16.45 + seed * 0.7;
+      const baseZ = 3.85 + (seed - 0.5) * 1.1;
+      p.position.set(
+        baseX + u * (1.15 + metrics.leakIntensity * 0.85),
+        baseY + Math.sin((u + seed) * Math.PI) * 0.32,
+        baseZ + Math.sin((u + seed) * 7.0) * 0.18,
+      );
+      const fade = (1 - u) * metrics.leakIntensity;
+      p.scale.setScalar(0.72 + fade * 0.8);
     });
   };
 
