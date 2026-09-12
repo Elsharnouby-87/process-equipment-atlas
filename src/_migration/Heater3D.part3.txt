@@ -1,0 +1,500 @@
+        flame.rotation.z = Math.sin(t * 3.7 + phase) * (outer ? 0.055 : 0.035) + impingementBias + operationImpingementBias + troubleshootingBias + unstableBias + draftBias;
+        flame.rotation.x = Math.cos(t * 4.6 + phase * 1.3) * (outer ? 0.025 : 0.016) + (draftAbnormalOperation ? Math.sin(t * 2.1 + phase) * 0.07 : 0);
+        const baseBottom = (flame.userData.baseBottom as number | undefined) ?? 6.5;
+        const halfHeight = (flame.userData.halfHeight as number | undefined) ?? 1;
+        const basePosition = flame.userData.burnerBasePosition as THREE.Vector3 | undefined;
+        const targetPosition = flame.userData.burnerTargetPosition as THREE.Vector3 | undefined;
+        const explodedYOffset = basePosition && targetPosition ? targetPosition.y - basePosition.y : 0;
+        flame.position.y = baseBottom + halfHeight * flame.scale.y + explodedYOffset;
+        if (basePosition) {
+          flame.position.x = basePosition.x;
+          flame.position.z = basePosition.z;
+          if (troubleshootingTarget && activeTroubleshootingPhase !== 'normal') flame.position.x = basePosition.x - halfHeight * flame.scale.y * Math.sin(flame.rotation.z);
+        }
+      });
+      const activeTroubleshootingOverlay = troubleshootingOverlayRef.current;
+      const t3DamperActive = activeTroubleshootingScenario === 'draftPressure' && Boolean(activeTroubleshootingPhase);
+      const baseDamperAngle = 0.18 + (damperPositionRef.current / 100) * 1.02;
+      const t3DamperTarget = activeTroubleshootingPhase === 'normal' ? 0.22 : activeTroubleshootingPhase === 'deviation' ? 0.62 : activeTroubleshootingPhase === 'contact' ? 1.02 : 1.22;
+      if (damperBladeRef.current) {
+        const targetAngle = t3DamperActive ? t3DamperTarget : baseDamperAngle;
+        damperBladeRef.current.rotation.x += (targetAngle - damperBladeRef.current.rotation.x) * 0.065;
+        if (damperLeverRef.current) damperLeverRef.current.rotation.x = damperBladeRef.current.rotation.x;
+      }
+      if (activeTroubleshootingOverlay?.visible) {
+        activeTroubleshootingOverlay.children.forEach(child => {
+          if (child instanceof THREE.Mesh && child.userData.troubleshootingPulse) {
+            const pulse = 1 + (Math.sin(t * 4.5) + 1) * 0.055;
+            child.scale.setScalar(pulse);
+          }
+          if (child instanceof THREE.Mesh && child.userData.troubleshootingScan) {
+            const baseY = (child.userData.troubleshootingBaseY as number | undefined) ?? 10.25;
+            child.position.y = baseY + Math.sin(t * 1.65) * 2.65;
+          }
+          if (child instanceof THREE.Mesh && child.userData.troubleshootingLeak) {
+            const base = child.userData.troubleshootingLeakBase as THREE.Vector3 | undefined;
+            const seed = (child.userData.troubleshootingLeakSeed as number | undefined) ?? 0;
+            if (base) {
+              const u = (t * 0.34 + seed) % 1;
+              child.position.set(base.x + Math.sin((u + seed) * 7.0) * 0.2, base.y + u * 0.75, base.z + u * 1.9);
+              const material = child.material as THREE.MeshBasicMaterial;
+              material.opacity = 0.72 * (1 - u * 0.72);
+            }
+          }
+          if (child instanceof THREE.Mesh && child.userData.troubleshootingBackfire) {
+            const cycle = (Math.sin(t * 4.8) + 1) * 0.5;
+            child.position.y = 6.08 - cycle * 0.68;
+            child.scale.y = 0.8 + cycle * 0.45;
+          }
+          if (child instanceof THREE.PointLight && (child.userData.troubleshootingCue === 't1-thermal' || child.userData.troubleshootingCue === 't2-hot')) child.intensity = 15 + Math.sin(t * 4.2) * 3.5;
+        });
+      }
+      if (activeOperationState) {
+        const operationMainLightOff = activeOperationState === 'mainBurnerLightOff';
+        const operationStabilizing = activeOperationState === 'firingStabilization';
+        const operationWarmUp = activeOperationState === 'controlledWarmUp';
+        const operationNormal = activeOperationState === 'normalOperation';
+        const operationLoadChange = activeOperationState === 'loadChange';
+        const operationShutdown = activeOperationState === 'controlledShutdown';
+        const operationCoolDown = activeOperationState === 'coolDownNonFiring';
+        const operationMainFiring = operationMainLightOff || operationStabilizing || operationWarmUp || operationNormal || operationLoadChange || operationShutdown;
+        if (operationMainFiring || operationCoolDown) {
+          const unstable = activeOperationFocus === 'firingUnstable';
+          const draftAbnormal = activeOperationFocus === 'firingDraftAbnormal';
+          if (operationWarmUp) {
+            const early = activeOperationFocus === 'warmupEarly';
+            const developing = activeOperationFocus === 'warmupDeveloping';
+            const uneven = activeOperationFocus === 'warmupUneven';
+            fireLight.intensity = early ? 46 : developing ? 56 : 64;
+            upperWarm.intensity = early ? 7 : developing ? 12 : uneven ? 14 : 16;
+            fireBounceLeft.intensity = uneven ? 24 : early ? 8 : developing ? 12 : 15;
+            fireBounceRight.intensity = uneven ? 7 : early ? 7 : developing ? 11 : 14;
+            tubeHot.emissiveIntensity = early ? 0.035 : developing ? 0.075 : uneven ? 0.13 : 0.11;
+            refrMat.emissiveIntensity = early ? 0.04 : developing ? 0.06 : uneven ? 0.09 : 0.08;
+          } else if (operationNormal) {
+            fireLight.intensity = 68 + Math.sin(t * 4.6) * 2.5;
+            upperWarm.intensity = 18;
+            fireBounceLeft.intensity = 16;
+            fireBounceRight.intensity = 15;
+            tubeHot.emissiveIntensity = 0.13;
+            refrMat.emissiveIntensity = 0.09;
+          } else if (operationLoadChange) {
+            const increase = activeOperationFocus === 'loadIncrease';
+            const decrease = activeOperationFocus === 'loadDecrease';
+            const notStabilized = activeOperationFocus === 'loadNotStabilized';
+            const loadPulse = notStabilized ? Math.sin(t * 5.6) * 10 : Math.sin(t * 4.8) * 2.5;
+            fireLight.intensity = (increase ? 78 : decrease ? 54 : 68) + loadPulse;
+            upperWarm.intensity = increase ? 22 : decrease ? 13 : 18;
+            fireBounceLeft.intensity = notStabilized ? 22 : increase ? 19 : decrease ? 11 : 16;
+            fireBounceRight.intensity = notStabilized ? 9 : increase ? 18 : decrease ? 10 : 15;
+            tubeHot.emissiveIntensity = increase ? 0.16 : decrease ? 0.1 : notStabilized ? 0.15 : 0.13;
+            refrMat.emissiveIntensity = increase ? 0.11 : decrease ? 0.07 : notStabilized ? 0.1 : 0.09;
+          } else if (operationShutdown) {
+            const reduced = activeOperationFocus === 'shutdownReduced';
+            const removed = activeOperationFocus === 'shutdownFiringRemoved';
+            const concern = activeOperationFocus === 'shutdownConcern';
+            fireLight.intensity = removed ? 0 : concern ? 45 + Math.sin(t * 5.3) * 9 : reduced ? 38 + Math.sin(t * 4.6) * 2 : 58 + Math.sin(t * 4.6) * 2;
+            upperWarm.intensity = removed ? 10 : concern ? 14 : reduced ? 12 : 16;
+            fireBounceLeft.intensity = removed ? 5 : concern ? 20 : reduced ? 10 : 14;
+            fireBounceRight.intensity = removed ? 4 : concern ? 8 : reduced ? 9 : 13;
+            tubeHot.emissiveIntensity = removed ? 0.085 : concern ? 0.12 : reduced ? 0.1 : 0.12;
+            refrMat.emissiveIntensity = removed ? 0.06 : concern ? 0.08 : reduced ? 0.07 : 0.085;
+          } else if (operationCoolDown) {
+            const progress = activeOperationFocus === 'cooldownProgress';
+            const nonFiring = activeOperationFocus === 'cooldownNonFiring';
+            const uneven = activeOperationFocus === 'cooldownUneven';
+            fireLight.intensity = 0;
+            upperWarm.intensity = uneven ? 7 : progress ? 6 : nonFiring ? 2 : 10;
+            fireBounceLeft.intensity = uneven ? 10 : progress ? 4 : nonFiring ? 1 : 6;
+            fireBounceRight.intensity = uneven ? 2 : progress ? 3 : nonFiring ? 1 : 5;
+            tubeHot.emissiveIntensity = uneven ? 0.07 : progress ? 0.05 : nonFiring ? 0.02 : 0.08;
+            refrMat.emissiveIntensity = uneven ? 0.055 : progress ? 0.04 : nonFiring ? 0.018 : 0.06;
+          } else {
+            const pulse = unstable ? Math.sin(t * 7.2) * 13 : draftAbnormal ? Math.sin(t * 3.1) * 9 : Math.sin(t * 5.1) * 3;
+            fireLight.intensity = (operationMainLightOff ? 34 : 56) + pulse;
+            upperWarm.intensity = operationMainLightOff ? 5 : 10;
+            fireBounceLeft.intensity = operationMainLightOff ? 6 : 11;
+            fireBounceRight.intensity = operationMainLightOff ? 6 : 10;
+            tubeHot.emissiveIntensity = 0;
+            refrMat.emissiveIntensity = 0.025;
+          }
+        } else {
+          fireLight.intensity = 0;
+          upperWarm.intensity = 0;
+          fireBounceLeft.intensity = 0;
+          fireBounceRight.intensity = 0;
+          tubeHot.emissiveIntensity = 0;
+          refrMat.emissiveIntensity = 0;
+        }
+      } else {
+        fireLight.intensity = 82 + Math.sin(t * 6.1) * 11 + Math.sin(t * 12.4) * 4.5;
+        upperWarm.intensity = 25 + Math.sin(t * 4.4) * 3.4;
+        fireBounceLeft.intensity = 19 + Math.sin(t * 5.7 + 0.8) * 3.4;
+        fireBounceRight.intensity = 18 + Math.sin(t * 6.2 + 2.1) * 3.1;
+        tubeHot.emissiveIntensity = 0.28;
+        refrMat.emissiveIntensity = 0.11;
+      }
+      const flowSelection = selectedRef.current;
+      const contextual = contextModeRef.current !== 'full';
+      for (const p of burnerAirParticles) {
+        const u = (p.userData.t + t * 0.085) % 1;
+        if (activeBurnerStudy === 'pilot') {
+          p.visible = false;
+          continue;
+        }
+        const angle = u * Math.PI * 4.5 + p.userData.t * 5.5;
+        const radius = THREE.MathUtils.lerp(1.45, 0.18, u);
+        p.position.set(Math.sin(angle) * radius, 3.75 + u * 2.7, -1.35 + Math.cos(angle) * radius * 0.58);
+      }
+      for (const p of burnerFuelParticles) {
+        const u = (p.userData.t + t * 0.075) % 1;
+        if (activeBurnerStudy === 'pilot') {
+          p.position.set(-1.4 + u * 1.4, 5.72 + u * 0.82, -1.35);
+        } else {
+          p.position.set(-2.3 + u * 2.3, 3.45 + u * 3.05, -1.35 + Math.sin(u * Math.PI) * 0.12);
+        }
+      }
+      for (const p of burnerHotParticles) {
+        const u = (p.userData.t + t * 0.07) % 1;
+        if (activeBurnerStudy === 'pilot') {
+          p.visible = false;
+          continue;
+        }
+        p.position.set(Math.sin((u + p.userData.t) * 8.0) * (0.3 + u * 0.55), 6.62 + u * 6.2, -1.35 + Math.cos((u + p.userData.t) * 7.0) * 0.28);
+      }
+      for (const p of radiantProcessParticles) {
+        const u = (p.userData.t + t * 0.055) % 1;
+        p.visible = activeRadiantStudy === 'flow';
+        if (p.visible) p.position.copy(radiantProcessCurve.getPoint(u));
+      }
+      const operationTraceActive = Boolean(flowEnabledRef.current && activeOperationState && ['processReady', 'purgeReady', 'purgeActive', 'purgeComplete', 'mainBurnerLightOff', 'firingStabilization', 'controlledWarmUp', 'normalOperation', 'loadChange', 'controlledShutdown'].includes(activeOperationState));
+      const atlasTraceActive = Boolean(flowEnabledRef.current && !activeOperationState && !activeBurnerStudy && !activeRadiantStudy && !activeHeatRecoveryStudy && !activeDraftStudy);
+      const tubeTraceActive = operationTraceActive || atlasTraceActive;
+      operationProcessTrace.visible = tubeTraceActive;
+      if (tubeTraceActive) {
+        processTraceGlowMat.opacity = 0.105 + (Math.sin(t * 2.3) + 1) * 0.022;
+        for (const trace of operationTraceArrows) {
+          const u = (trace.phase + t * trace.speed) % 1;
+          trace.mesh.position.copy(trace.curve.getPoint(u));
+          const tangent = trace.curve.getTangent(u).normalize();
+          trace.mesh.quaternion.setFromUnitVectors(arrowAxis, tangent);
+        }
+      }
+      const purgeActive = activeOperationState === 'purgeActive';
+      const purgeComplete = activeOperationState === 'purgeComplete';
+      purgeMat.opacity = purgeActive ? 0.92 : purgeComplete ? 0.34 : 0.92;
+      for (const p of purgeParticles) {
+        p.visible = purgeActive || purgeComplete;
+        if (!p.visible) continue;
+        const baseT = p.userData.t as number;
+        const lane = p.userData.lane as number;
+        const u = purgeActive ? (baseT + t * 0.046) % 1 : baseT;
+        let y = 4.5;
+        let width = 2.7;
+        if (u < 0.12) {
+          const r = u / 0.12;
+          y = 4.5 + r * 2.3;
+          width = THREE.MathUtils.lerp(3.2, 2.45, r);
+        } else if (u < 0.5) {
+          const r = (u - 0.12) / 0.38;
+          y = 6.8 + r * 10.3;
+          width = 2.55 + Math.sin(r * Math.PI) * 0.8;
+        } else if (u < 0.74) {
+          const r = (u - 0.5) / 0.24;
+          y = 17.1 + r * 8.0;
+          width = THREE.MathUtils.lerp(2.8, 2.35, r);
+        } else if (u < 0.86) {
+          const r = (u - 0.74) / 0.12;
+          y = 25.1 + r * 4.4;
+          width = THREE.MathUtils.lerp(2.35, 0.72, r);
+        } else {
+          const r = (u - 0.86) / 0.14;
+          y = 29.5 + r * 9.0;
+          width = 0.68;
+        }
+        const phase = baseT * 21 + u * 5.3;
+        p.position.set(lane * width + Math.sin(phase) * 0.28, y, Math.cos(phase * 0.83) * width * 0.34);
+      }
+      const restriction = damperPositionRef.current / 100;
+      const flowSpeed = flowSelection === 'Stack Damper' && contextual ? 0.062 * (1 - restriction * 0.42) : 0.066;
+      for (const p of flueParticles) {
+        if (activeOperationState) {
+          const firingOperation = activeOperationState === 'mainBurnerLightOff' || activeOperationState === 'firingStabilization' || activeOperationState === 'controlledWarmUp' || activeOperationState === 'normalOperation' || activeOperationState === 'loadChange' || activeOperationState === 'controlledShutdown';
+          const shutdownRemoved = activeOperationState === 'controlledShutdown' && activeOperationFocus === 'shutdownFiringRemoved';
+          p.visible = firingOperation && !shutdownRemoved;
+          if (!p.visible) continue;
+          const loadIncrease = activeOperationFocus === 'loadIncrease';
+          const loadDecrease = activeOperationFocus === 'loadDecrease';
+          const loadNotStabilized = activeOperationFocus === 'loadNotStabilized';
+          const shutdownReduced = activeOperationFocus === 'shutdownReduced';
+          const shutdownConcern = activeOperationFocus === 'shutdownConcern';
+          flueMat.opacity = activeOperationState === 'mainBurnerLightOff' ? 0.46 : activeOperationState === 'controlledWarmUp' ? 0.78 : activeOperationState === 'normalOperation' ? 0.82 : activeOperationState === 'loadChange' ? (loadIncrease ? 0.92 : loadDecrease ? 0.68 : 0.82) : activeOperationState === 'controlledShutdown' ? (shutdownConcern ? 0.62 : shutdownReduced ? 0.5 : 0.7) : 0.72;
+          const operatingSpeed = activeOperationState === 'mainBurnerLightOff' ? 0.032 : activeOperationState === 'controlledWarmUp' ? 0.05 : activeOperationState === 'normalOperation' ? 0.052 : activeOperationState === 'loadChange' ? (loadIncrease ? 0.058 : loadDecrease ? 0.043 : loadNotStabilized ? 0.052 + Math.sin(t * 2.1) * 0.006 : 0.052) : activeOperationState === 'controlledShutdown' ? (shutdownConcern ? 0.04 + Math.sin(t * 2.3) * 0.005 : shutdownReduced ? 0.035 : 0.044) : 0.046;
+          const u = (p.userData.t + t * operatingSpeed) % 1;
+          const y = 6.8 + u * 31.0;
+          const width = u < 0.38 ? 1.55 : u < 0.7 ? 2.1 : 0.62;
+          p.position.set(Math.sin((u + p.userData.t) * 11.0) * width, y, Math.cos((u + p.userData.t) * 8.5) * width * 0.58);
+          continue;
+        }
+        flueMat.opacity = 0.86;
+        if (activeRadiantStudy) { p.visible = false; continue; }
+        if (activeDraftStudy) {
+          const troubleshootingPressureStudy = activeDraftStudy === 'pressure' && activeTroubleshootingScenario === 'draftPressure' && Boolean(activeTroubleshootingPhase);
+          p.visible = ['overview', 'breeching', 'damper', 'path', 'stack'].includes(activeDraftStudy) || troubleshootingPressureStudy;
+          if (!p.visible) continue;
+          const phaseFactor = troubleshootingPressureStudy ? activeTroubleshootingPhase === 'normal' ? 0.9 : activeTroubleshootingPhase === 'deviation' ? 0.58 : activeTroubleshootingPhase === 'contact' ? 0.42 : 0.34 : 1;
+          flueMat.opacity = troubleshootingPressureStudy && (activeTroubleshootingPhase === 'contact' || activeTroubleshootingPhase === 'consequence') ? 0.58 : 0.86;
+          const draftSpeed = 0.06 * (1 - restriction * 0.42) * phaseFactor;
+          const u = (p.userData.t + t * draftSpeed) % 1;
+          if (activeDraftStudy === 'breeching') {
+            p.position.set(Math.sin((u + p.userData.t) * 8) * (2.8 - u * 1.55), 24.8 + u * 5.0, Math.cos((u + p.userData.t) * 7) * 1.45);
+          } else if (activeDraftStudy === 'damper') {
+            p.position.set(Math.sin((u + p.userData.t) * 8) * 0.72, 29.25 + u * 2.7, Math.cos((u + p.userData.t) * 7) * 0.55);
+          } else if (activeDraftStudy === 'stack') {
+            p.position.set(Math.sin((u + p.userData.t) * 8) * 0.7, 29.5 + u * 9.1, Math.cos((u + p.userData.t) * 7) * 0.52);
+          } else {
+            const y = 24.2 + u * 14.4;
+            const width = y < 29.5 ? THREE.MathUtils.lerp(2.7, 0.78, (y - 24.2) / 5.3) : 0.7;
+            p.position.set(Math.sin((u + p.userData.t) * 9) * width, y, Math.cos((u + p.userData.t) * 7) * width * 0.68);
+          }
+          continue;
+        }
+        if (activeHeatRecoveryStudy) {
+          p.visible = activeHeatRecoveryStudy === 'flue';
+          if (!p.visible) continue;
+          const scenarioFactor = activeHeatRecoveryScenario === 'plugged' ? 0.62 : activeHeatRecoveryScenario === 'fouled' ? 0.82 : 1;
+          const u = (p.userData.t + t * 0.054 * scenarioFactor) % 1;
+          const y = 16.65 + u * 11.3;
+          const width = u < 0.2 ? 2.05 : u < 0.78 ? 2.65 : 1.25;
+          p.position.set(Math.sin((u + p.userData.t) * 10.5) * width, y, Math.cos((u + p.userData.t) * 8.4) * width * 0.72);
+          continue;
+        }
+        p.visible = true;
+        const u = (p.userData.t + t * flowSpeed) % 1;
+        if (contextual && flowSelection === 'Burners') {
+          p.position.set(Math.sin((u + p.userData.t) * 11) * 2.5, 6.5 + u * 8.5, Math.cos((u + p.userData.t) * 8) * 1.5);
+        } else if (contextual && flowSelection === 'Radiant Tubes') {
+          p.position.set(Math.sin((u + p.userData.t) * 10) * 2.1, 6.7 + u * 11.3, Math.cos((u + p.userData.t) * 8) * 1.5);
+        } else if (contextual && flowSelection === 'Shield Tubes') {
+          p.position.set(Math.sin((u + p.userData.t) * 9) * 2.4, 16.8 + u * 4.1, -1.6 + u * 3.3);
+        } else if (contextual && flowSelection === 'Convection Bank') {
+          p.position.set(Math.sin((u + p.userData.t) * 12) * 2.5, 19.0 + u * 6.3, Math.cos((u + p.userData.t) * 7) * 2.2);
+        } else if (contextual && flowSelection === 'Breeching') {
+          p.position.set(Math.sin((u + p.userData.t) * 8) * (2.8 - u * 1.5), 24.8 + u * 5.2, Math.cos((u + p.userData.t) * 7) * 1.5);
+        } else if (contextual && (flowSelection === 'Stack Damper' || flowSelection === 'Stack')) {
+          p.position.set(Math.sin((u + p.userData.t) * 8) * 0.65, 29.0 + u * 10.0, Math.cos((u + p.userData.t) * 7) * 0.5);
+        } else {
+          const y = 6.8 + u * 31.0;
+          const width = u < 0.38 ? 1.6 : u < 0.7 ? 2.15 : 0.65;
+          p.position.set(Math.sin((u + p.userData.t) * 12.0) * width, y, Math.cos((u + p.userData.t) * 9.0) * width * 0.6);
+        }
+      }
+      const processRelevant = !activeRadiantStudy && (!contextual || ['Radiant Tubes', 'Shield Tubes', 'Convection Bank'].includes(flowSelection));
+      for (const p of processParticles) {
+        if (activeOperationState || atlasTraceActive) {
+          p.visible = false;
+          continue;
+        }
+        if (activeDraftStudy) { p.visible = false; continue; }
+        if (activeHeatRecoveryStudy) {
+          p.visible = activeHeatRecoveryStudy === 'process';
+          if (!p.visible) continue;
+          const u = (p.userData.t + t * 0.043) % 1;
+          p.position.copy(heatRecoveryProcessCurve.getPoint(u));
+          continue;
+        }
+        p.visible = processRelevant;
+        if (!processRelevant) continue;
+        const u = (p.userData.t + t * 0.041) % 1;
+        if (contextual && flowSelection === 'Convection Bank') {
+          p.position.set((u - 0.5) * 10.4, 20.0 + (Math.floor(u * 6) % 6) * 0.75, 2.45 - (u % 0.2) * 20);
+        } else if (contextual && flowSelection === 'Shield Tubes') {
+          p.position.set((u - 0.5) * 10.2, 18.0 + Math.sin(u * Math.PI * 2) * 0.7, -1.8 + u * 3.6);
+        } else if (contextual && flowSelection === 'Radiant Tubes') {
+          p.position.set(u < 0.5 ? 5.02 : -5.02, 6.8 + (u % 0.5) * 19, -2.8 + (u % 0.25) * 22);
+        } else if (u < 0.5) {
+          p.position.set((u - 0.25) * 15.5, 23.8 - u * 5.8, 2.85);
+        } else {
+          p.position.set(u < 0.75 ? 5.02 : -5.02, 7.0 + (u - 0.5) * 34.5, 2.55 - (u - 0.5) * 7.6);
+        }
+      }
+      renderer.render(scene, camera);
+    };
+    animate();
+
+    const onResize = () => {
+      camera.aspect = host.clientWidth / host.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(host.clientWidth, host.clientHeight);
+    };
+    window.addEventListener('resize', onResize);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener('resize', onResize);
+      renderer.domElement.removeEventListener('pointerdown', onPointerDown);
+      renderer.domElement.removeEventListener('pointermove', onPointerMove);
+      renderer.domElement.removeEventListener('pointerup', onPointerUp);
+      renderer.domElement.removeEventListener('pointercancel', onPointerUp);
+      renderer.domElement.removeEventListener('wheel', onWheel);
+      renderer.domElement.removeEventListener('contextmenu', onContextMenu);
+      if (host.contains(renderer.domElement)) host.removeChild(renderer.domElement);
+      disposeSceneResources(scene, [steelTex, panelTex, refractoryTex, concreteTex]);
+      renderer.renderLists.dispose();
+      renderer.dispose();
+    };
+  }, [onSelect]);
+
+  useEffect(() => {
+    const orbit = orbitRef.current;
+    const transition = transitionCameraRef.current;
+    if (!transition) return;
+    const component = cameraCommand.component ?? selected;
+    const preset = cameraPresets[component] ?? cameraPresets['Radiant Tubes'];
+    if (cameraCommand.action === 'fitHeater') {
+      transition({ yaw: orbit.yaw, pitch: 0.06, radius: 62, target: [0, 19.0, 0] }, 900);
+    } else if (cameraCommand.action === 'reset') {
+      transition({ yaw: -0.68, pitch: 0.06, radius: 62, target: [0, 19.0, 0] }, 950);
+    } else if (cameraCommand.action === 'zoomIn') {
+      transition({ yaw: orbit.yaw, pitch: orbit.pitch, radius: THREE.MathUtils.clamp(orbit.radius - 7, 8, 96), target: [orbit.target.x, orbit.target.y, orbit.target.z] }, 300);
+    } else if (cameraCommand.action === 'zoomOut') {
+      transition({ yaw: orbit.yaw, pitch: orbit.pitch, radius: THREE.MathUtils.clamp(orbit.radius + 7, 8, 96), target: [orbit.target.x, orbit.target.y, orbit.target.z] }, 300);
+    } else if (cameraCommand.action === 'fitComponent') {
+      transition({ ...preset, radius: Math.max(9, preset.radius * 0.86) }, 850);
+    } else if (cameraCommand.action === 'burnerExternal') {
+      transition({ yaw: -0.82, pitch: -0.07, radius: 13.5, target: [0, 4.6, -1.35] }, 900);
+    } else if (cameraCommand.action === 'burnerInternal') {
+      transition({ yaw: -0.64, pitch: 0.02, radius: 12.8, target: [0, 8.1, -1.35] }, 900);
+    } else if (cameraCommand.action === 'burnerPilot') {
+      transition({ yaw: -0.66, pitch: 0.015, radius: 8.2, target: [0, 6.55, -1.35] }, 900);
+    } else if (cameraCommand.action === 'burnerExploded') {
+      transition({ yaw: -0.74, pitch: -0.01, radius: 15.8, target: [0, 5.85, -1.35] }, 950);
+    } else if (cameraCommand.action === 'radiantFull') {
+      transition({ yaw: -0.76, pitch: 0.03, radius: 22.5, target: [0, 11.7, -0.4] }, 900);
+    } else if (cameraCommand.action === 'radiantPass') {
+      transition({ yaw: -0.94, pitch: 0.02, radius: 13.8, target: [4.7, 11.5, -1.0] }, 900);
+    } else if (cameraCommand.action === 'radiantSupports') {
+      transition({ yaw: -1.0, pitch: 0.04, radius: 14.2, target: [4.9, 12.6, 0] }, 900);
+    } else if (cameraCommand.action === 'radiantClearance') {
+      transition({ yaw: -0.5, pitch: 0.02, radius: 18.5, target: [0.7, 11.0, -1.35] }, 900);
+    } else if (cameraCommand.action === 'radiantFlow') {
+      transition({ yaw: -0.94, pitch: 0.02, radius: 14.8, target: [4.7, 11.4, -1.0] }, 900);
+    } else if (cameraCommand.action === 'radiantInspection') {
+      transition({ yaw: -1.02, pitch: 0.02, radius: 12.8, target: [4.9, 10.8, -1.25] }, 900);
+    } else if (cameraCommand.action === 'heatOverview') {
+      transition({ yaw: -0.78, pitch: 0.05, radius: 22.5, target: [0, 21.3, 0] }, 900);
+    } else if (cameraCommand.action === 'heatShield') {
+      transition({ yaw: -0.88, pitch: 0.04, radius: 13.5, target: [0, 18.6, 0] }, 900);
+    } else if (cameraCommand.action === 'heatConvection') {
+      transition({ yaw: -0.88, pitch: 0.05, radius: 15.3, target: [0, 22.25, 0] }, 900);
+    } else if (cameraCommand.action === 'heatFlue') {
+      transition({ yaw: -0.62, pitch: 0.04, radius: 20.5, target: [0, 21.2, 0] }, 900);
+    } else if (cameraCommand.action === 'heatProcess') {
+      transition({ yaw: -0.94, pitch: 0.03, radius: 15.2, target: [0, 21.25, -0.3] }, 900);
+    } else if (cameraCommand.action === 'heatFouling') {
+      transition({ yaw: -0.98, pitch: 0.02, radius: 12.8, target: [0, 21.6, 0] }, 900);
+    } else if (cameraCommand.action === 'draftOverview') {
+      transition({ yaw: -0.76, pitch: 0.08, radius: 27.5, target: [0, 30.0, 0] }, 900);
+    } else if (cameraCommand.action === 'draftBreeching') {
+      transition({ yaw: -0.86, pitch: 0.05, radius: 14.8, target: [0, 27.2, 0] }, 900);
+    } else if (cameraCommand.action === 'draftDamper') {
+      transition({ yaw: -1.02, pitch: 0.02, radius: 10.4, target: [0.5, 30.55, 0] }, 900);
+    } else if (cameraCommand.action === 'draftPath') {
+      transition({ yaw: -0.66, pitch: 0.06, radius: 24.5, target: [0, 30.2, 0] }, 900);
+    } else if (cameraCommand.action === 'draftStack') {
+      transition({ yaw: -0.82, pitch: 0.05, radius: 15.8, target: [0, 34.1, 0] }, 900);
+    } else if (cameraCommand.action === 'draftPressure') {
+      transition({ yaw: -0.6, pitch: 0.035, radius: 43.5, target: [0, 18.2, 0] }, 950);
+    } else if (cameraCommand.action === 'troubleDraft') {
+      transition({ yaw: -0.62, pitch: 0.035, radius: 26.5, target: [0, 19.0, 1.1] }, 900);
+    } else if (cameraCommand.action === 'troubleDraftDamper') {
+      transition({ yaw: -0.82, pitch: 0.025, radius: 10.8, target: [0, 30.6, 0] }, 850);
+    } else if (cameraCommand.action === 'troubleBackfire') {
+      transition({ yaw: -0.58, pitch: -0.015, radius: 9.6, target: [0, 5.9, -1.35] }, 850);
+    } else {
+      transition(preset, 900);
+    }
+  }, [cameraCommand, selected]);
+
+  useEffect(() => {
+    const components = componentRef.current;
+    const frontCasing = frontCasingRef.current;
+    const casingShell = casingShellRef.current;
+    const refr = refractoryRef.current;
+    const ghostFocus = ghostFocusRef.current;
+    const ghostRelated = ghostRelatedRef.current;
+    const ghostIsolate = ghostIsolateRef.current;
+    const ghostIsolateRelated = ghostIsolateRelatedRef.current;
+    const xrayShell = xrayShellRef.current;
+    const xrayRefractory = xrayRefractoryRef.current;
+    const xrayStructure = xrayStructureRef.current;
+    const breechingFullShell = breechingFullShellRef.current;
+    const breechingCutShell = breechingCutShellRef.current;
+    const stackFullShell = stackFullShellRef.current;
+    const stackCutShell = stackCutShellRef.current;
+    if (!frontCasing || !casingShell || !refr || !ghostFocus || !ghostRelated || !ghostIsolate || !ghostIsolateRelated || !xrayShell || !xrayRefractory || !xrayStructure) return;
+
+    const restoreGroup = (group: THREE.Group) => {
+      group.traverse(obj => {
+        if (obj instanceof THREE.Mesh && obj.userData.atlasOriginalMaterial) obj.material = obj.userData.atlasOriginalMaterial as THREE.Material | THREE.Material[];
+      });
+    };
+    const applyMaterial = (object: THREE.Object3D, material: THREE.Material) => {
+      object.traverse(obj => {
+        if (obj instanceof THREE.Mesh) obj.material = material;
+      });
+    };
+
+    components.forEach(group => {
+      group.visible = true;
+      group.traverse(obj => { obj.visible = true; });
+      restoreGroup(group);
+    });
+
+    const atlasPrimaryView = !operationState && !burnerStudyMode && !radiantStudyMode && !heatRecoveryStudyMode && !draftStudyMode;
+    const sectionalCutaway = atlasPrimaryView && mode === 'cutaway' && !explode;
+    frontCasing.visible = explode || mode !== 'cutaway';
+    frontCasing.userData.atlasTargetZ = explode ? 7.2 : 0;
+    if (breechingFullShell && breechingCutShell) {
+      breechingFullShell.visible = !sectionalCutaway;
+      breechingCutShell.visible = sectionalCutaway;
+    }
+    if (stackFullShell && stackCutShell) {
+      stackFullShell.visible = !sectionalCutaway;
+      stackCutShell.visible = sectionalCutaway;
+      if (troubleshootingScenario === 'draftPressure' && troubleshootingPhase) {
+        stackFullShell.visible = false;
+        stackCutShell.visible = true;
+      }
+    }
+    const hemiLight = hemiLightRef.current;
+    const frontFillLight = frontFillLightRef.current;
+    const topFillLight = topFillLightRef.current;
+    if (hemiLight && frontFillLight && topFillLight) {
+      const lighting = getAtlasLighting(mode, explode, atlasPrimaryView);
+      hemiLight.intensity = lighting.hemisphere;
+      frontFillLight.intensity = lighting.frontFill;
+      topFillLight.intensity = lighting.topFill;
+    }
+
+    const related = new Set(relatedComponents[selected] ?? []);
+    if (contextMode !== 'full') {
+      components.forEach((group, name) => {
+        if (name === selected) {
+          restoreGroup(group);
+          return;
+        }
+        if (contextMode === 'focus') applyMaterial(group, related.has(name) ? ghostRelated : ghostFocus);
+        else applyMaterial(group, related.has(name) ? ghostIsolateRelated : ghostIsolate);
+      });
+    }
+
+    const operationContext = operationFocus ? operationContextMap[operationFocus] : undefined;
+    if (operationState && operationContext && contextMode !== 'full') {
+      const primary = new Set(operationContext.primary);
+      const support = new Set(operationContext.support);
+      components.forEach((group, name) => {
+        if (primary.has(name)) restoreGroup(group);
+        else applyMaterial(group, support.has(name) ? ghostRelated : ghostFocus);
+      });
+    }
