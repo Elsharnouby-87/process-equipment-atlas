@@ -1,4 +1,4 @@
-name: GitHub Pages Development Preview
+name: Development Build QA
 
 on:
   push:
@@ -6,6 +6,7 @@ on:
       - floot-migration-dev
     paths:
       - 'src/**'
+      - 'scripts/**'
       - 'index.html'
       - 'package.json'
       - 'vite.config.ts'
@@ -17,11 +18,9 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
-  group: pages-preview
+  group: atlas-development-build
   cancel-in-progress: true
 
 jobs:
@@ -39,99 +38,10 @@ jobs:
       - name: Assemble Heater3D source
         run: |
           cat src/_migration/Heater3D.part0.txt src/_migration/Heater3D.part1.txt src/_migration/Heater3D.part2.txt src/_migration/Heater3D.part3.txt src/_migration/Heater3D.part4.txt > src/Heater3D.tsx
-          node <<'NODE'
-          const fs = require('fs');
-          const path = 'src/Heater3D.tsx';
-          let source = fs.readFileSync(path, 'utf8');
-
-          const visibilityBefore = "group.traverse(obj => { obj.visible = true; });";
-          const visibilityAfter = "group.traverse(obj => { if (obj !== breechingFullShell && obj !== breechingCutShell && obj !== stackFullShell && obj !== stackCutShell && obj !== pilotMicroRef.current) obj.visible = true; });";
-          if (!source.includes(visibilityBefore)) throw new Error('Expected v42 visibility reset not found');
-          source = source.replace(visibilityBefore, visibilityAfter);
-
-          const directPositionBefore = "0.18 + (damperPosition / 100) * 1.02";
-          const directPositionAfter = "1.38 - (damperPosition / 100) * 1.20";
-          if (!source.includes(directPositionBefore)) throw new Error('Damper direct-position mapping not found');
-          source = source.replace(directPositionBefore, directPositionAfter);
-
-          const refPositionBefore = "0.18 + (damperPositionRef.current / 100) * 1.02";
-          const refPositionAfter = "1.38 - (damperPositionRef.current / 100) * 1.20";
-          const refCount = source.split(refPositionBefore).length - 1;
-          if (refCount !== 2) throw new Error(`Expected 2 damper ref mappings, found ${refCount}`);
-          source = source.split(refPositionBefore).join(refPositionAfter);
-
-          const t3Before = "const t3DamperTarget = activeTroubleshootingPhase === 'normal' ? 0.22 : activeTroubleshootingPhase === 'deviation' ? 0.62 : activeTroubleshootingPhase === 'contact' ? 1.02 : 1.22;";
-          const t3After = "const t3DamperTarget = activeTroubleshootingPhase === 'normal' ? 1.18 : activeTroubleshootingPhase === 'deviation' ? 0.72 : activeTroubleshootingPhase === 'contact' ? 0.42 : 0.24;";
-          if (!source.includes(t3Before)) throw new Error('Troubleshooting damper sequence not found');
-          source = source.replace(t3Before, t3After);
-
-          const importAnchor = "import * as THREE from 'three';";
-          const runtimeImport = "import { createDraftInstrumentation3D } from './draftInstrumentation3D';";
-          if (!source.includes(importAnchor)) throw new Error('Three.js import anchor not found');
-          source = source.replace(importAnchor, `${importAnchor}\n${runtimeImport}`);
-
-          const damperAnchor = "    addComponent('Stack Damper', damper);\n\n    const draftOverlay = new THREE.Group();";
-          const damperInjection = "    addComponent('Stack Damper', damper);\n\n    const draftTrainingRuntime = createDraftInstrumentation3D();\n    addComponent('Draft Instruments', draftTrainingRuntime.draftGroup);\n    addComponent('Stack Analyzers', draftTrainingRuntime.analyzerGroup);\n    scene.add(draftTrainingRuntime.flowGroup);\n\n    const draftOverlay = new THREE.Group();";
-          if (!source.includes(damperAnchor)) throw new Error('Stack damper insertion anchor not found');
-          source = source.replace(damperAnchor, damperInjection);
-
-          const clockAnchor = "      const t = clock.getElapsedTime();";
-          const clockCount = source.split(clockAnchor).length - 1;
-          if (clockCount !== 1) throw new Error(`Expected one animation clock anchor, found ${clockCount}`);
-          const clockInjection = `${clockAnchor}\n      const showDraftTrainingFlow = Boolean(flowEnabledRef.current && (draftStudyRef.current || ['Breeching', 'Stack Damper', 'Stack', 'Draft Instruments', 'Stack Analyzers'].includes(selectedRef.current)));\n      draftTrainingRuntime.update(damperPositionRef.current, t, showDraftTrainingFlow);`;
-          source = source.replace(clockAnchor, clockInjection);
-          fs.writeFileSync(path, source);
-
-          const appPath = 'src/App.tsx';
-          let app = fs.readFileSync(appPath, 'utf8');
-          const groupBefore = "  { label: 'Draft & Flue Gas', components: ['Breeching', 'Stack Damper', 'Stack'] },";
-          const groupAfter = "  { label: 'Draft & Flue Gas', components: ['Breeching', 'Stack Damper', 'Draft Instruments', 'Stack Analyzers', 'Stack'] },";
-          if (!app.includes(groupBefore)) throw new Error('Draft component group anchor not found');
-          app = app.replace(groupBefore, groupAfter);
-
-          const detailsAnchor = "\nconst smartMode: Record<string, ViewMode> = {";
-          const detailsInjection = "\ndetails['Draft Instruments'] = {\n  group: 'Draft & Flue Gas',\n  location: 'Pressure tap at the radiant roof / arch reference region with representative PI/PT indication.',\n  summary: 'Draft measurement hardware teaching the key natural-draft pressure reference in mmH2O.',\n  function: 'Sense and indicate representative firebox draft so pressure direction can be read together with stack-damper movement.',\n  why: 'Arch / radiant-roof draft is commonly the highest-pressure / lowest-draft region and is a key reference for hot-gas containment.',\n  observe: ['Arch / radiant-roof pressure tap', 'Impulse / sensing line', 'PI/PT indication', 'Response to stack-damper movement'],\n  issues: ['Plugged or leaking sensing line', 'Indication error', 'Loss of negative pressure margin', 'Mismatch between indicated and actual draft'],\n  inspection: ['Pressure tap and line', 'Instrument condition', 'Reference-point integrity', 'Comparison with approved plant indication'],\n  related: ['Stack Damper', 'Breeching', 'Stack'],\n};\ndetails['Stack Analyzers'] = {\n  group: 'Draft & Flue Gas',\n  location: 'Representative stack sample probe and analyzer cabinet on the upper flue-gas path.',\n  summary: 'Training analyzer package for O2, CO, NOx and SOx interpretation alongside draft.',\n  function: 'Show representative combustion / emissions trends without implying certified CEMS performance or universal alarm limits.',\n  why: 'O2 and CO help interpret excess-air and combustion condition; NOx depends on several firing variables and SOx is strongly fuel-sulfur dependent.',\n  observe: ['Sample-probe location', 'O2 trend', 'CO trend', 'Potential leakage-air influence on stack O2'],\n  issues: ['Tramp-air bias', 'Sample-system plugging', 'Analyzer drift', 'Misinterpreting one analyzer signal without draft context'],\n  inspection: ['Sample probe', 'Sample line', 'Analyzer cabinet', 'Calibration / validation status in the real plant'],\n  related: ['Draft Instruments', 'Stack Damper', 'Stack'],\n};\n\nconst smartMode: Record<string, ViewMode> = {";
-          if (!app.includes(detailsAnchor)) throw new Error('Details insertion anchor not found');
-          app = app.replace(detailsAnchor, detailsInjection);
-
-          const smartBefore = "  'Stack Damper': 'normal',\n  Stack: 'normal',";
-          const smartAfter = "  'Stack Damper': 'normal',\n  'Draft Instruments': 'normal',\n  'Stack Analyzers': 'normal',\n  Stack: 'normal',";
-          if (!app.includes(smartBefore)) throw new Error('Smart mode draft anchor not found');
-          app = app.replace(smartBefore, smartAfter);
-
-          const navBefore = "    else if (selected === 'Breeching' || selected === 'Stack Damper' || selected === 'Stack') setActiveModule('draftStack');";
-          const navAfter = "    else if (selected === 'Breeching' || selected === 'Stack Damper' || selected === 'Draft Instruments' || selected === 'Stack Analyzers' || selected === 'Stack') setActiveModule('draftStack');";
-          if (!app.includes(navBefore)) throw new Error('Draft navigation anchor not found');
-          app = app.replace(navBefore, navAfter);
-          app = app.replace("const [damperPosition, setDamperPosition] = useState(18);", "const [damperPosition, setDamperPosition] = useState(50);");
-          app = app.replace("setDamperPosition(18);", "setDamperPosition(50);");
-          fs.writeFileSync(appPath, app);
-          NODE
+          node scripts/assemble-preview.mjs
 
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
       - name: Build GitHub source
         run: npm run build
-
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v4
-        with:
-          path: dist
-
-  deploy:
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
