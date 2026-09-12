@@ -40,8 +40,8 @@ source = replaceRegex(
 );
 
 // Preserve the simulator's existing fuel-speed / fuel-demand loop. After it has
-// run, override only the external/internal teaching-view position so the tracer
-// sits just outside the visible pipe skin while following the same route.
+// run, override only external/internal teaching-view positions so the tracer
+// sits just outside the pipe skin while still following the exact same route.
 source = replaceOnce(
   source,
   "      }\n      for (const p of burnerHotParticles) {",
@@ -49,15 +49,15 @@ source = replaceOnce(
   'fuel visibility override and glow loop'
 );
 
-// Conservative camera choice: intentionally retain the already-stable camera
-// architecture and checkpoint-13 underheater behavior. No arcball change here.
+// Conservative camera choice: intentionally retain the current stable camera
+// controls and checkpoint-13 underheater behavior. No arcball change.
 
-// Give the healthy/normal flame a little more visual breathing room without
-// changing the representative firebox envelope. Abnormal impingement scenarios
-// keep their explicit lean/contact logic and remain available as faults.
-source = replaceOnce(
+// Increase healthy flame/tube visual breathing room without touching the
+// firebox envelope. Match the generated outer-flame geometry robustly because
+// earlier assembly patches may tune its starting radius.
+source = replaceRegex(
   source,
-  "    const outer = new THREE.Mesh(new THREE.ConeGeometry(0.72, 5.6, 42, 12, true), outerMat);",
+  /    const outer = new THREE\.Mesh\(new THREE\.ConeGeometry\([0-9.]+, 5\.6, 42, 12, true\), outerMat\);/,
   "    const outer = new THREE.Mesh(new THREE.ConeGeometry(0.66, 5.6, 42, 12, true), outerMat);",
   'normal outer flame width refinement'
 );
