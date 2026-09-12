@@ -1,0 +1,500 @@
+    negativePressureLabel.position.set(0, 13.0, 5.7);
+    negativePressureLabel.userData.draftOverlay = 'negative';
+    negativePressureLabel.userData.isDraftLabel = true;
+    draftOverlay.add(negativePressureLabel);
+    const positivePressureLabel = makeLabel('POSITIVE PRESSURE HAZARD · HOT GAS OUTWARD');
+    positivePressureLabel.scale.set(5.1, 0.85, 1);
+    positivePressureLabel.position.set(0, 13.0, 5.7);
+    positivePressureLabel.userData.draftOverlay = 'positive';
+    positivePressureLabel.userData.isDraftLabel = true;
+    draftOverlay.add(positivePressureLabel);
+    const draftReferenceLabel = makeLabel('DRAFT REFERENCE REGION · FIREBOX / RADIANT ROOF');
+    draftReferenceLabel.scale.set(4.8, 0.82, 1);
+    draftReferenceLabel.position.set(7.15, 17.0, 0);
+    draftReferenceLabel.userData.draftOverlay = 'pressureCommon';
+    draftReferenceLabel.userData.isDraftLabel = true;
+    draftOverlay.add(draftReferenceLabel);
+    const damperStudyLabel = makeLabel('INTERNAL DAMPER · BLADE + SHAFT + ACTUATOR');
+    damperStudyLabel.scale.set(4.7, 0.82, 1);
+    damperStudyLabel.position.set(5.6, 31.25, 0);
+    damperStudyLabel.userData.draftOverlay = 'damper';
+    damperStudyLabel.userData.isDraftLabel = true;
+    draftOverlay.add(damperStudyLabel);
+    draftOverlayRef.current = draftOverlay;
+    scene.add(draftOverlay);
+
+    const labelsGroup = new THREE.Group();
+    const specs: { text: string; component: string; pos: [number, number, number]; kind: 'major' | 'detail'; detailFor?: string }[] = [
+      { text: 'BURNERS', component: 'Burners', pos: [0, 8.1, 5.4], kind: 'major' },
+      { text: 'RADIANT TUBES', component: 'Radiant Tubes', pos: [7.6, 12.7, 0.4], kind: 'major' },
+      { text: 'SHIELD / SHOCK', component: 'Shield Tubes', pos: [7.7, 18.45, 0.4], kind: 'major' },
+      { text: 'CONVECTION', component: 'Convection Bank', pos: [7.9, 22.4, 0.4], kind: 'major' },
+      { text: 'BREECHING', component: 'Breeching', pos: [7.4, 27.0, 0.4], kind: 'major' },
+      { text: 'STACK DAMPER', component: 'Stack Damper', pos: [5.9, 30.55, 0], kind: 'major' },
+      { text: 'STACK', component: 'Stack', pos: [5.5, 35.1, 0], kind: 'major' },
+      { text: 'UNDERFURNACE', component: 'Casing & Structure', pos: [-7.4, 3.0, 0], kind: 'major' },
+      { text: 'AIR REGISTER', component: 'Burners', pos: [5.0, 5.25, 1.4], kind: 'detail', detailFor: 'Burners' },
+      { text: 'BURNER TILE', component: 'Burners', pos: [4.8, 6.55, -1.0], kind: 'detail', detailFor: 'Burners' },
+      { text: 'FUEL HEADER', component: 'Burners', pos: [-5.5, 2.75, -3.0], kind: 'detail', detailFor: 'Burners' },
+      { text: 'PILOT / IGNITION', component: 'Burners', pos: [-4.4, 5.9, -1.8], kind: 'detail', detailFor: 'Burners' },
+      { text: 'TUBE SUPPORTS', component: 'Radiant Tubes', pos: [7.2, 13.4, 1.8], kind: 'detail', detailFor: 'Radiant Tubes' },
+      { text: 'RETURN BENDS', component: 'Radiant Tubes', pos: [7.1, 16.1, -1.0], kind: 'detail', detailFor: 'Radiant Tubes' },
+      { text: 'RADIANT OUTLET', component: 'Shield Tubes', pos: [-6.4, 17.4, 0], kind: 'detail', detailFor: 'Shield Tubes' },
+      { text: 'FIRST CONVECTION ROWS', component: 'Convection Bank', pos: [6.6, 20.1, 0], kind: 'detail', detailFor: 'Shield Tubes' },
+      { text: 'HEADER BOX', component: 'Convection Bank', pos: [7.1, 22.2, 2.5], kind: 'detail', detailFor: 'Convection Bank' },
+      { text: 'FINNED ROWS', component: 'Convection Bank', pos: [-7.0, 22.5, 0], kind: 'detail', detailFor: 'Convection Bank' },
+      { text: 'HOT FACE', component: 'Refractory', pos: [6.7, 12.0, 0], kind: 'detail', detailFor: 'Refractory' },
+      { text: 'DAMPER BLADE', component: 'Stack Damper', pos: [4.9, 30.5, 0], kind: 'detail', detailFor: 'Stack Damper' },
+      { text: 'SHAFT', component: 'Stack Damper', pos: [-4.8, 30.5, 0], kind: 'detail', detailFor: 'Stack Damper' },
+      { text: 'ACTUATOR', component: 'Stack Damper', pos: [5.0, 31.35, 0], kind: 'detail', detailFor: 'Stack Damper' },
+    ];
+    for (const spec of specs) {
+      const label = makeLabel(spec.text);
+      label.position.set(...spec.pos);
+      label.userData.componentName = spec.component;
+      label.userData.labelText = spec.text;
+      label.userData.baseY = spec.pos[1];
+      label.userData.kind = spec.kind;
+      label.userData.detailFor = spec.detailFor;
+      labelsGroup.add(label);
+    }
+    labelRef.current = labelsGroup;
+    scene.add(labelsGroup);
+
+    const flowGroup = new THREE.Group();
+    const flueMat = new THREE.MeshBasicMaterial({ color: '#ff7a18', transparent: true, opacity: 0.86 });
+    const processMat = new THREE.MeshBasicMaterial({ color: '#22b8ff', transparent: true, opacity: 0.92 });
+    const flueParticles: THREE.Mesh[] = [];
+    const processParticles: THREE.Mesh[] = [];
+    const burnerAirParticles: THREE.Mesh[] = [];
+    const burnerFuelParticles: THREE.Mesh[] = [];
+    const burnerHotParticles: THREE.Mesh[] = [];
+    const radiantProcessParticles: THREE.Mesh[] = [];
+    const purgeParticles: THREE.Mesh[] = [];
+    const burnerAirMat = new THREE.MeshBasicMaterial({ color: '#49c9ff', transparent: true, opacity: 0.95 });
+    const burnerFuelMat = new THREE.MeshBasicMaterial({ color: '#ffd36a', transparent: true, opacity: 0.96 });
+    const burnerHotMat = new THREE.MeshBasicMaterial({ color: '#ff7a18', transparent: true, opacity: 0.9 });
+    const purgeMat = new THREE.MeshBasicMaterial({ color: '#8deeff', transparent: true, opacity: 0.92, depthWrite: false });
+    for (let i = 0; i < 34; i += 1) {
+      const p = new THREE.Mesh(new THREE.SphereGeometry(0.095, 8, 7), flueMat);
+      p.userData.t = i / 34;
+      p.userData.flueFlow = true;
+      flowGroup.add(p);
+      flueParticles.push(p);
+    }
+    for (let i = 0; i < 24; i += 1) {
+      const p = new THREE.Mesh(new THREE.SphereGeometry(0.085, 8, 7), processMat);
+      p.userData.t = i / 24;
+      p.userData.processFlow = true;
+      flowGroup.add(p);
+      processParticles.push(p);
+    }
+    for (let i = 0; i < 18; i += 1) {
+      const p = new THREE.Mesh(new THREE.SphereGeometry(0.075, 8, 7), burnerAirMat);
+      p.userData.t = i / 18;
+      p.userData.burnerFlow = 'air';
+      flowGroup.add(p);
+      burnerAirParticles.push(p);
+    }
+    for (let i = 0; i < 14; i += 1) {
+      const p = new THREE.Mesh(new THREE.SphereGeometry(0.075, 8, 7), burnerFuelMat);
+      p.userData.t = i / 14;
+      p.userData.burnerFlow = 'fuel';
+      flowGroup.add(p);
+      burnerFuelParticles.push(p);
+    }
+    for (let i = 0; i < 18; i += 1) {
+      const p = new THREE.Mesh(new THREE.SphereGeometry(0.085, 8, 7), burnerHotMat);
+      p.userData.t = i / 18;
+      p.userData.burnerFlow = 'hot';
+      flowGroup.add(p);
+      burnerHotParticles.push(p);
+    }
+    const radiantFlowMat = new THREE.MeshBasicMaterial({ color: '#25c9ff', transparent: true, opacity: 0.98 });
+    for (let i = 0; i < 30; i += 1) {
+      const p = new THREE.Mesh(new THREE.SphereGeometry(0.095, 8, 7), radiantFlowMat);
+      p.userData.t = i / 30;
+      p.userData.radiantFlow = true;
+      flowGroup.add(p);
+      radiantProcessParticles.push(p);
+    }
+    for (let i = 0; i < 42; i += 1) {
+      const p = new THREE.Mesh(new THREE.SphereGeometry(0.08, 8, 7), purgeMat);
+      p.userData.t = i / 42;
+      p.userData.lane = ((i % 7) - 3) / 3;
+      p.userData.purgeFlow = true;
+      flowGroup.add(p);
+      purgeParticles.push(p);
+    }
+    const radiantProcessCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(6.35, 6.62, -1.4),
+      new THREE.Vector3(5.02, 6.72, -1.4),
+      new THREE.Vector3(5.02, 11.2, -1.4),
+      new THREE.Vector3(5.02, 15.85, -1.4),
+      new THREE.Vector3(5.02, 16.25, -1.0),
+      new THREE.Vector3(5.02, 15.85, -0.6),
+      new THREE.Vector3(5.02, 11.2, -0.6),
+      new THREE.Vector3(5.02, 6.72, -0.6),
+      new THREE.Vector3(5.18, 6.62, 0.15),
+    ], false, 'catmullrom', 0.18);
+    const heatRecoveryProcessCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(-5.35, 20.0, -2.5),
+      new THREE.Vector3(5.35, 20.0, -2.5),
+      new THREE.Vector3(5.55, 20.49, -1.5),
+      new THREE.Vector3(-5.35, 20.49, -1.5),
+      new THREE.Vector3(-5.55, 20.98, -0.5),
+      new THREE.Vector3(5.35, 20.98, -0.5),
+      new THREE.Vector3(5.55, 21.47, 0.5),
+      new THREE.Vector3(-5.35, 21.47, 0.5),
+      new THREE.Vector3(-5.55, 21.96, 1.5),
+      new THREE.Vector3(5.35, 21.96, 1.5),
+    ], false, 'catmullrom', 0.12);
+    const operationProcessPoints = [
+      new THREE.Vector3(-5.35, 24.41, 2.5),
+      new THREE.Vector3(5.35, 24.41, 2.5),
+      new THREE.Vector3(5.65, 24.165, 2.5),
+      new THREE.Vector3(5.35, 23.92, 2.5),
+      new THREE.Vector3(-5.35, 23.92, 2.5),
+      new THREE.Vector3(-5.72, 23.67, 1.5),
+      new THREE.Vector3(-5.35, 23.43, 1.5),
+      new THREE.Vector3(5.35, 23.43, 1.5),
+      new THREE.Vector3(5.65, 23.185, 1.5),
+      new THREE.Vector3(5.35, 22.94, 1.5),
+      new THREE.Vector3(-5.35, 22.94, 1.5),
+      new THREE.Vector3(-5.72, 22.69, 0.5),
+      new THREE.Vector3(-5.35, 22.45, 0.5),
+      new THREE.Vector3(5.35, 22.45, 0.5),
+      new THREE.Vector3(5.65, 22.205, 0.5),
+      new THREE.Vector3(5.35, 21.96, 0.5),
+      new THREE.Vector3(-5.35, 21.96, 0.5),
+      new THREE.Vector3(-5.72, 21.71, -0.5),
+      new THREE.Vector3(-5.35, 21.47, -0.5),
+      new THREE.Vector3(5.35, 21.47, -0.5),
+      new THREE.Vector3(5.65, 21.225, -0.5),
+      new THREE.Vector3(5.35, 20.98, -0.5),
+      new THREE.Vector3(-5.35, 20.98, -0.5),
+      new THREE.Vector3(-5.72, 20.73, -1.5),
+      new THREE.Vector3(-5.35, 20.49, -1.5),
+      new THREE.Vector3(5.35, 20.49, -1.5),
+      new THREE.Vector3(5.65, 20.245, -1.5),
+      new THREE.Vector3(5.35, 20.0, -1.5),
+      new THREE.Vector3(-5.35, 20.0, -1.5),
+      new THREE.Vector3(-5.62, 19.55, -1.5),
+      new THREE.Vector3(-5.62, 17.0, -1.5),
+      new THREE.Vector3(-5.02, 16.25, -1.4),
+      new THREE.Vector3(-5.02, 15.85, -1.4),
+      new THREE.Vector3(-5.02, 10.8, -1.4),
+      new THREE.Vector3(-5.02, 6.72, -1.4),
+      new THREE.Vector3(-5.18, 6.62, -0.15),
+    ];
+    const operationProcessCurve = new THREE.CurvePath<THREE.Vector3>();
+    for (let i = 0; i < operationProcessPoints.length - 1; i += 1) {
+      operationProcessCurve.add(new THREE.LineCurve3(operationProcessPoints[i], operationProcessPoints[i + 1]));
+    }
+
+    const operationProcessTrace = new THREE.Group();
+    operationProcessTrace.visible = false;
+    const processTraceCoreMat = new THREE.MeshBasicMaterial({ color: '#28d7ff', transparent: true, opacity: 0.72, depthWrite: false, blending: THREE.AdditiveBlending });
+    const processTraceGlowMat = new THREE.MeshBasicMaterial({ color: '#3de2ff', transparent: true, opacity: 0.12, depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending });
+    const processTraceArrowMat = new THREE.MeshBasicMaterial({ color: '#d7fbff', transparent: true, opacity: 0.96, depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending });
+    const operationTraceArrows: { mesh: THREE.Mesh; curve: THREE.Curve<THREE.Vector3>; phase: number; speed: number }[] = [];
+    const arrowAxis = new THREE.Vector3(0, 1, 0);
+    const addOperationProcessTrace = (points: THREE.Vector3[], coreRadius: number, phase: number, speed: number, withArrow = true) => {
+      const curve: THREE.Curve<THREE.Vector3> = points.length === 2 ? new THREE.LineCurve3(points[0], points[1]) : new THREE.CatmullRomCurve3(points, false, 'centripetal', 0.18);
+      const tubularSegments = Math.max(24, points.length * 18);
+      const glow = new THREE.Mesh(new THREE.TubeGeometry(curve, tubularSegments, coreRadius * 1.72, 8, false), processTraceGlowMat);
+      glow.renderOrder = 44;
+      operationProcessTrace.add(glow);
+      const core = new THREE.Mesh(new THREE.TubeGeometry(curve, tubularSegments, coreRadius, 8, false), processTraceCoreMat);
+      core.renderOrder = 45;
+      operationProcessTrace.add(core);
+      if (withArrow) {
+        const arrow = new THREE.Mesh(new THREE.ConeGeometry(coreRadius * 1.05, coreRadius * 3.1, 10), processTraceArrowMat);
+        arrow.renderOrder = 46;
+        operationProcessTrace.add(arrow);
+        operationTraceArrows.push({ mesh: arrow, curve, phase, speed });
+      }
+      return curve;
+    };
+
+    let radiantTraceIndex = 0;
+    for (const side of [-1, 1]) {
+      const x = side * 5.02;
+      for (let i = 0; i < zVals.length; i += 2) {
+        const z1 = zVals[i];
+        const z2 = zVals[i + 1];
+        addOperationProcessTrace([
+          new THREE.Vector3(x, 6.72, z1),
+          new THREE.Vector3(x, 10.8, z1),
+          new THREE.Vector3(x, 15.85, z1),
+          new THREE.Vector3(x, 16.25, (z1 + z2) / 2),
+          new THREE.Vector3(x, 15.85, z2),
+          new THREE.Vector3(x, 10.8, z2),
+          new THREE.Vector3(x, 6.72, z2),
+        ], 0.195, (radiantTraceIndex * 0.127) % 1, 0.058);
+        radiantTraceIndex += 1;
+      }
+    }
+
+    let convectionTraceIndex = 0;
+    for (const z of [-2.5, -1.5, -0.5, 0.5, 1.5, 2.5]) {
+      for (let pair = 0; pair < 9; pair += 2) {
+        const y1 = 20.0 + pair * 0.49;
+        const y2 = 20.0 + (pair + 1) * 0.49;
+        addOperationProcessTrace([
+          new THREE.Vector3(-5.35, y1, z),
+          new THREE.Vector3(5.35, y1, z),
+          new THREE.Vector3(5.65, (y1 + y2) / 2, z),
+          new THREE.Vector3(5.35, y2, z),
+          new THREE.Vector3(-5.35, y2, z),
+        ], 0.148, (convectionTraceIndex * 0.071) % 1, 0.052);
+        convectionTraceIndex += 1;
+      }
+    }
+
+    addOperationProcessTrace([
+      new THREE.Vector3(-5.35, 20.0, -1.5),
+      new THREE.Vector3(-5.62, 19.55, -1.5),
+      new THREE.Vector3(-5.62, 17.0, -1.5),
+      new THREE.Vector3(-5.02, 16.25, -1.4),
+    ], 0.105, 0.18, 0.046);
+    scene.add(operationProcessTrace);
+
+    flowRef.current = flowGroup;
+    scene.add(flowGroup);
+
+    componentRef.current = components;
+    const highlight = new THREE.Box3Helper(new THREE.Box3(), new THREE.Color('#ff9a3d'));
+    highlight.material.transparent = true;
+    highlight.material.opacity = 0.12;
+    highlight.material.depthTest = false;
+    highlight.renderOrder = 50;
+    highlight.visible = false;
+    highlightRef.current = highlight;
+    scene.add(highlight);
+
+    const updateCamera = () => {
+      const o = orbitRef.current;
+      camera.position.set(
+        o.target.x + Math.sin(o.yaw) * Math.cos(o.pitch) * o.radius,
+        o.target.y + Math.sin(o.pitch) * o.radius,
+        o.target.z + Math.cos(o.yaw) * Math.cos(o.pitch) * o.radius
+      );
+      camera.lookAt(o.target);
+    };
+    updateCameraRef.current = updateCamera;
+    const transitionCamera = (preset: CameraPreset, duration = 900) => {
+      const current = orbitRef.current;
+      cameraTweenRef.current = {
+        startedAt: performance.now(),
+        duration,
+        from: {
+          yaw: current.yaw,
+          pitch: current.pitch,
+          radius: current.radius,
+          target: [current.target.x, current.target.y, current.target.z],
+        },
+        to: preset,
+      };
+    };
+    transitionCameraRef.current = transitionCamera;
+    updateCamera();
+
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2();
+    const activePointers = new Map<number, { x: number; y: number }>();
+    let dragging = false;
+    let moved = false;
+    let lastX = 0;
+    let lastY = 0;
+    let panMode = false;
+    let pinchDistance = 0;
+    let pinchCenter = { x: 0, y: 0 };
+    let lastTapAt = 0;
+
+    const pickComponent = (clientX: number, clientY: number) => {
+      const rect = renderer.domElement.getBoundingClientRect();
+      pointer.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+      pointer.y = -((clientY - rect.top) / rect.height) * 2 + 1;
+      raycaster.setFromCamera(pointer, camera);
+      const hit = raycaster.intersectObjects(scene.children, true).find(entry => entry.object.userData.component);
+      return hit?.object.userData.component as string | undefined;
+    };
+
+    const onPointerDown = (event: PointerEvent) => {
+      cameraTweenRef.current = null;
+      dragging = true;
+      moved = false;
+      activePointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      panMode = event.button === 2 || event.shiftKey;
+      lastX = event.clientX;
+      lastY = event.clientY;
+      renderer.domElement.setPointerCapture(event.pointerId);
+      if (activePointers.size === 2) {
+        const pts = [...activePointers.values()];
+        pinchDistance = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y);
+        pinchCenter = { x: (pts[0].x + pts[1].x) / 2, y: (pts[0].y + pts[1].y) / 2 };
+      }
+    };
+    const onPointerMove = (event: PointerEvent) => {
+      if (!dragging || !activePointers.has(event.pointerId)) return;
+      activePointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      if (activePointers.size >= 2) {
+        const pts = [...activePointers.values()].slice(0, 2);
+        const distance = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y);
+        const center = { x: (pts[0].x + pts[1].x) / 2, y: (pts[0].y + pts[1].y) / 2 };
+        if (pinchDistance > 0) orbitRef.current.radius = THREE.MathUtils.clamp(orbitRef.current.radius * (pinchDistance / Math.max(distance, 1)), 8, 96);
+        orbitRef.current.target.x -= (center.x - pinchCenter.x) * 0.012;
+        orbitRef.current.target.y += (center.y - pinchCenter.y) * 0.012;
+        pinchDistance = distance;
+        pinchCenter = center;
+        moved = true;
+        updateCamera();
+        return;
+      }
+      const dx = event.clientX - lastX;
+      const dy = event.clientY - lastY;
+      if (Math.abs(dx) + Math.abs(dy) > 3) moved = true;
+      if (panMode) {
+        orbitRef.current.target.x -= dx * 0.018;
+        orbitRef.current.target.y += dy * 0.018;
+      } else {
+        orbitRef.current.yaw -= dx * 0.005;
+        orbitRef.current.pitch = THREE.MathUtils.clamp(orbitRef.current.pitch + dy * 0.0036, -0.44, 0.72);
+      }
+      lastX = event.clientX;
+      lastY = event.clientY;
+      updateCamera();
+    };
+    const onPointerUp = (event: PointerEvent) => {
+      activePointers.delete(event.pointerId);
+      dragging = activePointers.size > 0;
+      pinchDistance = 0;
+      if (!moved) {
+        const name = pickComponent(event.clientX, event.clientY);
+        if (name) {
+          const now = performance.now();
+          onSelect(name);
+          if (event.pointerType === 'touch' && now - lastTapAt < 320) {
+            const preset = cameraPresets[name];
+            if (preset) transitionCamera({ ...preset, radius: Math.max(9, preset.radius * 0.86) }, 650);
+          }
+          lastTapAt = now;
+        }
+      }
+    };
+    const onWheel = (event: WheelEvent) => {
+      event.preventDefault();
+      cameraTweenRef.current = null;
+      orbitRef.current.radius = THREE.MathUtils.clamp(orbitRef.current.radius + event.deltaY * 0.04, 8, 96);
+      updateCamera();
+    };
+    const onContextMenu = (event: MouseEvent) => event.preventDefault();
+    renderer.domElement.addEventListener('pointerdown', onPointerDown);
+    renderer.domElement.addEventListener('pointermove', onPointerMove);
+    renderer.domElement.addEventListener('pointerup', onPointerUp);
+    renderer.domElement.addEventListener('pointercancel', onPointerUp);
+    renderer.domElement.addEventListener('wheel', onWheel, { passive: false });
+    renderer.domElement.addEventListener('contextmenu', onContextMenu);
+
+    const clock = new THREE.Clock();
+    let animationFrameId = 0;
+    const animate = () => {
+      animationFrameId = requestAnimationFrame(animate);
+      const t = clock.getElapsedTime();
+      const cameraTween = cameraTweenRef.current;
+      if (cameraTween) {
+        const raw = THREE.MathUtils.clamp((performance.now() - cameraTween.startedAt) / cameraTween.duration, 0, 1);
+        const eased = raw < 0.5 ? 4 * raw * raw * raw : 1 - Math.pow(-2 * raw + 2, 3) / 2;
+        const orbit = orbitRef.current;
+        orbit.yaw = THREE.MathUtils.lerp(cameraTween.from.yaw, cameraTween.to.yaw, eased);
+        orbit.pitch = THREE.MathUtils.lerp(cameraTween.from.pitch, cameraTween.to.pitch, eased);
+        orbit.radius = THREE.MathUtils.lerp(cameraTween.from.radius, cameraTween.to.radius, eased);
+        orbit.target.set(
+          THREE.MathUtils.lerp(cameraTween.from.target[0], cameraTween.to.target[0], eased),
+          THREE.MathUtils.lerp(cameraTween.from.target[1], cameraTween.to.target[1], eased),
+          THREE.MathUtils.lerp(cameraTween.from.target[2], cameraTween.to.target[2], eased)
+        );
+        updateCamera();
+        if (raw >= 1) cameraTweenRef.current = null;
+      }
+      componentRef.current.forEach(group => {
+        const target = group.userData.atlasTargetPosition as THREE.Vector3 | undefined;
+        if (target) group.position.lerp(target, 0.085);
+      });
+      if (selectionGlowRef.current && explode) {
+        const activeSelected = componentRef.current.get(selectedRef.current);
+        if (activeSelected) {
+          const activeBox = new THREE.Box3().setFromObject(activeSelected);
+          selectionGlowRef.current.position.copy(activeBox.getCenter(new THREE.Vector3()));
+        }
+      }
+      const animatedBurners = componentRef.current.get('Burners');
+      animatedBurners?.traverse(child => {
+        const target = child.userData.burnerTargetPosition as THREE.Vector3 | undefined;
+        if (target) child.position.lerp(target, 0.1);
+      });
+      const frontTargetZ = (frontCasing.userData.atlasTargetZ as number | undefined) ?? 0;
+      frontCasing.position.z = THREE.MathUtils.lerp(frontCasing.position.z, frontTargetZ, 0.09);
+
+      const activeBurnerStudy = burnerStudyRef.current;
+      const activeRadiantStudy = radiantStudyRef.current;
+      const activeRadiantScenario = radiantScenarioRef.current;
+      const activeHeatRecoveryStudy = heatRecoveryStudyRef.current;
+      const activeHeatRecoveryScenario = heatRecoveryScenarioRef.current;
+      const activeDraftStudy = draftStudyRef.current;
+      const activeOperationState = operationStateRef.current;
+      const activeOperationFocus = operationFocusRef.current;
+      const activeTroubleshootingScenario = troubleshootingScenarioRef.current;
+      const activeTroubleshootingPhase = troubleshootingPhaseRef.current;
+
+      flameMaterials.forEach((material, index) => {
+        material.uniforms.uTime.value = t;
+        const flame = flameMeshes[index];
+        const isPilotFlame = Boolean(flame.userData.isPilotFlame);
+        const operationMainLightOff = activeOperationState === 'mainBurnerLightOff';
+        const operationStabilizing = activeOperationState === 'firingStabilization';
+        const operationWarmUp = activeOperationState === 'controlledWarmUp';
+        const operationNormal = activeOperationState === 'normalOperation';
+        const operationLoadChange = activeOperationState === 'loadChange';
+        const operationShutdown = activeOperationState === 'controlledShutdown';
+        const operationMainFiring = operationMainLightOff || operationStabilizing || operationWarmUp || operationNormal || operationLoadChange || operationShutdown;
+        if (activeOperationState) {
+          const pilotState = activeOperationState === 'pilotIgnition' || activeOperationState === 'pilotProven';
+          const pilotBlocked = activeOperationFocus === 'pilotNotEstablished';
+          const representativeMain = Boolean(flame.userData.heroBurner);
+          const shutdownFiringRemoved = operationShutdown && activeOperationFocus === 'shutdownFiringRemoved';
+          const abnormalFlameLoss = activeOperationFocus === 'abnormalFlameLoss' && representativeMain && !isPilotFlame;
+          flame.visible = isPilotFlame ? pilotState && !pilotBlocked : operationMainFiring && !shutdownFiringRemoved && !abnormalFlameLoss && (!operationMainLightOff || representativeMain);
+        }
+        const role = (flame.userData.flameRole as string | undefined) ?? 'outer';
+        const phase = (flame.userData.phase as number | undefined) ?? index * 0.47;
+        const baseX = (flame.userData.baseScaleX as number | undefined) ?? 1;
+        const baseY = (flame.userData.baseScaleY as number | undefined) ?? 1;
+        const baseZ = (flame.userData.baseScaleZ as number | undefined) ?? 1;
+        const outer = role === 'outer';
+        const widthPulse = outer ? 0.105 : 0.072;
+        const lengthPulse = outer ? 0.11 : 0.075;
+        const warmupOperation = Boolean(activeOperationFocus?.startsWith('warmup')) && !isPilotFlame;
+        const normalOperation = Boolean(activeOperationFocus?.startsWith('normal')) && !isPilotFlame;
+        const stableLoadOperation = ['loadSteady', 'loadIncrease', 'loadDecrease'].includes(activeOperationFocus ?? '') && !isPilotFlame;
+        const stableShutdownOperation = ['shutdownStable', 'shutdownReduced'].includes(activeOperationFocus ?? '') && !isPilotFlame;
+        const stableOperation = (activeOperationFocus === 'firingStable' || warmupOperation || normalOperation || stableLoadOperation || stableShutdownOperation) && !isPilotFlame;
+        const unstableOperation = (activeOperationFocus === 'firingUnstable' || activeOperationFocus === 'loadNotStabilized' || activeOperationFocus === 'shutdownConcern') && !isPilotFlame;
+        const draftAbnormalOperation = activeOperationFocus === 'firingDraftAbnormal' && !isPilotFlame;
+        const effectiveWidthPulse = stableOperation ? widthPulse * 0.42 : unstableOperation ? widthPulse * 2.25 : draftAbnormalOperation ? widthPulse * 1.55 : widthPulse;
+        const effectiveLengthPulse = stableOperation ? lengthPulse * 0.42 : unstableOperation ? lengthPulse * 2.1 : draftAbnormalOperation ? lengthPulse * 1.45 : lengthPulse;
+        const lightOffScale = operationMainLightOff && !isPilotFlame ? 0.78 : 1;
+        const warmupScale = activeOperationFocus === 'warmupEarly' ? 0.82 : activeOperationFocus === 'warmupDeveloping' ? 0.91 : 1;
+        const loadScale = activeOperationFocus === 'loadIncrease' ? 1.12 : activeOperationFocus === 'loadDecrease' ? 0.86 : activeOperationFocus === 'loadNotStabilized' ? 0.98 + Math.sin(t * 2.7 + phase) * 0.08 : 1;
+        const shutdownScale = activeOperationFocus === 'shutdownReduced' ? 0.62 : activeOperationFocus === 'shutdownConcern' ? 0.76 + Math.sin(t * 2.9 + phase) * 0.08 : 1;
+        const troubleshootingTarget = Boolean(activeTroubleshootingScenario === 'flameImpingement' && activeTroubleshootingPhase && flame.userData.burnerCell === '4.15:-1.35' && !isPilotFlame);
+        const troubleshootingLengthScale = troubleshootingTarget ? activeTroubleshootingPhase === 'deviation' ? 1.02 : activeTroubleshootingPhase === 'contact' ? 1.08 : activeTroubleshootingPhase === 'consequence' ? 1.1 : 1 : 1;
+        flame.scale.x = baseX * lightOffScale * warmupScale * loadScale * shutdownScale * (1 + Math.sin(t * 5.2 + phase) * effectiveWidthPulse + Math.sin(t * 9.7 + phase * 1.7) * 0.035);
+        flame.scale.y = baseY * lightOffScale * warmupScale * loadScale * shutdownScale * troubleshootingLengthScale * (1 + Math.sin(t * 4.1 + phase * 0.8) * effectiveLengthPulse + Math.sin(t * 11.3 + phase) * 0.025);
+        flame.scale.z = baseZ * lightOffScale * warmupScale * loadScale * shutdownScale * (1 + Math.cos(t * 5.8 + phase * 1.15) * effectiveWidthPulse * 0.82);
+        const impingementBias = activeRadiantStudy === 'clearance' && activeRadiantScenario === 'impingement' && flame.userData.heroBurner ? 0.33 : 0;
+        const operationImpingementBias = activeOperationFocus === 'firingImpingement' && flame.userData.heroBurner && !isPilotFlame ? 0.34 : 0;
+        const troubleshootingBias = troubleshootingTarget ? activeTroubleshootingPhase === 'deviation' ? -0.1 : activeTroubleshootingPhase === 'contact' ? -0.18 : activeTroubleshootingPhase === 'consequence' ? -0.2 : 0 : 0;
+        const unstableBias = unstableOperation ? Math.sin(t * 5.8 + phase) * 0.14 : 0;
+        const draftBias = draftAbnormalOperation ? Math.sin(t * 2.4 + phase * 0.55) * 0.12 : 0;
