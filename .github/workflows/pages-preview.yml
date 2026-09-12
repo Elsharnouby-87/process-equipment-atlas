@@ -80,8 +80,55 @@ jobs:
           if (clockCount !== 1) throw new Error(`Expected one animation clock anchor, found ${clockCount}`);
           const clockInjection = `${clockAnchor}\n      const showDraftTrainingFlow = Boolean(flowEnabledRef.current && (draftStudyRef.current || ['Breeching', 'Stack Damper', 'Stack', 'Draft Instruments', 'Stack Analyzers'].includes(selectedRef.current)));\n      draftTrainingRuntime.update(damperPositionRef.current, t, showDraftTrainingFlow);`;
           source = source.replace(clockAnchor, clockInjection);
-
           fs.writeFileSync(path, source);
+
+          const appPath = 'src/App.tsx';
+          let app = fs.readFileSync(appPath, 'utf8');
+          const groupBefore = "  { label: 'Draft & Flue Gas', components: ['Breeching', 'Stack Damper', 'Stack'] },";
+          const groupAfter = "  { label: 'Draft & Flue Gas', components: ['Breeching', 'Stack Damper', 'Draft Instruments', 'Stack Analyzers', 'Stack'] },";
+          if (!app.includes(groupBefore)) throw new Error('Draft component group anchor not found');
+          app = app.replace(groupBefore, groupAfter);
+
+          const detailsAnchor = "\nconst smartMode: Record<string, ViewMode> = {";
+          const detailsInjection = `
+details['Draft Instruments'] = {
+  group: 'Draft & Flue Gas',
+  location: 'Pressure tap at the radiant roof / arch reference region with representative PI/PT indication.',
+  summary: 'Draft measurement hardware teaching the key natural-draft pressure reference in mmH2O.',
+  function: 'Sense and indicate representative firebox draft so pressure direction can be read together with stack-damper movement.',
+  why: 'Arch / radiant-roof draft is commonly the highest-pressure / lowest-draft region and is a key reference for hot-gas containment.',
+  observe: ['Arch / radiant-roof pressure tap', 'Impulse / sensing line', 'PI/PT indication', 'Response to stack-damper movement'],
+  issues: ['Plugged or leaking sensing line', 'Indication error', 'Loss of negative pressure margin', 'Mismatch between indicated and actual draft'],
+  inspection: ['Pressure tap and line', 'Instrument condition', 'Reference-point integrity', 'Comparison with approved plant indication'],
+  related: ['Stack Damper', 'Breeching', 'Stack'],
+};
+details['Stack Analyzers'] = {
+  group: 'Draft & Flue Gas',
+  location: 'Representative stack sample probe and analyzer cabinet on the upper flue-gas path.',
+  summary: 'Training analyzer package for O2, CO, NOx and SOx interpretation alongside draft.',
+  function: 'Show representative combustion / emissions trends without implying certified CEMS performance or universal alarm limits.',
+  why: 'O2 and CO help interpret excess-air and combustion condition; NOx depends on several firing variables and SOx is strongly fuel-sulfur dependent.',
+  observe: ['Sample-probe location', 'O2 trend', 'CO trend', 'Potential leakage-air influence on stack O2'],
+  issues: ['Tramp-air bias', 'Sample-system plugging', 'Analyzer drift', 'Misinterpreting one analyzer signal without draft context'],
+  inspection: ['Sample probe', 'Sample line', 'Analyzer cabinet', 'Calibration / validation status in the real plant'],
+  related: ['Draft Instruments', 'Stack Damper', 'Stack'],
+};
+${detailsAnchor}`;
+          if (!app.includes(detailsAnchor)) throw new Error('Details insertion anchor not found');
+          app = app.replace(detailsAnchor, detailsInjection);
+
+          const smartBefore = "  'Stack Damper': 'normal',\n  Stack: 'normal',";
+          const smartAfter = "  'Stack Damper': 'normal',\n  'Draft Instruments': 'normal',\n  'Stack Analyzers': 'normal',\n  Stack: 'normal',";
+          if (!app.includes(smartBefore)) throw new Error('Smart mode draft anchor not found');
+          app = app.replace(smartBefore, smartAfter);
+
+          const navBefore = "    else if (selected === 'Breeching' || selected === 'Stack Damper' || selected === 'Stack') setActiveModule('draftStack');";
+          const navAfter = "    else if (selected === 'Breeching' || selected === 'Stack Damper' || selected === 'Draft Instruments' || selected === 'Stack Analyzers' || selected === 'Stack') setActiveModule('draftStack');";
+          if (!app.includes(navBefore)) throw new Error('Draft navigation anchor not found');
+          app = app.replace(navBefore, navAfter);
+          app = app.replace("const [damperPosition, setDamperPosition] = useState(18);", "const [damperPosition, setDamperPosition] = useState(50);");
+          app = app.replace("setDamperPosition(18);", "setDamperPosition(50);");
+          fs.writeFileSync(appPath, app);
           NODE
 
       - name: Install dependencies
