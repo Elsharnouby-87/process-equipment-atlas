@@ -1,4 +1,4 @@
-name: GitHub Pages Migration Preview
+name: GitHub Pages Development Preview
 
 on:
   push:
@@ -19,7 +19,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout migration branch
+      - name: Checkout development source
         uses: actions/checkout@v4
         with:
           ref: floot-migration-dev
@@ -28,18 +28,21 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
 
-      - name: Build independent baseline mirror
-        run: node preview-mirror/mirror.mjs
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Build GitHub source
+        run: npm run build
 
       - name: Configure GitHub Pages
-        id: pages
         uses: actions/configure-pages@v5
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: preview-mirror/dist
+          path: dist
 
   deploy:
     permissions:
