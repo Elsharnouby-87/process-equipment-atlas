@@ -86,12 +86,14 @@ export function getDraftTrainingMetrics(damperRestriction: number): DraftTrainin
       : 'QUALITATIVE · firing / temperature dependent';
   const soxLabel = 'FUEL-SULFUR DEPENDENT · ~steady vs damper';
 
-  // This is the exact geometric mapping used by the 3D damper blade.
+  // Exact geometric mapping used by the 3D damper blade.
   const bladeAngleRad = 1.38 - (restriction / 100) * 1.20;
   const bladeAngleDeg = Number((bladeAngleRad * 180 / Math.PI).toFixed(0));
 
-  // Visual-dynamics helpers. They describe qualitative evacuation tendency, not CFD velocity or mass flow.
-  const flowCongestion = clamp((restriction - 48) / 52, 0, 1);
+  // Qualitative visual-dynamics helpers — intentionally not CFD or a mass-flow calculation.
+  // Mobile QA showed that the physical trend was correct but too subtle at the extremes,
+  // so the animation contrast is deliberately amplified while the engineering direction remains unchanged.
+  const flowCongestion = clamp((restriction - 34) / 49, 0, 1.35);
   const leakIntensity = clamp((draft + 0.25) / 5.75, 0, 1);
 
   return {
@@ -108,10 +110,10 @@ export function getDraftTrainingMetrics(damperRestriction: number): DraftTrainin
     noxLabel,
     soxLabel,
     bladeAngleDeg,
-    blueParticleOpacity: clamp(0.28 + (oxygen - 1.2) / 6.0, 0.26, 0.94),
-    oxygenParticleFraction: clamp(0.28 + (oxygen - 1.2) / 5.5, 0.25, 1),
-    flowSpeedScale: lerp(0.42, 1.42, opening01),
-    flowStretchScale: lerp(0.72, 1.38, opening01),
+    blueParticleOpacity: clamp(0.36 + (oxygen - 1.2) / 5.3, 0.34, 1),
+    oxygenParticleFraction: clamp(0.30 + (oxygen - 1.2) / 5.2, 0.25, 1),
+    flowSpeedScale: lerp(0.24, 1.58, opening01),
+    flowStretchScale: lerp(0.58, 1.48, opening01),
     flowCongestion,
     leakIntensity,
   };
