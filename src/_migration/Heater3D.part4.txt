@@ -1,0 +1,241 @@
+
+    components.forEach((group, name) => {
+      const offset = explode ? explodeOffsets[name] ?? new THREE.Vector3() : new THREE.Vector3();
+      group.userData.atlasTargetPosition = offset.clone();
+    });
+
+    const radiantGroup = components.get('Radiant Tubes');
+    const radiantOverlay = radiantOverlayRef.current;
+    const troubleshootingOverlay = troubleshootingOverlayRef.current;
+    if (troubleshootingOverlay) {
+      const phaseIndex = troubleshootingPhase === 'deviation' ? 1 : troubleshootingPhase === 'contact' ? 2 : troubleshootingPhase === 'consequence' ? 3 : 0;
+      troubleshootingOverlay.visible = Boolean(troubleshootingPhase && troubleshootingPhase !== 'normal');
+      troubleshootingOverlay.children.forEach(child => {
+        const cue = child.userData.troubleshootingCue as string | undefined;
+        const isLabel = Boolean(child.userData.isTroubleshootingLabel);
+        const t1Visible = troubleshootingScenario === 'flameImpingement' && (cue === 't1-deviation' ? phaseIndex >= 1 : cue === 't1-contact' ? phaseIndex >= 2 : cue === 't1-thermal' ? phaseIndex >= 3 : false);
+        const t2Visible = troubleshootingScenario === 'tubeHotArea' && (cue === 't2-scan' ? phaseIndex >= 1 : cue === 't2-compare' ? phaseIndex >= 1 : cue === 't2-hot' ? phaseIndex >= 2 : cue === 't2-context' ? phaseIndex >= 3 : false);
+        const t3Visible = troubleshootingScenario === 'draftPressure' && (cue === 't3-damper' ? phaseIndex >= 0 : cue === 't3-margin' ? phaseIndex >= 1 : cue === 't3-positive' ? phaseIndex >= 2 : cue === 't3-leak' ? phaseIndex >= 3 : cue === 't3-backfire' ? phaseIndex >= 3 : false);
+        child.visible = (t1Visible || t2Visible || t3Visible) && (!isLabel || labels);
+      });
+    }
+    if (radiantOverlay) {
+      radiantOverlay.visible = Boolean(radiantStudyMode);
+      radiantOverlay.children.forEach(child => {
+        const overlay = child.userData.radiantOverlay as string | undefined;
+        if (!overlay) return;
+        child.visible = (overlay === 'clearance' && radiantStudyMode === 'clearance') || (overlay === 'pass' && radiantStudyMode === 'pass') || (overlay === 'hotspot' && (radiantScenario === 'hotspot' || radiantScenario === 'impingement')) || (overlay === 'coking' && radiantScenario === 'coking');
+      });
+    }
+    if (radiantStudyMode && radiantGroup) {
+      radiantGroup.children.forEach(child => {
+        const role = child.userData.radiantRole as string | undefined;
+        const heroPass = child.userData.radiantHeroPass as boolean | undefined;
+        if (radiantStudyMode === 'pass' || radiantStudyMode === 'flow') {
+          if (role === 'coil' && !heroPass) applyMaterial(child, ghostFocus);
+          else if (role === 'support' || role === 'manifold') applyMaterial(child, ghostRelated);
+        } else if (radiantStudyMode === 'supports') {
+          if (role === 'coil') applyMaterial(child, ghostRelated);
+          else if (role === 'manifold') applyMaterial(child, ghostFocus);
+        }
+      });
+    }
+
+    const shieldGroup = components.get('Shield Tubes');
+    const convectionGroup = components.get('Convection Bank');
+    const heatRecoveryOverlay = heatRecoveryOverlayRef.current;
+    if (heatRecoveryOverlay) {
+      heatRecoveryOverlay.visible = Boolean(heatRecoveryStudyMode);
+      heatRecoveryOverlay.children.forEach(child => {
+        const overlay = child.userData.heatRecoveryOverlay as string | undefined;
+        if (!overlay) return;
+        child.visible = (overlay === 'comparison' && ['overview', 'shield', 'convection'].includes(heatRecoveryStudyMode ?? '')) || (overlay === 'fouled' && heatRecoveryStudyMode === 'fouling' && heatRecoveryScenario !== 'clean') || (overlay === 'plugged' && heatRecoveryStudyMode === 'fouling' && heatRecoveryScenario === 'plugged');
+      });
+    }
+    if (heatRecoveryStudyMode && shieldGroup && convectionGroup) {
+      if (heatRecoveryStudyMode === 'overview' || heatRecoveryStudyMode === 'flue') {
+        restoreGroup(shieldGroup);
+        restoreGroup(convectionGroup);
+      } else if (heatRecoveryStudyMode === 'shield') {
+        restoreGroup(shieldGroup);
+        applyMaterial(convectionGroup, ghostRelated);
+      } else {
+        restoreGroup(convectionGroup);
+        applyMaterial(shieldGroup, ghostRelated);
+      }
+    }
+
+    const breechingGroup = components.get('Breeching');
+    const damperGroup = components.get('Stack Damper');
+    const stackGroup = components.get('Stack');
+    const draftOverlay = draftOverlayRef.current;
+    if (draftOverlay) {
+      draftOverlay.visible = Boolean(draftStudyMode);
+      draftOverlay.children.forEach(child => {
+        const overlay = child.userData.draftOverlay as string | undefined;
+        const isLabel = child.userData.isDraftLabel as boolean | undefined;
+        if (!overlay) return;
+        const scenarioVisible = (overlay === 'negative' && draftStudyMode === 'pressure' && draftPressureScenario === 'negative') || (overlay === 'positive' && draftStudyMode === 'pressure' && draftPressureScenario === 'positive') || (overlay === 'pressureCommon' && draftStudyMode === 'pressure') || (overlay === 'damper' && (draftStudyMode === 'damper' || (draftStudyMode === 'pressure' && troubleshootingScenario === 'draftPressure')));
+        child.visible = scenarioVisible && (!isLabel || labels);
+      });
+    }
+    if (draftStudyMode && breechingGroup && damperGroup && stackGroup) {
+      if (draftStudyMode === 'overview' || draftStudyMode === 'path' || draftStudyMode === 'pressure') {
+        restoreGroup(breechingGroup);
+        restoreGroup(damperGroup);
+        restoreGroup(stackGroup);
+        if (convectionGroup) restoreGroup(convectionGroup);
+      } else if (draftStudyMode === 'breeching') {
+        restoreGroup(breechingGroup);
+        applyMaterial(damperGroup, ghostRelated);
+        applyMaterial(stackGroup, ghostRelated);
+      } else if (draftStudyMode === 'damper') {
+        restoreGroup(damperGroup);
+        applyMaterial(breechingGroup, ghostRelated);
+        applyMaterial(stackGroup, ghostRelated);
+      } else if (draftStudyMode === 'stack') {
+        restoreGroup(stackGroup);
+        applyMaterial(breechingGroup, ghostRelated);
+        applyMaterial(damperGroup, ghostRelated);
+      }
+    }
+
+    const burnerGroup = components.get('Burners');
+    const pilotMicro = pilotMicroRef.current;
+    if (pilotMicro) {
+      const operationPilotState = operationState === 'pilotIgnition' || operationState === 'pilotProven';
+      pilotMicro.visible = burnerStudyMode === 'pilot' || operationPilotState;
+      const microLabels = pilotMicro.userData.labelGroup as THREE.Group | undefined;
+      if (microLabels) microLabels.visible = labels && pilotMicro.visible;
+      pilotMicro.children.forEach(child => {
+        const role = child.userData.pilotRole as string | undefined;
+        if (role === 'ignitionSpark') child.visible = operationState === 'pilotIgnition';
+        if (role === 'provingAccepted') child.visible = operationState === 'pilotProven' && operationFocus === 'pilotProven';
+        if (role === 'pilotGlow') child.visible = operationPilotState && operationFocus !== 'pilotNotEstablished';
+      });
+    }
+    if (operationState && burnerGroup) {
+      burnerGroup.children.forEach(child => {
+        if (child.userData.burnerRole === 'Flame') child.visible = false;
+      });
+    }
+    if (burnerStudyMode && burnerGroup) {
+      burnerGroup.children.forEach(child => {
+        if (child.userData.isPilotMicro) return;
+        const cellId = child.userData.burnerCell as string | undefined;
+        const hero = child.userData.heroBurner as boolean | undefined;
+        if (cellId && !hero) applyMaterial(child, contextMode === 'isolate' ? ghostIsolateRelated : ghostFocus);
+        else if (!cellId) applyMaterial(child, ghostRelated);
+        if (burnerStudyMode === 'pilot' && hero) {
+          const role = child.userData.burnerRole as string | undefined;
+          if (role === 'Flame') child.visible = false;
+          else if (role !== 'Pilot / Ignition' && role !== 'Burner Tile / Throat' && role !== 'Burner Body / Neck') applyMaterial(child, ghostRelated);
+        }
+      });
+    }
+
+    if (atlasPrimaryView && mode === 'xray') {
+      const casingGroup = components.get('Casing & Structure');
+      const platformGroup = components.get('Platforms & Access');
+      if (casingGroup) restoreGroup(casingGroup);
+      if (platformGroup) restoreGroup(platformGroup);
+      for (const name of ['Burners', 'Radiant Tubes', 'Shield Tubes', 'Convection Bank', 'Stack Damper']) {
+        const group = components.get(name);
+        if (group) restoreGroup(group);
+      }
+      applyMaterial(casingShell, xrayShell);
+      if (selected !== 'Refractory') applyMaterial(refr, xrayRefractory);
+      const applyXrayEnvelope = (group: THREE.Group | undefined) => {
+        group?.traverse(obj => {
+          if (!(obj instanceof THREE.Mesh)) return;
+          const role = obj.userData.xrayRole as string | undefined;
+          if (role === 'shell') obj.material = xrayShell;
+          else if (role === 'structure') obj.material = xrayStructure;
+        });
+      };
+      applyXrayEnvelope(components.get('Breeching'));
+      applyXrayEnvelope(components.get('Stack'));
+    }
+
+    burnerGroup?.children.forEach(child => {
+      const base = child.userData.burnerBasePosition as THREE.Vector3 | undefined;
+      if (!base) return;
+      const target = base.clone();
+      const role = child.userData.burnerRole as string | undefined;
+      if (burnerStudyMode === 'exploded' && child.userData.heroBurner && role) target.add(semanticExplodeOffsets[role] ?? new THREE.Vector3());
+      child.userData.burnerTargetPosition = target;
+    });
+
+    if (labelRef.current) {
+      labelRef.current.visible = labels && !explode;
+      const operationLabels = operationState ? new Set(operationLabelMap[operationFocus ?? 'overview'] ?? []) : null;
+      labelRef.current.children.forEach(child => {
+        const name = child.userData.componentName as string | undefined;
+        const labelText = child.userData.labelText as string | undefined;
+        const baseY = child.userData.baseY as number | undefined;
+        const kind = child.userData.kind as 'major' | 'detail' | undefined;
+        const detailFor = child.userData.detailFor as string | undefined;
+        if (baseY !== undefined) child.position.y = baseY + (explode && name ? (explodeOffsets[name]?.y ?? 0) : 0);
+        if (operationLabels) child.visible = Boolean(labelText && operationLabels.has(labelText));
+        else if (contextMode === 'full') child.visible = kind === 'major';
+        else if (contextMode === 'focus') child.visible = name === selected || related.has(name ?? '') || detailFor === selected;
+        else child.visible = name === selected || detailFor === selected;
+        if ((burnerStudyMode === 'pilot' || burnerStudyMode === 'exploded') && name === 'Burners') child.visible = false;
+        if (radiantStudyMode && name === 'Radiant Tubes' && kind === 'major') child.visible = false;
+        if (heatRecoveryStudyMode && (name === 'Shield Tubes' || name === 'Convection Bank') && kind === 'major') child.visible = false;
+        if (draftStudyMode && (name === 'Breeching' || name === 'Stack Damper' || name === 'Stack') && kind === 'major') child.visible = false;
+      });
+    }
+    if (flowRef.current) {
+      flowRef.current.visible = flow && !explode;
+      flowRef.current.children.forEach(child => {
+        const burnerFlow = child.userData.burnerFlow as string | undefined;
+        const radiantFlow = child.userData.radiantFlow as boolean | undefined;
+        const flueFlow = child.userData.flueFlow as boolean | undefined;
+        const processFlow = child.userData.processFlow as boolean | undefined;
+        const purgeFlow = child.userData.purgeFlow as boolean | undefined;
+        if (operationState) {
+          if (purgeFlow) child.visible = operationState === 'purgeActive' || operationState === 'purgeComplete';
+          else if (processFlow) child.visible = ['processReady', 'purgeReady', 'purgeActive', 'purgeComplete'].includes(operationState);
+          else child.visible = false;
+        } else if (burnerFlow) child.visible = Boolean(burnerStudyMode) && burnerStudyMode !== 'exploded' && (burnerStudyMode !== 'pilot' || burnerFlow === 'fuel');
+        else if (radiantFlow) child.visible = radiantStudyMode === 'flow';
+        else if (flueFlow) child.visible = draftStudyMode ? ['overview', 'breeching', 'damper', 'path', 'stack'].includes(draftStudyMode) : !burnerStudyMode && !radiantStudyMode && !heatRecoveryStudyMode;
+        else if (processFlow) child.visible = !draftStudyMode && !burnerStudyMode && !radiantStudyMode && !heatRecoveryStudyMode;
+        else child.visible = !burnerStudyMode && !radiantStudyMode && !heatRecoveryStudyMode && !draftStudyMode;
+      });
+    }
+
+    const selectedGroup = components.get(selected);
+    const highlight = highlightRef.current;
+    const selectionGlow = selectionGlowRef.current;
+    if (selectedGroup) {
+      const selectionBox = new THREE.Box3().setFromObject(selectedGroup);
+      const center = selectionBox.getCenter(new THREE.Vector3());
+      if (highlight) {
+        highlight.box.copy(selectionBox);
+        highlight.visible = atlasPrimaryView && !explode && selected === 'Stack Damper' && (mode === 'xray' || mode === 'cutaway');
+        highlight.material.opacity = highlight.visible ? 0.32 : 0.12;
+      }
+      if (selectionGlow) {
+        selectionGlow.position.copy(center);
+        selectionGlow.intensity = atlasPrimaryView && selected === 'Stack Damper' && (mode === 'xray' || mode === 'cutaway') ? 13 : contextMode === 'full' ? 3.5 : contextMode === 'focus' ? 7 : 9;
+        selectionGlow.distance = Math.max(7, selectionBox.getSize(new THREE.Vector3()).length() * 0.55);
+      }
+    } else {
+      if (highlight) highlight.visible = false;
+      if (selectionGlow) selectionGlow.intensity = 0;
+    }
+  }, [mode, selected, labels, flow, explode, contextMode, burnerStudyMode, radiantStudyMode, radiantScenario, heatRecoveryStudyMode, heatRecoveryScenario, draftStudyMode, draftPressureScenario, operationState, operationFocus, troubleshootingScenario, troubleshootingPhase]);
+
+  useEffect(() => {
+    const previous = viewModeStateRef.current;
+    const viewChanged = previous.mode !== mode || previous.explode !== explode;
+    viewModeStateRef.current = { mode, explode };
+    const transition = transitionCameraRef.current;
+    if (!transition || !viewChanged || operationState || burnerStudyMode || radiantStudyMode || heatRecoveryStudyMode || draftStudyMode) return;
+    transition(getAtlasModeCameraPreset(selected, mode, explode), explode ? 1050 : selected === 'Stack Damper' ? 850 : 900);
+  }, [mode, explode, selected, operationState, burnerStudyMode, radiantStudyMode, heatRecoveryStudyMode, draftStudyMode]);
+
+  return <div ref={hostRef} className="three-host" aria-label="Interactive high-fidelity industrial 3D fired heater model" />;
+}
