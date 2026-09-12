@@ -42,6 +42,7 @@ jobs:
           node scripts/assemble-burner-sim.mjs
           node scripts/free-explore-patch.mjs
           node scripts/burner-camera-geometry-refinement.mjs
+          node scripts/fuel-visibility-clearance-refinement.mjs
 
       - name: Install dependencies
         run: npm install --no-audit --no-fund
