@@ -65,6 +65,22 @@ jobs:
           if (!source.includes(t3Before)) throw new Error('Troubleshooting damper sequence not found');
           source = source.replace(t3Before, t3After);
 
+          const importAnchor = "import * as THREE from 'three';";
+          const runtimeImport = "import { createDraftInstrumentation3D } from './draftInstrumentation3D';";
+          if (!source.includes(importAnchor)) throw new Error('Three.js import anchor not found');
+          source = source.replace(importAnchor, `${importAnchor}\n${runtimeImport}`);
+
+          const damperAnchor = "    addComponent('Stack Damper', damper);\n\n    const draftOverlay = new THREE.Group();";
+          const damperInjection = "    addComponent('Stack Damper', damper);\n\n    const draftTrainingRuntime = createDraftInstrumentation3D();\n    addComponent('Draft Instruments', draftTrainingRuntime.draftGroup);\n    addComponent('Stack Analyzers', draftTrainingRuntime.analyzerGroup);\n    scene.add(draftTrainingRuntime.flowGroup);\n\n    const draftOverlay = new THREE.Group();";
+          if (!source.includes(damperAnchor)) throw new Error('Stack damper insertion anchor not found');
+          source = source.replace(damperAnchor, damperInjection);
+
+          const clockAnchor = "      const t = clock.getElapsedTime();";
+          const clockCount = source.split(clockAnchor).length - 1;
+          if (clockCount !== 1) throw new Error(`Expected one animation clock anchor, found ${clockCount}`);
+          const clockInjection = `${clockAnchor}\n      const showDraftTrainingFlow = Boolean(flowEnabledRef.current && (draftStudyRef.current || ['Breeching', 'Stack Damper', 'Stack', 'Draft Instruments', 'Stack Analyzers'].includes(selectedRef.current)));\n      draftTrainingRuntime.update(damperPositionRef.current, t, showDraftTrainingFlow);`;
+          source = source.replace(clockAnchor, clockInjection);
+
           fs.writeFileSync(path, source);
           NODE
 
