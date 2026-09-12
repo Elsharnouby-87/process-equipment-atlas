@@ -36,6 +36,7 @@ jobs:
           node scripts/assemble-burner-sim.mjs
           node scripts/free-explore-patch.mjs
           node scripts/burner-camera-geometry-refinement.mjs
+          node scripts/fuel-visibility-clearance-refinement.mjs
 
       - name: Install dependencies
         run: npm install --no-audit --no-fund
@@ -65,4 +66,4 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-# deployment refresh: checkpoint 13 fuel visibility + conservative camera + clearance
+# deployment refresh: checkpoint 14 visible fuel tracer + clearance polish
