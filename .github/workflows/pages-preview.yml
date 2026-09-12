@@ -90,30 +90,7 @@ jobs:
           app = app.replace(groupBefore, groupAfter);
 
           const detailsAnchor = "\nconst smartMode: Record<string, ViewMode> = {";
-          const detailsInjection = `
-details['Draft Instruments'] = {
-  group: 'Draft & Flue Gas',
-  location: 'Pressure tap at the radiant roof / arch reference region with representative PI/PT indication.',
-  summary: 'Draft measurement hardware teaching the key natural-draft pressure reference in mmH2O.',
-  function: 'Sense and indicate representative firebox draft so pressure direction can be read together with stack-damper movement.',
-  why: 'Arch / radiant-roof draft is commonly the highest-pressure / lowest-draft region and is a key reference for hot-gas containment.',
-  observe: ['Arch / radiant-roof pressure tap', 'Impulse / sensing line', 'PI/PT indication', 'Response to stack-damper movement'],
-  issues: ['Plugged or leaking sensing line', 'Indication error', 'Loss of negative pressure margin', 'Mismatch between indicated and actual draft'],
-  inspection: ['Pressure tap and line', 'Instrument condition', 'Reference-point integrity', 'Comparison with approved plant indication'],
-  related: ['Stack Damper', 'Breeching', 'Stack'],
-};
-details['Stack Analyzers'] = {
-  group: 'Draft & Flue Gas',
-  location: 'Representative stack sample probe and analyzer cabinet on the upper flue-gas path.',
-  summary: 'Training analyzer package for O2, CO, NOx and SOx interpretation alongside draft.',
-  function: 'Show representative combustion / emissions trends without implying certified CEMS performance or universal alarm limits.',
-  why: 'O2 and CO help interpret excess-air and combustion condition; NOx depends on several firing variables and SOx is strongly fuel-sulfur dependent.',
-  observe: ['Sample-probe location', 'O2 trend', 'CO trend', 'Potential leakage-air influence on stack O2'],
-  issues: ['Tramp-air bias', 'Sample-system plugging', 'Analyzer drift', 'Misinterpreting one analyzer signal without draft context'],
-  inspection: ['Sample probe', 'Sample line', 'Analyzer cabinet', 'Calibration / validation status in the real plant'],
-  related: ['Draft Instruments', 'Stack Damper', 'Stack'],
-};
-${detailsAnchor}`;
+          const detailsInjection = "\ndetails['Draft Instruments'] = {\n  group: 'Draft & Flue Gas',\n  location: 'Pressure tap at the radiant roof / arch reference region with representative PI/PT indication.',\n  summary: 'Draft measurement hardware teaching the key natural-draft pressure reference in mmH2O.',\n  function: 'Sense and indicate representative firebox draft so pressure direction can be read together with stack-damper movement.',\n  why: 'Arch / radiant-roof draft is commonly the highest-pressure / lowest-draft region and is a key reference for hot-gas containment.',\n  observe: ['Arch / radiant-roof pressure tap', 'Impulse / sensing line', 'PI/PT indication', 'Response to stack-damper movement'],\n  issues: ['Plugged or leaking sensing line', 'Indication error', 'Loss of negative pressure margin', 'Mismatch between indicated and actual draft'],\n  inspection: ['Pressure tap and line', 'Instrument condition', 'Reference-point integrity', 'Comparison with approved plant indication'],\n  related: ['Stack Damper', 'Breeching', 'Stack'],\n};\ndetails['Stack Analyzers'] = {\n  group: 'Draft & Flue Gas',\n  location: 'Representative stack sample probe and analyzer cabinet on the upper flue-gas path.',\n  summary: 'Training analyzer package for O2, CO, NOx and SOx interpretation alongside draft.',\n  function: 'Show representative combustion / emissions trends without implying certified CEMS performance or universal alarm limits.',\n  why: 'O2 and CO help interpret excess-air and combustion condition; NOx depends on several firing variables and SOx is strongly fuel-sulfur dependent.',\n  observe: ['Sample-probe location', 'O2 trend', 'CO trend', 'Potential leakage-air influence on stack O2'],\n  issues: ['Tramp-air bias', 'Sample-system plugging', 'Analyzer drift', 'Misinterpreting one analyzer signal without draft context'],\n  inspection: ['Sample probe', 'Sample line', 'Analyzer cabinet', 'Calibration / validation status in the real plant'],\n  related: ['Draft Instruments', 'Stack Damper', 'Stack'],\n};\n\nconst smartMode: Record<string, ViewMode> = {";
           if (!app.includes(detailsAnchor)) throw new Error('Details insertion anchor not found');
           app = app.replace(detailsAnchor, detailsInjection);
 
