@@ -15,16 +15,15 @@ function replaceRegex(source, pattern, replacement, label) {
 // -----------------------------------------------------------------------------
 // CHECKPOINT 14 — FUEL VISIBILITY + CONSERVATIVE CAMERA + CLEARANCE POLISH
 // Runs after checkpoint-12 burner/camera/geometry refinement.
-// This is deliberately visual/interaction polish only — no new process model.
+// Visual teaching polish only — no new process model.
 // -----------------------------------------------------------------------------
 
 const heaterPath = 'src/Heater3D.tsx';
 let source = fs.readFileSync(heaterPath, 'utf8');
 
-// 1) Make the fuel teaching cue unmistakably visible while keeping it tied to
-// the representative pipe route. The bright core sits just off the pipe center
-// line; the soft additive halo makes the cue readable even against copper/dark
-// hardware. This is a visual teaching overlay, not a literal fluid rendering.
+// 1) Fuel teaching cue: same representative piping path, but rendered as a
+// visible tracer just outside the pipe skin. Bright core + soft halo keeps it
+// readable against copper/dark hardware without implying a literal CFD view.
 source = replaceOnce(
   source,
   "    const burnerFuelParticles: THREE.Mesh[] = [];\n    const burnerHotParticles: THREE.Mesh[] = [];",
@@ -32,9 +31,9 @@ source = replaceOnce(
   'fuel glow particle array'
 );
 
-source = replaceOnce(
+source = replaceRegex(
   source,
-  "    const burnerFuelMat = new THREE.MeshBasicMaterial({ color: '#ffd36a', transparent: true, opacity: 0.96 });",
+  /    const burnerFuelMat = new THREE\.MeshBasicMaterial\(\{[^\n]*\}\);/,
   "    const burnerFuelMat = new THREE.MeshBasicMaterial({ color: '#ffd24a', transparent: true, opacity: 1, depthWrite: false, depthTest: false });\n    const burnerFuelGlowMat = new THREE.MeshBasicMaterial({ color: '#fff2a3', transparent: true, opacity: 0.24, depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending });",
   'fuel material visibility'
 );
@@ -46,16 +45,24 @@ source = replaceRegex(
   'fuel particle core + halo creation'
 );
 
-source = replaceRegex(
+// Replace only the routing portion inside the existing fuel loop, preserving
+// the simulator's fuel-speed and fuel-demand scaling logic.
+source = replaceOnce(
   source,
-  /      for \(const p of burnerFuelParticles\) \{\n        const u = \(p\.userData\.t \+ t \* 0\.075\) % 1;\n        if \(activeBurnerStudy === 'external'\) \{\n          p\.position\.copy\(heroFuelPath\.getPoint\(THREE\.MathUtils\.clamp\(u, 0, 0\.9999\)\)\);\n        \} else if \(activeBurnerStudy === 'pilot'\) \{\n          p\.position\.set\(-1\.4 \+ u \* 1\.4, 5\.72 \+ u \* 0\.82, -1\.35\);\n        \} else \{\n          p\.position\.set\(-2\.3 \+ u \* 2\.3, 3\.45 \+ u \* 3\.05, -1\.35 \+ Math\.sin\(u \* Math\.PI\) \* 0\.12\);\n        \}\n      \}/,
-  `      for (const p of burnerFuelParticles) {\n        const u = (p.userData.t + t * 0.078) % 1;\n        if (activeBurnerStudy === 'external' || activeBurnerStudy === 'internal') {\n          const point = heroFuelPath.getPoint(THREE.MathUtils.clamp(u, 0, 0.9999));\n          const offset = activeBurnerStudy === 'internal'\n            ? new THREE.Vector3(0.16, 0.07, 0.15)\n            : new THREE.Vector3(0.14, 0.06, 0.13);\n          p.position.copy(point).add(offset);\n          const pulse = 1 + Math.sin(t * 7.2 + (p.userData.t as number) * Math.PI * 2) * 0.16;\n          p.scale.setScalar(pulse);\n        } else if (activeBurnerStudy === 'pilot') {\n          p.position.set(-1.4 + u * 1.4, 5.72 + u * 0.82, -1.35);\n        } else {\n          p.position.set(-2.3 + u * 2.3, 3.45 + u * 3.05, -1.35 + Math.sin(u * Math.PI) * 0.12);\n        }\n      }\n      for (const p of burnerFuelGlowParticles) {\n        const u = (p.userData.t + t * 0.078) % 1;\n        if (activeBurnerStudy === 'external' || activeBurnerStudy === 'internal') {\n          const point = heroFuelPath.getPoint(THREE.MathUtils.clamp(u, 0, 0.9999));\n          const offset = activeBurnerStudy === 'internal'\n            ? new THREE.Vector3(0.16, 0.07, 0.15)\n            : new THREE.Vector3(0.14, 0.06, 0.13);\n          p.position.copy(point).add(offset);\n          const glowPulse = 0.9 + (Math.sin(t * 6.4 + (p.userData.t as number) * Math.PI * 2) + 1) * 0.16;\n          p.scale.setScalar(glowPulse);\n        } else if (activeBurnerStudy === 'pilot') {\n          p.position.set(-1.4 + u * 1.4, 5.72 + u * 0.82, -1.35);\n        } else {\n          p.position.set(-2.3 + u * 2.3, 3.45 + u * 3.05, -1.35 + Math.sin(u * Math.PI) * 0.12);\n        }\n      }`,
+  `        if (activeBurnerStudy === 'external') {\n          p.position.copy(heroFuelPath.getPoint(THREE.MathUtils.clamp(u, 0, 0.9999)));\n        } else if (activeBurnerStudy === 'pilot') {\n          p.position.set(-1.4 + u * 1.4, 5.72 + u * 0.82, -1.35);\n        } else {\n          p.position.set(-2.3 + u * 2.3, 3.45 + u * 3.05, -1.35 + Math.sin(u * Math.PI) * 0.12);\n        }`,
+  `        if (activeBurnerStudy === 'external' || activeBurnerStudy === 'internal') {\n          const point = heroFuelPath.getPoint(THREE.MathUtils.clamp(u, 0, 0.9999));\n          const offset = activeBurnerStudy === 'internal'\n            ? new THREE.Vector3(0.16, 0.07, 0.15)\n            : new THREE.Vector3(0.14, 0.06, 0.13);\n          p.position.copy(point).add(offset);\n          const pulse = 1 + Math.sin(t * 7.2 + (p.userData.t as number) * Math.PI * 2) * 0.16;\n          const commandScale = activeBurnerControl ? combustionTrainingMetrics.fuelParticleScale : 1;\n          p.scale.setScalar(commandScale * pulse);\n        } else if (activeBurnerStudy === 'pilot') {\n          p.position.set(-1.4 + u * 1.4, 5.72 + u * 0.82, -1.35);\n        } else {\n          p.position.set(-2.3 + u * 2.3, 3.45 + u * 3.05, -1.35 + Math.sin(u * Math.PI) * 0.12);\n        }`,
   'fuel route visibility in underfurnace + internal cutaway'
 );
 
-// 2) Conservative camera polish only: keep the stable yaw/pitch architecture,
-// but bias steep underheater inspection a little lower and allow a touch more
-// downward travel. No arcball/quaternion control is introduced here.
+source = replaceOnce(
+  source,
+  "      }\n      for (const p of burnerHotParticles) {",
+  `      }\n      for (const p of burnerFuelGlowParticles) {\n        const fuelSpeed = activeBurnerControl ? combustionTrainingMetrics.fuelParticleSpeed : 1;\n        const u = (p.userData.t + t * 0.075 * fuelSpeed) % 1;\n        if (activeBurnerControl) p.visible = fuelGasPositionRef.current > 2;\n        if (activeBurnerStudy === 'external' || activeBurnerStudy === 'internal') {\n          const point = heroFuelPath.getPoint(THREE.MathUtils.clamp(u, 0, 0.9999));\n          const offset = activeBurnerStudy === 'internal'\n            ? new THREE.Vector3(0.16, 0.07, 0.15)\n            : new THREE.Vector3(0.14, 0.06, 0.13);\n          p.position.copy(point).add(offset);\n          const glowPulse = 0.92 + (Math.sin(t * 6.4 + (p.userData.t as number) * Math.PI * 2) + 1) * 0.14;\n          const commandScale = activeBurnerControl ? combustionTrainingMetrics.fuelParticleScale : 1;\n          p.scale.setScalar(commandScale * glowPulse);\n        } else if (activeBurnerStudy === 'pilot') {\n          p.position.set(-1.4 + u * 1.4, 5.72 + u * 0.82, -1.35);\n        } else {\n          p.position.set(-2.3 + u * 2.3, 3.45 + u * 3.05, -1.35 + Math.sin(u * Math.PI) * 0.12);\n        }\n      }\n      for (const p of burnerHotParticles) {`,
+  'fuel glow animation loop'
+);
+
+// 2) Conservative camera polish: preserve current yaw/pitch control model and
+// stability, but give steep underheater inspection a slightly lower target.
 source = replaceOnce(
   source,
   "        lookTarget.y = THREE.MathUtils.lerp(o.target.y, Math.min(o.target.y, 5.6), assist);\n        if (camera.position.y < 0.72) camera.position.y = 0.72;",
@@ -70,10 +77,8 @@ source = replaceOnce(
   'conservative lower pitch extension'
 );
 
-// 3) Increase normal flame-to-tube visual separation modestly. Keep the tube
-// planes inside the representative refractory envelope, and narrow only the
-// normal outer flame cone enough to read as healthy firing. Fault/impingement
-// logic still deliberately leans/translates the flame into the tube envelope.
+// 3) More normal flame-to-tube breathing room, still within the representative
+// firebox envelope. Abnormal impingement logic remains intentionally available.
 const tubePlaneMatches = [...source.matchAll(/\b5\.28\b/g)].length;
 if (tubePlaneMatches < 8) throw new Error(`tube plane refinement: expected several 5.28 anchors, found ${tubePlaneMatches}`);
 source = source.replace(/\b5\.28\b/g, '5.40');
