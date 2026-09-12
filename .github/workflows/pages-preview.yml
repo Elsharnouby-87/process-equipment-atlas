@@ -36,6 +36,20 @@ jobs:
         with:
           node-version: 22
 
+      - name: Assemble Heater3D source
+        run: |
+          cat src/_migration/Heater3D.part0.txt src/_migration/Heater3D.part1.txt src/_migration/Heater3D.part2.txt src/_migration/Heater3D.part3.txt src/_migration/Heater3D.part4.txt > src/Heater3D.tsx
+          node <<'NODE'
+          const fs = require('fs');
+          const path = 'src/Heater3D.tsx';
+          let source = fs.readFileSync(path, 'utf8');
+          const before = "group.traverse(obj => { obj.visible = true; });";
+          const after = "group.traverse(obj => { if (obj !== breechingFullShell && obj !== breechingCutShell && obj !== stackFullShell && obj !== stackCutShell && obj !== pilotMicroRef.current) obj.visible = true; });";
+          if (!source.includes(before)) throw new Error('Expected v42 visibility reset not found');
+          source = source.replace(before, after);
+          fs.writeFileSync(path, source);
+          NODE
+
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
