@@ -15,6 +15,9 @@ function replaceRegex(source, pattern, replacement, label) {
 const heaterPath = 'src/Heater3D.tsx';
 let source = fs.readFileSync(heaterPath, 'utf8');
 
+// CHECKPOINT 14 — visible fuel tracer + conservative clearance polish.
+// Keep the representative fuel route from checkpoint 12, but make it legible
+// beside the pipe rather than visually buried inside it.
 source = replaceOnce(
   source,
   "    const burnerFuelParticles: THREE.Mesh[] = [];\n    const burnerHotParticles: THREE.Mesh[] = [];",
@@ -36,29 +39,26 @@ source = replaceRegex(
   'fuel particle core + halo creation'
 );
 
+// Preserve the simulator's existing fuel-speed / fuel-demand loop. After it has
+// run, override only the external/internal teaching-view position so the tracer
+// sits just outside the visible pipe skin while following the same route.
 source = replaceOnce(
   source,
   "      }\n      for (const p of burnerHotParticles) {",
-  `      }\n      if (activeBurnerStudy === 'external' || activeBurnerStudy === 'internal') {\n        for (const p of burnerFuelParticles) {\n          const fuelSpeed = activeBurnerControl ? combustionTrainingMetrics.fuelParticleSpeed : 1;\n          const u = (p.userData.t + t * 0.075 * fuelSpeed) % 1;\n          const point = heroFuelPath.getPoint(THREE.MathUtils.clamp(u, 0, 0.9999));\n          const offset = activeBurnerStudy === 'internal'\n            ? new THREE.Vector3(0.16, 0.07, 0.15)\n            : new THREE.Vector3(0.14, 0.06, 0.13);\n          p.position.copy(point).add(offset);\n          if (activeBurnerControl) p.visible = fuelGasPositionRef.current > 2;\n          const pulse = 1 + Math.sin(t * 7.2 + (p.userData.t as number) * Math.PI * 2) * 0.16;\n          const commandScale = activeBurnerControl ? combustionTrainingMetrics.fuelParticleScale : 1;\n          p.scale.setScalar(commandScale * pulse);\n        }\n      }\n      for (const p of burnerFuelGlowParticles) {\n        const fuelSpeed = activeBurnerControl ? combustionTrainingMetrics.fuelParticleSpeed : 1;\n        const u = (p.userData.t + t * 0.075 * fuelSpeed) % 1;\n        if (activeBurnerControl) p.visible = fuelGasPositionRef.current > 2;\n        if (activeBurnerStudy === 'external' || activeBurnerStudy === 'internal') {\n          const point = heroFuelPath.getPoint(THREE.MathUtils.clamp(u, 0, 0.9999));\n          const offset = activeBurnerStudy === 'internal'\n            ? new THREE.Vector3(0.16, 0.07, 0.15)\n            : new THREE.Vector3(0.14, 0.06, 0.13);\n          p.position.copy(point).add(offset);\n          const glowPulse = 0.92 + (Math.sin(t * 6.4 + (p.userData.t as number) * Math.PI * 2) + 1) * 0.14;\n          const commandScale = activeBurnerControl ? combustionTrainingMetrics.fuelParticleScale : 1;\n          p.scale.setScalar(commandScale * glowPulse);\n        } else if (activeBurnerStudy === 'pilot') {\n          p.position.set(-1.4 + u * 1.4, 5.72 + u * 0.82, -1.35);\n        } else {\n          p.position.set(-2.3 + u * 2.3, 3.45 + u * 3.05, -1.35 + Math.sin(u * Math.PI) * 0.12);\n        }\n      }\n      for (const p of burnerHotParticles) {`,
+  `      }\n      if (activeBurnerStudy === 'external' || activeBurnerStudy === 'internal') {\n        for (const p of burnerFuelParticles) {\n          const fuelSpeed = activeBurnerControl ? combustionTrainingMetrics.fuelParticleSpeed : 1;\n          const u = (p.userData.t + t * 0.075 * fuelSpeed) % 1;\n          const point = heroFuelPath.getPoint(THREE.MathUtils.clamp(u, 0, 0.9999));\n          const offset = activeBurnerStudy === 'internal'\n            ? new THREE.Vector3(0.18, 0.085, 0.17)\n            : new THREE.Vector3(0.16, 0.075, 0.15);\n          p.position.copy(point).add(offset);\n          if (activeBurnerControl) p.visible = fuelGasPositionRef.current > 2;\n          const pulse = 1 + Math.sin(t * 7.2 + (p.userData.t as number) * Math.PI * 2) * 0.16;\n          const commandScale = activeBurnerControl ? combustionTrainingMetrics.fuelParticleScale : 1;\n          p.scale.setScalar(commandScale * pulse);\n        }\n      }\n      for (const p of burnerFuelGlowParticles) {\n        const fuelSpeed = activeBurnerControl ? combustionTrainingMetrics.fuelParticleSpeed : 1;\n        const u = (p.userData.t + t * 0.075 * fuelSpeed) % 1;\n        if (activeBurnerControl) p.visible = fuelGasPositionRef.current > 2;\n        if (activeBurnerStudy === 'external' || activeBurnerStudy === 'internal') {\n          const point = heroFuelPath.getPoint(THREE.MathUtils.clamp(u, 0, 0.9999));\n          const offset = activeBurnerStudy === 'internal'\n            ? new THREE.Vector3(0.18, 0.085, 0.17)\n            : new THREE.Vector3(0.16, 0.075, 0.15);\n          p.position.copy(point).add(offset);\n          const glowPulse = 0.92 + (Math.sin(t * 6.4 + (p.userData.t as number) * Math.PI * 2) + 1) * 0.14;\n          const commandScale = activeBurnerControl ? combustionTrainingMetrics.fuelParticleScale : 1;\n          p.scale.setScalar(commandScale * glowPulse);\n        } else if (activeBurnerStudy === 'pilot') {\n          p.position.set(-1.4 + u * 1.4, 5.72 + u * 0.82, -1.35);\n        } else {\n          p.position.set(-2.3 + u * 2.3, 3.45 + u * 3.05, -1.35 + Math.sin(u * Math.PI) * 0.12);\n        }\n      }\n      for (const p of burnerHotParticles) {`,
   'fuel visibility override and glow loop'
 );
 
-// Camera: intentionally preserve the already-stable conservative controls from
-// checkpoint 13. No arcball or further control-model change in this polish.
+// Conservative camera choice: intentionally retain the already-stable camera
+// architecture and checkpoint-13 underheater behavior. No arcball change here.
 
-const tubePlaneMatches = [...source.matchAll(/\b5\.28\b/g)].length;
-if (tubePlaneMatches < 8) throw new Error(`tube plane refinement: expected several 5.28 anchors, found ${tubePlaneMatches}`);
-source = source.replace(/\b5\.28\b/g, '5.40');
-
-const manifoldMatches = [...source.matchAll(/\b5\.44\b/g)].length;
-if (manifoldMatches < 2) throw new Error(`manifold refinement: expected 5.44 anchors, found ${manifoldMatches}`);
-source = source.replace(/\b5\.44\b/g, '5.56');
-source = source.replace("hotspot.position.set(5.26, 10.25, -1.4);", "hotspot.position.set(5.38, 10.25, -1.4);");
-
+// Give the healthy/normal flame a little more visual breathing room without
+// changing the representative firebox envelope. Abnormal impingement scenarios
+// keep their explicit lean/contact logic and remain available as faults.
 source = replaceOnce(
   source,
   "    const outer = new THREE.Mesh(new THREE.ConeGeometry(0.72, 5.6, 42, 12, true), outerMat);",
-  "    const outer = new THREE.Mesh(new THREE.ConeGeometry(0.68, 5.6, 42, 12, true), outerMat);",
+  "    const outer = new THREE.Mesh(new THREE.ConeGeometry(0.66, 5.6, 42, 12, true), outerMat);",
   'normal outer flame width refinement'
 );
 
