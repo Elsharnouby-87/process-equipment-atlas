@@ -1,11 +1,17 @@
-name: GitHub Pages Migration Preview
+name: GitHub Pages Development Preview
 
 on:
   push:
     branches:
       - floot-migration-dev
     paths:
-      - 'preview-mirror/**'
+      - 'src/**'
+      - 'index.html'
+      - 'package.json'
+      - 'vite.config.ts'
+      - 'postcss.config.js'
+      - 'tailwind.config.js'
+      - 'tsconfig.json'
       - '.github/workflows/pages-preview.yml'
   workflow_dispatch:
 
@@ -22,26 +28,33 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout migration branch
+      - name: Checkout development branch
         uses: actions/checkout@v4
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
 
-      - name: Build independent baseline mirror
-        run: node preview-mirror/mirror.mjs
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Build GitHub source
+        run: npm run build
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
-          path: preview-mirror/dist
+          path: dist
 
   deploy:
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
