@@ -16,8 +16,6 @@ const heaterPath = 'src/Heater3D.tsx';
 let source = fs.readFileSync(heaterPath, 'utf8');
 
 // CHECKPOINT 14 — visible fuel tracer + conservative clearance polish.
-// Keep the representative fuel route from checkpoint 12, but make it legible
-// beside the pipe rather than visually buried inside it.
 source = replaceOnce(
   source,
   "    const burnerFuelParticles: THREE.Mesh[] = [];\n    const burnerHotParticles: THREE.Mesh[] = [];",
@@ -41,7 +39,7 @@ source = replaceRegex(
 
 // Preserve the simulator's existing fuel-speed / fuel-demand loop. After it has
 // run, override only external/internal teaching-view positions so the tracer
-// sits just outside the pipe skin while still following the exact same route.
+// sits just outside the pipe skin while still following the same route.
 source = replaceOnce(
   source,
   "      }\n      for (const p of burnerHotParticles) {",
@@ -49,17 +47,22 @@ source = replaceOnce(
   'fuel visibility override and glow loop'
 );
 
-// Conservative camera choice: intentionally retain the current stable camera
-// controls and checkpoint-13 underheater behavior. No arcball change.
+// Conservative camera choice: retain the current stable controls unchanged.
 
-// Increase healthy flame/tube visual breathing room without touching the
-// firebox envelope. Match the generated outer-flame geometry robustly because
-// earlier assembly patches may tune its starting radius.
+// Increase healthy flame/tube visual breathing room by narrowing the outer
+// flame envelope through its base horizontal scales. This avoids changing the
+// firebox/tube geometry again; abnormal impingement lean/contact logic remains.
 source = replaceRegex(
   source,
-  /    const outer = new THREE\.Mesh\(new THREE\.ConeGeometry\([0-9.]+, 5\.6, 42, 12, true\), outerMat\);/,
-  "    const outer = new THREE.Mesh(new THREE.ConeGeometry(0.66, 5.6, 42, 12, true), outerMat);",
-  'normal outer flame width refinement'
+  /    const outerScaleX = (.+);/,
+  "    const outerScaleX = ($1) * 0.92;",
+  'outer flame x clearance scale'
+);
+source = replaceRegex(
+  source,
+  /    const outerScaleZ = (.+);/,
+  "    const outerScaleZ = ($1) * 0.92;",
+  'outer flame z clearance scale'
 );
 
 fs.writeFileSync(heaterPath, source);
