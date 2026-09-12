@@ -1,0 +1,499 @@
+    ignitionElectrode.userData.pilotRole = 'ignitionElectrode';
+    pilotMicro.add(ignitionElectrode);
+    pilotMicro.add(cylinderBetween(new THREE.Vector3(0.46, 0.08, 0.02), new THREE.Vector3(0.46, 1.18, 0.02), 0.045, boltMat, 12));
+    pilotMicro.add(cylinderBetween(new THREE.Vector3(0.76, 0.1, 0.2), new THREE.Vector3(0.76, 1.32, 0.2), 0.05, ceramic, 12));
+    const ignitionSpark = new THREE.Mesh(new THREE.SphereGeometry(0.11, 12, 9), new THREE.MeshBasicMaterial({ color: '#dffaff' }));
+    ignitionSpark.position.set(-0.28, 1.12, -0.02);
+    ignitionSpark.userData.pilotRole = 'ignitionSpark';
+    ignitionSpark.visible = false;
+    pilotMicro.add(ignitionSpark);
+    const provingRing = new THREE.Mesh(new THREE.TorusGeometry(0.2, 0.035, 10, 28), new THREE.MeshBasicMaterial({ color: '#65ef9e', transparent: true, opacity: 0.92 }));
+    provingRing.rotation.x = Math.PI / 2;
+    provingRing.position.set(0.76, 1.27, 0.2);
+    provingRing.userData.pilotRole = 'provingAccepted';
+    provingRing.visible = false;
+    pilotMicro.add(provingRing);
+    const pilotGlow = new THREE.PointLight('#66cfff', 7, 2.8, 2);
+    pilotGlow.position.set(0, 1.1, 0);
+    pilotGlow.userData.pilotRole = 'pilotGlow';
+    pilotGlow.visible = false;
+    pilotMicro.add(pilotGlow);
+    const pilotFlameMat = makeFlameMaterial('#5fc4ff', '#ffd37a', 1.35, 41.7);
+    const pilotFlame = new THREE.Mesh(new THREE.ConeGeometry(0.24, 0.96, 24, 7, true), pilotFlameMat);
+    pilotFlame.userData.baseScaleX = 1;
+    pilotFlame.userData.baseScaleY = 1;
+    pilotFlame.userData.baseScaleZ = 1;
+    pilotFlame.userData.baseBottom = 0.54;
+    pilotFlame.userData.halfHeight = 0.48;
+    pilotFlame.userData.flameRole = 'core';
+    pilotFlame.userData.isPilotFlame = true;
+    pilotFlame.userData.phase = 7.2;
+    pilotFlame.position.set(0, 1.02, 0);
+    pilotMicro.add(pilotFlame);
+    flameMaterials.push(pilotFlameMat);
+    flameMeshes.push(pilotFlame);
+    const pilotLabels = new THREE.Group();
+    const pilotLabelSpecs: [string, [number, number, number]][] = [
+      ['IGNITION ELECTRODE', [-1.45, 1.35, 0]],
+      ['PILOT PORT', [-1.15, 0.35, 0]],
+      ['GROUND REFERENCE', [1.35, 0.62, 0]],
+      ['FLAME PROVING', [1.55, 1.42, 0.2]],
+    ];
+    pilotLabelSpecs.forEach(([text, position]) => {
+      const label = makeLabel(text);
+      label.scale.set(2.5, 0.56, 1);
+      label.position.set(...position);
+      pilotLabels.add(label);
+    });
+    pilotMicro.add(pilotLabels);
+    pilotMicro.userData.labelGroup = pilotLabels;
+    burners.add(pilotMicro);
+    pilotMicroRef.current = pilotMicro;
+
+    burners.children.forEach(child => { child.userData.burnerBasePosition = child.position.clone(); child.userData.burnerTargetPosition = child.position.clone(); });
+    addComponent('Burners', burners);
+
+    const radiant = new THREE.Group();
+    const zVals = [-3.0, -2.2, -1.4, -0.6, 0.2, 1.0, 1.8, 2.6];
+    for (const side of [-1, 1]) {
+      const x = side * 5.02;
+      for (let i = 0; i < zVals.length; i += 2) {
+        const z1 = zVals[i];
+        const z2 = zVals[i + 1];
+        const coil = tubePath([
+          new THREE.Vector3(x, 6.72, z1),
+          new THREE.Vector3(x, 10.8, z1),
+          new THREE.Vector3(x, 15.85, z1),
+          new THREE.Vector3(x, 16.25, (z1 + z2) / 2),
+          new THREE.Vector3(x, 15.85, z2),
+          new THREE.Vector3(x, 10.8, z2),
+          new THREE.Vector3(x, 6.72, z2),
+        ], 0.18, tubeHot, 96);
+        coil.userData.radiantRole = 'coil';
+        coil.userData.radiantPass = side === 1 ? 'A' : 'B';
+        coil.userData.radiantHeroPass = side === 1 && i === 2;
+        radiant.add(coil);
+      }
+      const lowerSupport = box([0.54, 0.48, 6.95], [x, 6.48, -0.15], darkSteel);
+      lowerSupport.userData.radiantRole = 'support';
+      lowerSupport.userData.radiantPass = side === 1 ? 'A' : 'B';
+      radiant.add(lowerSupport);
+      for (const y of [8.0, 10.7, 13.4, 15.65]) {
+        const rail = box([0.45, 0.16, 7.0], [x + side * 0.05, y, -0.15], darkSteel);
+        rail.userData.radiantRole = 'support';
+        rail.userData.radiantPass = side === 1 ? 'A' : 'B';
+        radiant.add(rail);
+        for (const z of zVals) {
+          const guide = box([0.34, 0.26, 0.18], [x - side * 0.21, y, z], darkSteel);
+          guide.userData.radiantRole = 'support';
+          guide.userData.radiantPass = side === 1 ? 'A' : 'B';
+          radiant.add(guide);
+          const clamp = new THREE.Mesh(new THREE.TorusGeometry(0.215, 0.027, 6, 16), boltMat);
+          clamp.rotation.x = Math.PI / 2;
+          clamp.position.set(x, y, z);
+          clamp.userData.radiantRole = 'support';
+          clamp.userData.radiantPass = side === 1 ? 'A' : 'B';
+          radiant.add(clamp);
+        }
+      }
+      const manifoldX = side * 5.18;
+      const manifold = cylinderBetween(new THREE.Vector3(manifoldX, 6.62, -3.2), new THREE.Vector3(manifoldX, 6.62, 3.0), 0.22, tubeMat, 16);
+      manifold.userData.radiantRole = 'manifold';
+      manifold.userData.radiantPass = side === 1 ? 'A' : 'B';
+      radiant.add(manifold);
+      const nozzle = cylinderBetween(new THREE.Vector3(manifoldX, 6.62, -3.2), new THREE.Vector3(side * 6.4, 6.62, -3.2), 0.2, tubeMat, 16);
+      nozzle.userData.radiantRole = 'manifold';
+      nozzle.userData.radiantPass = side === 1 ? 'A' : 'B';
+      radiant.add(nozzle);
+      const sideFlange = cylinder(0.34, 0.13, [side * 6.3, 6.62, -3.2], darkSteel, 22);
+      sideFlange.rotation.z = Math.PI / 2;
+      sideFlange.userData.radiantRole = 'manifold';
+      sideFlange.userData.radiantPass = side === 1 ? 'A' : 'B';
+      radiant.add(sideFlange);
+    }
+    addComponent('Radiant Tubes', radiant);
+
+    const radiantOverlay = new THREE.Group();
+    radiantOverlay.visible = false;
+    const corridorMat = new THREE.MeshBasicMaterial({ color: '#54c9ff', transparent: true, opacity: 0.08, wireframe: true, depthWrite: false });
+    const corridor = new THREE.Mesh(new THREE.CylinderGeometry(3.1, 3.1, 9.6, 28, 1, true), corridorMat);
+    corridor.position.set(0, 11.4, -1.35);
+    corridor.userData.radiantOverlay = 'clearance';
+    radiantOverlay.add(corridor);
+    const hotMat = new THREE.MeshBasicMaterial({ color: '#ff542b', transparent: true, opacity: 0.9 });
+    const hotspot = new THREE.Mesh(new THREE.SphereGeometry(0.36, 18, 14), hotMat);
+    hotspot.position.set(5.0, 10.25, -1.4);
+    hotspot.userData.radiantOverlay = 'hotspot';
+    radiantOverlay.add(hotspot);
+    const hotLight = new THREE.PointLight('#ff5b22', 24, 5.5, 2);
+    hotLight.position.copy(hotspot.position);
+    hotLight.userData.radiantOverlay = 'hotspot';
+    radiantOverlay.add(hotLight);
+    const cokeMat = new THREE.MeshPhysicalMaterial({ color: '#261b16', roughness: 0.92, metalness: 0.04, transparent: true, opacity: 0.95 });
+    const cokeRing = new THREE.Mesh(new THREE.TorusGeometry(0.155, 0.055, 12, 30), cokeMat);
+    cokeRing.rotation.x = Math.PI / 2;
+    cokeRing.position.set(5.02, 10.25, -1.4);
+    cokeRing.scale.setScalar(1.5);
+    cokeRing.userData.radiantOverlay = 'coking';
+    radiantOverlay.add(cokeRing);
+    const fluidCore = cylinder(0.07, 1.5, [5.02, 10.25, -1.4], new THREE.MeshBasicMaterial({ color: '#31c8ff', transparent: true, opacity: 0.75 }), 18);
+    fluidCore.userData.radiantOverlay = 'coking';
+    radiantOverlay.add(fluidCore);
+    const overlayLabels: { text: string; pos: [number, number, number]; overlay: string }[] = [
+      { text: 'FLAME CLEARANCE', pos: [0, 14.9, 2.8], overlay: 'clearance' },
+      { text: 'REPRESENTATIVE PASS', pos: [6.9, 12.8, -1.0], overlay: 'pass' },
+      { text: 'LOCAL HOT SPOT', pos: [7.0, 10.25, -1.4], overlay: 'hotspot' },
+      { text: 'INTERNAL COKE · SCHEMATIC', pos: [7.2, 9.45, -1.4], overlay: 'coking' },
+    ];
+    overlayLabels.forEach(spec => {
+      const label = makeLabel(spec.text);
+      label.scale.set(3.3, 0.74, 1);
+      label.position.set(...spec.pos);
+      label.userData.radiantOverlay = spec.overlay;
+      radiantOverlay.add(label);
+    });
+    radiantOverlayRef.current = radiantOverlay;
+    scene.add(radiantOverlay);
+
+    const troubleshootingOverlay = new THREE.Group();
+    troubleshootingOverlay.visible = false;
+    const deviationArrow = new THREE.ArrowHelper(new THREE.Vector3(0.58, 0.81, -0.03).normalize(), new THREE.Vector3(4.16, 8.45, -1.35), 2.15, 0xffa24c, 0.38, 0.2);
+    deviationArrow.userData.troubleshootingCue = 't1-deviation';
+    troubleshootingOverlay.add(deviationArrow);
+    const contactMat = new THREE.MeshBasicMaterial({ color: '#ff7a2f', transparent: true, opacity: 0.9, depthWrite: false, blending: THREE.AdditiveBlending });
+    const contactRing = new THREE.Mesh(new THREE.TorusGeometry(0.34, 0.055, 10, 34), contactMat);
+    contactRing.rotation.x = Math.PI / 2;
+    contactRing.position.set(5.02, 10.25, -1.4);
+    contactRing.userData.troubleshootingCue = 't1-contact';
+    contactRing.userData.troubleshootingPulse = true;
+    troubleshootingOverlay.add(contactRing);
+    const contactHalo = new THREE.Mesh(new THREE.SphereGeometry(0.31, 18, 12), new THREE.MeshBasicMaterial({ color: '#ff9a43', transparent: true, opacity: 0.28, depthWrite: false, blending: THREE.AdditiveBlending }));
+    contactHalo.position.copy(contactRing.position);
+    contactHalo.userData.troubleshootingCue = 't1-contact';
+    contactHalo.userData.troubleshootingPulse = true;
+    troubleshootingOverlay.add(contactHalo);
+    const thermalMat = new THREE.MeshStandardMaterial({ color: '#8a2819', emissive: '#ff4a17', emissiveIntensity: 2.2, transparent: true, opacity: 0.88, roughness: 0.5 });
+    const thermalSleeve = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 1.85, 24), thermalMat);
+    thermalSleeve.position.set(5.02, 10.25, -1.4);
+    thermalSleeve.userData.troubleshootingCue = 't1-thermal';
+    thermalSleeve.userData.troubleshootingPulse = true;
+    troubleshootingOverlay.add(thermalSleeve);
+    const thermalLight = new THREE.PointLight('#ff5428', 17, 5.4, 2);
+    thermalLight.position.copy(thermalSleeve.position);
+    thermalLight.userData.troubleshootingCue = 't1-thermal';
+    troubleshootingOverlay.add(thermalLight);
+    const scanMat = new THREE.MeshBasicMaterial({ color: '#55d8ff', transparent: true, opacity: 0.92, depthWrite: false, blending: THREE.AdditiveBlending });
+    const scanRing = new THREE.Mesh(new THREE.TorusGeometry(0.35, 0.045, 10, 36), scanMat);
+    scanRing.rotation.x = Math.PI / 2;
+    scanRing.position.set(5.02, 10.25, -1.4);
+    scanRing.userData.troubleshootingCue = 't2-scan';
+    scanRing.userData.troubleshootingScan = true;
+    scanRing.userData.troubleshootingBaseY = 10.25;
+    troubleshootingOverlay.add(scanRing);
+    const compareTarget = new THREE.Mesh(new THREE.TorusGeometry(0.31, 0.035, 10, 32), new THREE.MeshBasicMaterial({ color: '#ffb25c', transparent: true, opacity: 0.86, depthWrite: false }));
+    compareTarget.rotation.x = Math.PI / 2;
+    compareTarget.position.set(5.02, 10.25, -1.4);
+    compareTarget.userData.troubleshootingCue = 't2-compare';
+    troubleshootingOverlay.add(compareTarget);
+    const compareReference = new THREE.Mesh(new THREE.TorusGeometry(0.31, 0.035, 10, 32), new THREE.MeshBasicMaterial({ color: '#62d9ff', transparent: true, opacity: 0.82, depthWrite: false }));
+    compareReference.rotation.x = Math.PI / 2;
+    compareReference.position.set(5.02, 10.25, -0.6);
+    compareReference.userData.troubleshootingCue = 't2-compare';
+    troubleshootingOverlay.add(compareReference);
+    const tubeHotMat = new THREE.MeshStandardMaterial({ color: '#8e2b1c', emissive: '#ff511f', emissiveIntensity: 2.35, transparent: true, opacity: 0.9, roughness: 0.48 });
+    const tubeHotSleeve = new THREE.Mesh(new THREE.CylinderGeometry(0.225, 0.225, 1.55, 24), tubeHotMat);
+    tubeHotSleeve.position.set(5.02, 10.25, -1.4);
+    tubeHotSleeve.userData.troubleshootingCue = 't2-hot';
+    tubeHotSleeve.userData.troubleshootingPulse = true;
+    troubleshootingOverlay.add(tubeHotSleeve);
+    const tubeHotHalo = new THREE.Mesh(new THREE.SphereGeometry(0.34, 18, 12), new THREE.MeshBasicMaterial({ color: '#ff6a2c', transparent: true, opacity: 0.2, depthWrite: false, blending: THREE.AdditiveBlending }));
+    tubeHotHalo.position.copy(tubeHotSleeve.position);
+    tubeHotHalo.userData.troubleshootingCue = 't2-hot';
+    tubeHotHalo.userData.troubleshootingPulse = true;
+    troubleshootingOverlay.add(tubeHotHalo);
+    const tubeHotLight = new THREE.PointLight('#ff5b2a', 15, 5.1, 2);
+    tubeHotLight.position.copy(tubeHotSleeve.position);
+    tubeHotLight.userData.troubleshootingCue = 't2-hot';
+    troubleshootingOverlay.add(tubeHotLight);
+    const addTroubleDraftArrow = (origin: THREE.Vector3, direction: THREE.Vector3, length: number, color: number, cue: string) => {
+      const arrow = new THREE.ArrowHelper(direction.clone().normalize(), origin, length, color, 0.38, 0.2);
+      arrow.userData.troubleshootingCue = cue;
+      troubleshootingOverlay.add(arrow);
+    };
+    for (const x of [-3.2, 0, 3.2]) {
+      addTroubleDraftArrow(new THREE.Vector3(x, 15.7, 2.5), new THREE.Vector3(0, 1, -0.16), 1.55, 0xffb34f, 't3-margin');
+      addTroubleDraftArrow(new THREE.Vector3(x, 16.9, 3.72), new THREE.Vector3(0, 0.08, 1), 1.8, 0xff6638, 't3-positive');
+    }
+    for (let i = 0; i < 10; i += 1) {
+      const leak = new THREE.Mesh(new THREE.SphereGeometry(0.11 + (i % 3) * 0.025, 9, 7), new THREE.MeshBasicMaterial({ color: '#ff733d', transparent: true, opacity: 0.72, depthWrite: false, blending: THREE.AdditiveBlending }));
+      leak.position.set(-3.3 + (i % 5) * 1.65, 16.65 + (i % 2) * 0.42, 4.05 + (i % 3) * 0.16);
+      leak.userData.troubleshootingCue = 't3-leak';
+      leak.userData.troubleshootingLeak = true;
+      leak.userData.troubleshootingLeakSeed = i / 10;
+      leak.userData.troubleshootingLeakBase = leak.position.clone();
+      troubleshootingOverlay.add(leak);
+    }
+    const damperCueRing = new THREE.Mesh(new THREE.TorusGeometry(2.02, 0.045, 8, 48), new THREE.MeshBasicMaterial({ color: '#ff9a43', transparent: true, opacity: 0.78, depthWrite: false }));
+    damperCueRing.rotation.x = Math.PI / 2;
+    damperCueRing.position.set(0, 30.55, 0);
+    damperCueRing.userData.troubleshootingCue = 't3-damper';
+    damperCueRing.userData.troubleshootingPulse = true;
+    troubleshootingOverlay.add(damperCueRing);
+    addTroubleDraftArrow(new THREE.Vector3(2.45, 31.55, 0.9), new THREE.Vector3(-0.15, -0.7, -0.7), 1.4, 0xff9a43, 't3-damper');
+    addTroubleDraftArrow(new THREE.Vector3(-2.45, 29.65, -0.9), new THREE.Vector3(0.15, 0.7, 0.7), 1.4, 0xff9a43, 't3-damper');
+    const backfireOuter = new THREE.Mesh(new THREE.ConeGeometry(0.42, 1.55, 28, 6, true), new THREE.MeshBasicMaterial({ color: '#ff5a1f', transparent: true, opacity: 0.86, depthWrite: false, blending: THREE.AdditiveBlending }));
+    backfireOuter.rotation.z = Math.PI;
+    backfireOuter.position.set(0, 5.92, -1.35);
+    backfireOuter.userData.troubleshootingCue = 't3-backfire';
+    backfireOuter.userData.troubleshootingBackfire = true;
+    backfireOuter.userData.troubleshootingPulse = true;
+    troubleshootingOverlay.add(backfireOuter);
+    const backfireCore = new THREE.Mesh(new THREE.ConeGeometry(0.2, 1.05, 22, 5, true), new THREE.MeshBasicMaterial({ color: '#ffd06a', transparent: true, opacity: 0.92, depthWrite: false, blending: THREE.AdditiveBlending }));
+    backfireCore.rotation.z = Math.PI;
+    backfireCore.position.set(0, 5.98, -1.35);
+    backfireCore.userData.troubleshootingCue = 't3-backfire';
+    backfireCore.userData.troubleshootingBackfire = true;
+    troubleshootingOverlay.add(backfireCore);
+    const backfireRing = new THREE.Mesh(new THREE.TorusGeometry(0.78, 0.055, 8, 34), new THREE.MeshBasicMaterial({ color: '#ff7844', transparent: true, opacity: 0.72, depthWrite: false }));
+    backfireRing.rotation.x = Math.PI / 2;
+    backfireRing.position.set(0, 6.12, -1.35);
+    backfireRing.userData.troubleshootingCue = 't3-backfire';
+    backfireRing.userData.troubleshootingPulse = true;
+    troubleshootingOverlay.add(backfireRing);
+    const troubleLabels: { text: string; pos: [number, number, number]; cue: string }[] = [
+      { text: 'FLAME ENVELOPE SHIFT', pos: [6.0, 8.75, -1.35], cue: 't1-deviation' },
+      { text: 'FLAME / TUBE CONTACT', pos: [7.15, 10.45, -1.4], cue: 't1-contact' },
+      { text: 'LOCAL THERMAL CONSEQUENCE', pos: [7.35, 11.25, -1.4], cue: 't1-thermal' },
+      { text: 'THERMAL SCAN · COMPARE PATTERN', pos: [7.2, 13.0, -1.0], cue: 't2-scan' },
+      { text: 'TARGET / REFERENCE TUBES', pos: [7.25, 11.75, -1.0], cue: 't2-compare' },
+      { text: 'LOCALIZED HOT AREA', pos: [7.0, 10.3, -1.4], cue: 't2-hot' },
+      { text: 'SYMPTOM ≠ ROOT CAUSE', pos: [7.05, 9.25, -1.4], cue: 't2-context' },
+      { text: 'REDUCED DRAFT TENDENCY · QUALITATIVE', pos: [6.7, 18.5, 1.0], cue: 't3-margin' },
+      { text: 'ARCH PRESSURE DIRECTION · OUTWARD', pos: [6.85, 17.0, 3.6], cue: 't3-positive' },
+      { text: 'DAMPER RESTRICTION · QUALITATIVE', pos: [5.85, 31.35, 0.0], cue: 't3-damper' },
+      { text: 'HOT GAS LEAKAGE CONCERN', pos: [6.5, 15.85, 4.4], cue: 't3-leak' },
+      { text: 'PREMIX BURNER FLASHBACK / BACKFIRE AWARENESS', pos: [5.8, 6.0, -1.35], cue: 't3-backfire' },
+    ];
+    troubleLabels.forEach(spec => {
+      const label = makeLabel(spec.text);
+      label.scale.set(3.8, 0.74, 1);
+      label.position.set(...spec.pos);
+      label.userData.troubleshootingCue = spec.cue;
+      label.userData.isTroubleshootingLabel = true;
+      troubleshootingOverlay.add(label);
+    });
+    troubleshootingOverlayRef.current = troubleshootingOverlay;
+    scene.add(troubleshootingOverlay);
+
+    const shield = new THREE.Group();
+    for (let row = 0; row < 5; row += 1) {
+      const y = 17.78 + row * 0.5;
+      const z = -1.9 + row * 0.92;
+      const tube = new THREE.Mesh(new THREE.CylinderGeometry(0.225, 0.225, 10.85, 24), tubeMat);
+      tube.rotation.z = Math.PI / 2;
+      tube.position.set(0, y, z);
+      tube.castShadow = true;
+      tube.userData.heatRecoveryRole = 'shieldBareTube';
+      shield.add(tube);
+      for (const x of [-3.75, 3.75]) {
+        const saddle = box([0.18, 0.58, 0.5], [x, y - 0.24, z], darkSteel);
+        saddle.userData.heatRecoveryRole = 'shieldSupport';
+        shield.add(saddle);
+      }
+    }
+    const shieldSupport = box([11.25, 0.22, 7.3], [0, 17.5, 0], steel);
+    shieldSupport.userData.heatRecoveryRole = 'shieldSupport';
+    shield.add(shieldSupport);
+    addComponent('Shield Tubes', shield);
+
+    const convection = new THREE.Group();
+    const convectionRows: { y: number; z: number }[] = [];
+    for (let row = 0; row < 10; row += 1) {
+      const y = 20.0 + row * 0.49;
+      for (const z of [-2.5, -1.5, -0.5, 0.5, 1.5, 2.5]) convectionRows.push({ y, z });
+    }
+    for (const { y, z } of convectionRows) {
+      const tube = new THREE.Mesh(new THREE.CylinderGeometry(0.135, 0.135, 10.85, 14), tubeMat);
+      tube.rotation.z = Math.PI / 2;
+      tube.position.set(0, y, z);
+      tube.castShadow = true;
+      tube.userData.heatRecoveryRole = 'convectionTube';
+      convection.add(tube);
+      for (let x = -4.55; x <= 4.55; x += 0.88) {
+        const fin = new THREE.Mesh(new THREE.CylinderGeometry(0.265, 0.265, 0.028, 14), darkSteel);
+        fin.rotation.z = Math.PI / 2;
+        fin.position.set(x, y, z);
+        fin.userData.heatRecoveryRole = 'convectionFin';
+        convection.add(fin);
+      }
+    }
+    for (let pair = 0; pair < 9; pair += 2) {
+      const y1 = 20.0 + pair * 0.49;
+      const y2 = 20.0 + (pair + 1) * 0.49;
+      for (const z of [-2.5, -1.5, -0.5, 0.5, 1.5, 2.5]) {
+        convection.add(tubePath([
+          new THREE.Vector3(5.35, y1, z),
+          new THREE.Vector3(5.65, (y1 + y2) / 2, z),
+          new THREE.Vector3(5.35, y2, z),
+        ], 0.135, tubeMat, 24));
+      }
+    }
+    convection.add(box([0.72, 5.45, 7.7], [-5.85, 22.25, 0], panelMat));
+    convection.add(box([0.72, 5.45, 7.7], [5.85, 22.25, 0], panelMat));
+    for (const side of [-1, 1]) {
+      const x = side * 6.24;
+      for (const y of [20.2, 21.55, 22.9, 24.25]) {
+        for (const z of [-2.55, 2.55]) {
+          const cover = box([0.16, 0.82, 1.35], [x, y, z], darkSteel);
+          convection.add(cover);
+          for (let i = 0; i < 6; i += 1) {
+            const a = (i / 6) * Math.PI * 2;
+            const bolt = cylinder(0.034, 0.11, [x + side * 0.11, y + Math.cos(a) * 0.28, z + Math.sin(a) * 0.48], boltMat, 8);
+            bolt.rotation.z = Math.PI / 2;
+            convection.add(bolt);
+          }
+        }
+      }
+    }
+    for (const y of [19.74, 21.95, 24.48]) convection.add(box([11.35, 0.16, 0.24], [0, y, 0], steel));
+    convection.add(box([11.7, 0.28, 7.65], [0, 19.55, 0], steel));
+    convection.add(box([11.7, 0.28, 7.65], [0, 25.05, 0], steel));
+    addComponent('Convection Bank', convection);
+
+    const heatRecoveryOverlay = new THREE.Group();
+    heatRecoveryOverlay.visible = false;
+    const depositMat = new THREE.MeshStandardMaterial({ color: '#5b4030', roughness: 0.96, metalness: 0.02 });
+    const plugMat = new THREE.MeshStandardMaterial({ color: '#33251e', roughness: 0.98, metalness: 0.01 });
+    for (const y of [20.48, 21.46, 22.44]) {
+      for (const z of [-1.5, 0.5, 2.5]) {
+        for (const x of [-3.2, -1.1, 1.2, 3.25]) {
+          const deposit = new THREE.Mesh(new THREE.SphereGeometry(0.19, 10, 8), depositMat);
+          deposit.scale.set(1.5, 0.75, 1.05);
+          deposit.position.set(x, y + 0.08, z + 0.15);
+          deposit.userData.heatRecoveryOverlay = 'fouled';
+          heatRecoveryOverlay.add(deposit);
+        }
+      }
+    }
+    for (const x of [-2.6, -0.85, 0.9, 2.65]) {
+      const plug = new THREE.Mesh(new THREE.SphereGeometry(0.42, 12, 9), plugMat);
+      plug.scale.set(1.25, 1.6, 1.15);
+      plug.position.set(x, 21.75, 0.05);
+      plug.userData.heatRecoveryOverlay = 'plugged';
+      heatRecoveryOverlay.add(plug);
+    }
+    const heatLabels: { text: string; pos: [number, number, number]; overlay: string }[] = [
+      { text: 'BARE SHIELD TUBES · NO FINS', pos: [7.5, 18.45, 0], overlay: 'comparison' },
+      { text: 'FINNED CONVECTION TUBES', pos: [7.8, 22.65, 0], overlay: 'comparison' },
+      { text: 'EXTERNAL FOULING', pos: [7.0, 21.5, 1.2], overlay: 'fouled' },
+      { text: 'PARTIAL GAS-PATH PLUGGING', pos: [-7.2, 21.9, 0], overlay: 'plugged' },
+    ];
+    heatLabels.forEach(spec => {
+      const label = makeLabel(spec.text);
+      label.scale.set(4.1, 0.76, 1);
+      label.position.set(...spec.pos);
+      label.userData.heatRecoveryOverlay = spec.overlay;
+      heatRecoveryOverlay.add(label);
+    });
+    heatRecoveryOverlayRef.current = heatRecoveryOverlay;
+    scene.add(heatRecoveryOverlay);
+
+    const breeching = new THREE.Group();
+    const breechingFullShell = new THREE.Group();
+    const breechingLowerFull = frustum(11.55, 7.2, 2.45, 7.45, [0, 26.4, 0], panelMat);
+    const breechingUpperFull = frustum(7.2, 4.55, 2.0, 5.45, [0, 28.62, 0], shellMat);
+    breechingLowerFull.userData.xrayRole = 'shell';
+    breechingUpperFull.userData.xrayRole = 'shell';
+    breechingFullShell.add(breechingLowerFull, breechingUpperFull);
+    const breechingCutShell = new THREE.Group();
+    const breechingLowerCut = frustum(11.55, 7.2, 2.45, 7.45, [0, 26.4, 0], cutawayPanelMat, true);
+    const breechingUpperCut = frustum(7.2, 4.55, 2.0, 5.45, [0, 28.62, 0], cutawayShellMat, true);
+    breechingLowerCut.userData.xrayRole = 'shell';
+    breechingUpperCut.userData.xrayRole = 'shell';
+    breechingCutShell.add(breechingLowerCut, breechingUpperCut);
+    breechingCutShell.visible = false;
+    breeching.add(breechingFullShell, breechingCutShell);
+    for (const y of [25.35, 27.65, 29.55]) {
+      const stiffener = box([11.0 - (y - 25.35) * 1.4, 0.11, 7.0 - (y - 25.35) * 0.5], [0, y, 0], darkSteel);
+      stiffener.userData.xrayRole = 'structure';
+      breeching.add(stiffener);
+    }
+    breechingFullShellRef.current = breechingFullShell;
+    breechingCutShellRef.current = breechingCutShell;
+    addComponent('Breeching', breeching);
+
+    const stack = new THREE.Group();
+    const stackFullShell = cylinder(2.12, 8.65, [0, 34.0, 0], shellMat, 40);
+    stackFullShell.userData.xrayRole = 'shell';
+    const stackCutShell = new THREE.Mesh(new THREE.CylinderGeometry(2.12, 2.12, 8.65, 40, 1, false, 0.62, Math.PI * 2 - 1.24), cutawayShellMat);
+    stackCutShell.position.set(0, 34.0, 0);
+    stackCutShell.castShadow = true;
+    stackCutShell.receiveShadow = true;
+    stackCutShell.userData.xrayRole = 'shell';
+    stackCutShell.visible = false;
+    stack.add(stackFullShell, stackCutShell);
+    stackFullShellRef.current = stackFullShell;
+    stackCutShellRef.current = stackCutShell;
+    for (const y of [29.72, 31.15, 33.15, 35.15, 37.15, 38.22]) {
+      const ring = new THREE.Mesh(new THREE.TorusGeometry(2.2, 0.085, 8, 40), darkSteel);
+      ring.rotation.x = Math.PI / 2;
+      ring.position.y = y;
+      ring.userData.xrayRole = 'structure';
+      stack.add(ring);
+    }
+    const stackBase = cylinder(2.32, 0.23, [0, 29.68, 0], steel, 40);
+    stackBase.userData.xrayRole = 'structure';
+    stack.add(stackBase);
+    for (const x of [-2.15, 2.15]) {
+      const rib = box([0.055, 8.35, 0.12], [x, 34.0, 0], darkSteel);
+      rib.userData.xrayRole = 'structure';
+      stack.add(rib);
+    }
+    for (const z of [-2.15, 2.15]) {
+      const rib = box([0.12, 8.35, 0.055], [0, 34.0, z], darkSteel);
+      rib.userData.xrayRole = 'structure';
+      stack.add(rib);
+    }
+    const inspectionPort = cylinder(0.27, 0.24, [2.13, 33.1, -0.82], darkSteel, 20);
+    inspectionPort.rotation.z = Math.PI / 2;
+    inspectionPort.userData.xrayRole = 'structure';
+    stack.add(inspectionPort);
+    const inspectionRing = new THREE.Mesh(new THREE.TorusGeometry(0.29, 0.045, 6, 22), boltMat);
+    inspectionRing.rotation.y = Math.PI / 2;
+    inspectionRing.position.set(2.26, 33.1, -0.82);
+    inspectionRing.userData.xrayRole = 'structure';
+    stack.add(inspectionRing);
+    addComponent('Stack', stack);
+
+    const damper = new THREE.Group();
+    damper.add(cylinderBetween(new THREE.Vector3(-2.48, 30.55, 0), new THREE.Vector3(2.78, 30.55, 0), 0.115, copper, 16));
+    const damperBladeMat = new THREE.MeshPhysicalMaterial({ color: '#c16b2e', metalness: 0.78, roughness: 0.25, emissive: '#481700', emissiveIntensity: 0.42, clearcoat: 0.08, clearcoatRoughness: 0.5 });
+    const blade = new THREE.Mesh(new THREE.CylinderGeometry(1.82, 1.82, 0.12, 40), damperBladeMat);
+    blade.rotation.x = 0.18 + (damperPositionRef.current / 100) * 1.02;
+    blade.position.set(0, 30.55, 0);
+    damperBladeRef.current = blade;
+    damper.add(blade);
+    damper.add(cylinder(0.34, 0.62, [2.72, 30.55, 0], darkSteel, 20));
+    const damperLever = new THREE.Group();
+    damperLever.position.set(2.78, 30.55, 0);
+    damperLever.add(cylinderBetween(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0.72, 0), 0.065, copper, 10));
+    damperLever.rotation.x = blade.rotation.x;
+    damperLeverRef.current = damperLever;
+    damper.add(damperLever);
+    const actuatorBox = box([0.85, 0.72, 0.65], [3.2, 30.55, 0], darkSteel);
+    damper.add(actuatorBox);
+    damper.add(cylinderBetween(new THREE.Vector3(2.85, 30.55, 0), new THREE.Vector3(3.0, 31.15, 0), 0.055, boltMat, 10));
+    addComponent('Stack Damper', damper);
+
+    const draftOverlay = new THREE.Group();
+    draftOverlay.visible = false;
+    const addDraftArrow = (origin: THREE.Vector3, direction: THREE.Vector3, color: number, overlay: string) => {
+      const arrow = new THREE.ArrowHelper(direction.clone().normalize(), origin, 1.45, color, 0.38, 0.2);
+      arrow.userData.draftOverlay = overlay;
+      draftOverlay.add(arrow);
+    };
+    for (const x of [-3.3, 0, 3.3]) {
+      addDraftArrow(new THREE.Vector3(x, 11.4, 5.65), new THREE.Vector3(0, 0, -1), 0x4bc9ff, 'negative');
+      addDraftArrow(new THREE.Vector3(x, 11.4, 4.18), new THREE.Vector3(0, 0, 1), 0xff6f32, 'positive');
+    }
+    const negativePressureLabel = makeLabel('NEGATIVE PRESSURE · TENDENCY INWARD');
