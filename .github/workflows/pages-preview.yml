@@ -34,6 +34,7 @@ jobs:
           cat src/_migration/Heater3D.part0.txt src/_migration/Heater3D.part1.txt src/_migration/Heater3D.part2.txt src/_migration/Heater3D.part3.txt src/_migration/Heater3D.part4.txt > src/Heater3D.tsx
           node scripts/assemble-preview.mjs
           node scripts/assemble-burner-sim.mjs
+          node scripts/free-explore-patch.mjs
 
       - name: Install dependencies
         run: npm install --no-audit --no-fund
