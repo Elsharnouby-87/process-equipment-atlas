@@ -25,15 +25,17 @@ export const operationContextMap: Record<string, OperationContext> = {
 };
 
 export const explodeOffsets: Record<string, THREE.Vector3> = {
-  Burners: new THREE.Vector3(0, -3.8, 0),
-  'Radiant Tubes': new THREE.Vector3(0, 0, 0),
-  'Shield Tubes': new THREE.Vector3(0, 2.6, 0),
-  'Convection Bank': new THREE.Vector3(0, 5.7, 0),
-  Breeching: new THREE.Vector3(0, 8.6, 0),
-  'Stack Damper': new THREE.Vector3(0, 10.8, 0),
-  Stack: new THREE.Vector3(0, 13.6, 0),
-  Refractory: new THREE.Vector3(-4.3, 0.4, -0.9),
-  'Platforms & Access': new THREE.Vector3(0, 0, 0),
+  Burners: new THREE.Vector3(0, -4.8, 0),
+  'Radiant Tubes': new THREE.Vector3(0, 0, -4.2),
+  'Shield Tubes': new THREE.Vector3(0, 3.2, -2.0),
+  'Convection Bank': new THREE.Vector3(0, 6.6, 0),
+  Breeching: new THREE.Vector3(0, 10.1, 0),
+  'Stack Damper': new THREE.Vector3(0, 13.0, 0),
+  'Draft Instruments': new THREE.Vector3(6.2, 1.0, 2.2),
+  'Stack Analyzers': new THREE.Vector3(6.4, 16.4, 2.4),
+  Stack: new THREE.Vector3(0, 16.4, 0),
+  Refractory: new THREE.Vector3(-5.7, 0.4, -1.1),
+  'Platforms & Access': new THREE.Vector3(6.6, 0, -1.2),
   'Casing & Structure': new THREE.Vector3(0, 0, 0),
 };
 
@@ -112,7 +114,7 @@ export function getAtlasLighting(mode: ViewMode, explode: boolean, atlasPrimaryV
 }
 
 export function getAtlasModeCameraPreset(selected: string, mode: ViewMode, explode: boolean): CameraPreset {
-  if (explode) return { yaw: -0.72, pitch: 0.07, radius: 74, target: [0, 25.0, 0] };
+  if (explode) return { yaw: -0.72, pitch: 0.055, radius: 84, target: [0, 27.0, 0] };
   if (mode === 'xray' && selected === 'Radiant Tubes') return { yaw: -0.68, pitch: 0.05, radius: 54, target: [0, 19.2, 0] };
   if (mode === 'cutaway' && selected === 'Radiant Tubes') return { yaw: -0.7, pitch: 0.045, radius: 49, target: [0, 18.7, 0] };
   if (selected === 'Stack Damper') return { yaw: -0.82, pitch: 0.045, radius: mode === 'xray' ? 19.5 : 17.5, target: [0, 30.35, 0] };
