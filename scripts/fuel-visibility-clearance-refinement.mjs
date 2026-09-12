@@ -36,9 +36,6 @@ source = replaceRegex(
   'fuel particle core + halo creation'
 );
 
-// Keep the existing simulator fuel loop intact. Immediately afterward, override
-// only the external/internal teaching views so both use the pipe-following hero
-// fuel route with a small visibility offset, then animate the matching halo.
 source = replaceOnce(
   source,
   "      }\n      for (const p of burnerHotParticles) {",
@@ -46,19 +43,8 @@ source = replaceOnce(
   'fuel visibility override and glow loop'
 );
 
-source = replaceOnce(
-  source,
-  "        lookTarget.y = THREE.MathUtils.lerp(o.target.y, Math.min(o.target.y, 5.6), assist);\n        if (camera.position.y < 0.72) camera.position.y = 0.72;",
-  "        lookTarget.y = THREE.MathUtils.lerp(o.target.y, Math.min(o.target.y, 5.25), assist);\n        if (camera.position.y < 0.62) camera.position.y = 0.62;",
-  'conservative underheater look assist'
-);
-
-source = replaceOnce(
-  source,
-  "        orbitRef.current.pitch = THREE.MathUtils.clamp(orbitRef.current.pitch + dy * 0.0039, -1.535, 1.48);",
-  "        orbitRef.current.pitch = THREE.MathUtils.clamp(orbitRef.current.pitch + dy * 0.0039, -1.55, 1.48);",
-  'conservative lower pitch extension'
-);
+// Camera: intentionally preserve the already-stable conservative controls from
+// checkpoint 13. No arcball or further control-model change in this polish.
 
 const tubePlaneMatches = [...source.matchAll(/\b5\.28\b/g)].length;
 if (tubePlaneMatches < 8) throw new Error(`tube plane refinement: expected several 5.28 anchors, found ${tubePlaneMatches}`);
