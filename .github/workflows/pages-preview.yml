@@ -36,10 +36,28 @@ jobs:
           const fs = require('fs');
           const path = 'src/Heater3D.tsx';
           let source = fs.readFileSync(path, 'utf8');
-          const before = "group.traverse(obj => { obj.visible = true; });";
-          const after = "group.traverse(obj => { if (obj !== breechingFullShell && obj !== breechingCutShell && obj !== stackFullShell && obj !== stackCutShell && obj !== pilotMicroRef.current) obj.visible = true; });";
-          if (!source.includes(before)) throw new Error('Expected v42 visibility reset not found');
-          source = source.replace(before, after);
+
+          const visibilityBefore = "group.traverse(obj => { obj.visible = true; });";
+          const visibilityAfter = "group.traverse(obj => { if (obj !== breechingFullShell && obj !== breechingCutShell && obj !== stackFullShell && obj !== stackCutShell && obj !== pilotMicroRef.current) obj.visible = true; });";
+          if (!source.includes(visibilityBefore)) throw new Error('Expected v42 visibility reset not found');
+          source = source.replace(visibilityBefore, visibilityAfter);
+
+          const directPositionBefore = "0.18 + (damperPosition / 100) * 1.02";
+          const directPositionAfter = "1.38 - (damperPosition / 100) * 1.20";
+          if (!source.includes(directPositionBefore)) throw new Error('Damper direct-position mapping not found');
+          source = source.replace(directPositionBefore, directPositionAfter);
+
+          const refPositionBefore = "0.18 + (damperPositionRef.current / 100) * 1.02";
+          const refPositionAfter = "1.38 - (damperPositionRef.current / 100) * 1.20";
+          const refCount = source.split(refPositionBefore).length - 1;
+          if (refCount !== 2) throw new Error(`Expected 2 damper ref mappings, found ${refCount}`);
+          source = source.split(refPositionBefore).join(refPositionAfter);
+
+          const t3Before = "const t3DamperTarget = activeTroubleshootingPhase === 'normal' ? 0.22 : activeTroubleshootingPhase === 'deviation' ? 0.62 : activeTroubleshootingPhase === 'contact' ? 1.02 : 1.22;";
+          const t3After = "const t3DamperTarget = activeTroubleshootingPhase === 'normal' ? 1.18 : activeTroubleshootingPhase === 'deviation' ? 0.72 : activeTroubleshootingPhase === 'contact' ? 0.42 : 0.24;";
+          if (!source.includes(t3Before)) throw new Error('Troubleshooting damper sequence not found');
+          source = source.replace(t3Before, t3After);
+
           fs.writeFileSync(path, source);
           NODE
 
