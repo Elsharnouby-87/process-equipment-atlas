@@ -1,0 +1,49 @@
+name: Development Build QA
+
+on:
+  push:
+    branches:
+      - floot-migration-dev
+    paths:
+      - 'src/**'
+      - 'scripts/**'
+      - 'index.html'
+      - 'package.json'
+      - 'vite.config.ts'
+      - 'postcss.config.js'
+      - 'tailwind.config.js'
+      - 'tsconfig.json'
+      - '.github/workflows/pages-preview.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: atlas-development-build
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout development branch
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Assemble Heater3D source
+        run: |
+          cat src/_migration/Heater3D.part0.txt src/_migration/Heater3D.part1.txt src/_migration/Heater3D.part2.txt src/_migration/Heater3D.part3.txt src/_migration/Heater3D.part4.txt > src/Heater3D.tsx
+          node scripts/assemble-preview.mjs
+          node scripts/assemble-burner-sim.mjs
+          node scripts/free-explore-patch.mjs
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Build GitHub source
+        run: npm run build
