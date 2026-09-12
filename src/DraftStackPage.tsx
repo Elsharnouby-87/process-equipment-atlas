@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ArrowLeft, Eye, Focus, Gauge, Info, Layers3, Rotate3D, ScanLine, ShieldAlert, Wind, Wrench, X, ZoomIn, ZoomOut } from 'lucide-react';
 import Heater3D from './Heater3D';
 import GlobalNavigation from './GlobalNavigation';
@@ -106,16 +106,18 @@ function selectedForStudy(study: ExtendedDraftStudy) {
   return 'Breeching';
 }
 
-function shouldShowFlow(study: ExtendedDraftStudy) {
-  return ['damper', 'path', 'stack', 'instruments', 'analyzers'].includes(study);
+function shouldShowFlow(_study: ExtendedDraftStudy) {
+  return true;
 }
 
 export default function DraftStackPage({ onBack, onNavigate }: Props) {
   const [study, setStudy] = useState<ExtendedDraftStudy>('overview');
   const [damperPosition, setDamperPosition] = useState(50);
   const [labels, setLabels] = useState(true);
-  const [flow, setFlow] = useState(false);
+  const [flow, setFlow] = useState(true);
   const [mobileSheet, setMobileSheet] = useState<'views' | 'details' | null>(null);
+  const [damperTeachingActive, setDamperTeachingActive] = useState(false);
+  const damperTeachingTimer = useRef<number | null>(null);
   const [cameraCommand, setCameraCommand] = useState<CameraCommand>({ id: 1, action: 'draftOverview', component: 'Breeching' });
   const noSelect = useCallback(() => {}, []);
   const copy = viewCopy[study];
@@ -128,20 +130,32 @@ export default function DraftStackPage({ onBack, onNavigate }: Props) {
     setCameraCommand(current => ({ id: current.id + 1, action, component }));
   }, [selected]);
 
+  const updateDamper = useCallback((value: number) => {
+    setDamperPosition(value);
+    setDamperTeachingActive(true);
+    if (damperTeachingTimer.current !== null) window.clearTimeout(damperTeachingTimer.current);
+    damperTeachingTimer.current = window.setTimeout(() => setDamperTeachingActive(false), 1500);
+  }, []);
+
+  useEffect(() => () => {
+    if (damperTeachingTimer.current !== null) window.clearTimeout(damperTeachingTimer.current);
+  }, []);
+
   useEffect(() => {
     cameraAction(cameraForStudy(study), selected);
     setFlow(shouldShowFlow(study));
   }, [study, selected, cameraAction]);
 
   const applyPreset = (key: keyof typeof draftTrainingPresets) => {
-    setDamperPosition(draftTrainingPresets[key].damperRestriction);
+    updateDamper(draftTrainingPresets[key].damperRestriction);
   };
 
   const resetStudy = () => {
     setStudy('overview');
     setDamperPosition(50);
-    setFlow(false);
+    setFlow(true);
     setLabels(true);
+    setDamperTeachingActive(false);
     cameraAction('draftOverview', 'Breeching');
   };
 
@@ -202,15 +216,20 @@ export default function DraftStackPage({ onBack, onNavigate }: Props) {
           </div>
 
           {study !== 'pressure' && <div className="draft-system-badge">CONVECTION → BREECHING → DAMPER → STACK</div>}
-          {flow && <div className="radiant-flow-legend draft-flow-legend draft-flow-legend-dual"><span className="heat">HOT FLUE GAS</span><span className="oxygen">EXCESS AIR / O₂ CUE · QUALITATIVE</span></div>}
+          <div className="radiant-flow-legend draft-flow-legend draft-flow-legend-dual"><span className="heat">HOT FLUE GAS · LIVE</span><span className="oxygen">EXCESS AIR / O₂ CUE · QUALITATIVE</span></div>
           {study === 'pressure' && <div className={`radiant-scenario-badge draft-pressure-badge ${pressureScenario}`}><ShieldAlert size={14} /><span>{metrics.stateLabel.toUpperCase()}</span></div>}
 
           <div className={`draft-live-strip ${metrics.state}`}>
-            <div><span>DAMPER OPENING</span><strong>{metrics.damperOpening.toFixed(0)}%</strong></div>
+            <div><span>DAMPER OPENING</span><strong>{metrics.damperOpening.toFixed(0)}% <small>· blade {metrics.bladeAngleDeg}°</small></strong></div>
             <div><span>ARCH DRAFT</span><strong>{metrics.draftMmH2O > 0 ? '+' : ''}{metrics.draftMmH2O.toFixed(1)} <small>mmH₂O</small></strong></div>
             <div><span>O₂</span><strong>{metrics.oxygenPct.toFixed(1)} <small>%</small></strong></div>
             <div><span>CO*</span><strong>{metrics.coPpm} <small>ppm</small></strong></div>
             <em>{metrics.stateLabel}</em>
+          </div>
+
+          <div className={`draft-instrument-flyout ${metrics.state} ${damperTeachingActive ? 'active' : ''}`} aria-hidden={!damperTeachingActive}>
+            <div className="draft-instrument-clone pt"><span>ARCH PT / PI</span><strong>{metrics.draftMmH2O > 0 ? '+' : ''}{metrics.draftMmH2O.toFixed(1)}</strong><small>mmH₂O · from radiant-roof reference</small></div>
+            <div className="draft-instrument-clone o2"><span>STACK O₂ ANALYZER</span><strong>{metrics.oxygenPct.toFixed(1)}%</strong><small>{metrics.oxygenLabel}</small></div>
           </div>
 
           <div className="control-dock radiant-control-dock draft-control-dock">
@@ -218,7 +237,7 @@ export default function DraftStackPage({ onBack, onNavigate }: Props) {
             <button onClick={() => cameraAction('zoomIn')}><ZoomIn size={17} /> Zoom +</button>
             <button onClick={() => cameraAction('zoomOut')}><ZoomOut size={17} /> Zoom −</button>
             <button className={labels ? 'active' : ''} onClick={() => setLabels(value => !value)}><Eye size={17} /> Labels</button>
-            <button className={flow ? 'active' : ''} onClick={() => setFlow(value => !value)}><Wind size={17} /> Flow</button>
+            <button className="active" title="Flue-gas and O₂ cues remain live in draft studies"><Wind size={17} /> Flow Live</button>
             <button onClick={resetStudy}><Rotate3D size={17} /> Reset</button>
           </div>
 
@@ -234,9 +253,9 @@ export default function DraftStackPage({ onBack, onNavigate }: Props) {
               <>
                 <span className="sheet-eyebrow">{copy.eyebrow}</span><h3>{copy.title}</h3><p>{copy.body}</p>
                 <span className="sheet-subhead">LIVE TRAINING RESPONSE</span>
-                <div className="draft-mobile-metrics"><b>{metrics.draftMmH2O.toFixed(1)} mmH₂O</b><b>O₂ {metrics.oxygenPct.toFixed(1)}%</b><b>CO {metrics.coPpm} ppm*</b></div>
+                <div className="draft-mobile-metrics"><b>{metrics.draftMmH2O.toFixed(1)} mmH₂O</b><b>O₂ {metrics.oxygenPct.toFixed(1)}%</b><b>CO {metrics.coPpm} ppm*</b><b>Blade {metrics.bladeAngleDeg}°</b></div>
                 <span className="sheet-subhead">DAMPER RESTRICTION</span>
-                <div className="draft-damper-control mobile"><div><b>MORE OPEN</b><b>MORE CLOSED</b></div><input aria-label="Qualitative stack damper position" type="range" min="0" max="100" value={damperPosition} onChange={event => setDamperPosition(Number(event.target.value))} /></div>
+                <div className="draft-damper-control mobile"><div><b>MORE OPEN</b><b>MORE CLOSED</b></div><input aria-label="Qualitative stack damper position" type="range" min="0" max="100" value={damperPosition} onPointerDown={() => updateDamper(damperPosition)} onChange={event => updateDamper(Number(event.target.value))} /></div>
                 <p className="sheet-note">Representative training logic only. O₂ / CO are not universal plant targets or alarm values.</p>
               </>
             )}
@@ -254,9 +273,9 @@ export default function DraftStackPage({ onBack, onNavigate }: Props) {
               <div><small>ARCH DRAFT</small><strong>{metrics.draftMmH2O > 0 ? '+' : ''}{metrics.draftMmH2O.toFixed(1)}</strong><em>mmH₂O</em></div>
               <div><small>O₂</small><strong>{metrics.oxygenPct.toFixed(1)}</strong><em>% · {metrics.oxygenLabel}</em></div>
               <div><small>CO*</small><strong>{metrics.coPpm}</strong><em>ppm · {metrics.coLabel}</em></div>
-              <div><small>DAMPER</small><strong>{metrics.damperOpening.toFixed(0)}</strong><em>% open</em></div>
+              <div><small>DAMPER</small><strong>{metrics.damperOpening.toFixed(0)}</strong><em>% open · blade {metrics.bladeAngleDeg}°</em></div>
             </div>
-            <div className="draft-damper-control"><div><b>MORE OPEN</b><b>MORE CLOSED</b></div><input aria-label="Qualitative stack damper position" type="range" min="0" max="100" value={damperPosition} onChange={event => setDamperPosition(Number(event.target.value))} /></div>
+            <div className="draft-damper-control"><div><b>MORE OPEN</b><b>MORE CLOSED</b></div><input aria-label="Qualitative stack damper position" type="range" min="0" max="100" value={damperPosition} onPointerDown={() => updateDamper(damperPosition)} onChange={event => updateDamper(Number(event.target.value))} /></div>
             <div className="draft-preset-row"><button onClick={() => applyPreset('excess')}>Excess Draft</button><button className="target" onClick={() => applyPreset('target')}>Near Target</button><button className="danger" onClick={() => applyPreset('positive')}>Positive Concern</button></div>
             <p className="scenario-note">One-variable training experiment: only the stack-damper restriction is being changed. Burner air-register position, firing rate, fuel composition and ambient conditions are intentionally held outside this simplified model.</p>
           </section>
@@ -273,7 +292,7 @@ export default function DraftStackPage({ onBack, onNavigate }: Props) {
 
           <section className="radiant-tech-section"><span>SYSTEM RELATIONSHIP</span><p>Draft comes from the pressure balance of the full heater and stack. The stack provides natural-draft driving force while burners, tube banks, breeching, damper and other restrictions consume part of that pressure difference. Excessive negative draft increases air leakage; insufficient draft can reduce burner-air delivery and, if pressure becomes positive, reverse the leakage direction.</p></section>
 
-          <section className="radiant-warning draft-warning"><Wrench size={17} /><p><b>Training boundary.</b> Draft, O₂ and CO values in this interaction are representative signals chosen to teach direction and coupling. Actual acceptable ranges, analyzer alarms, burner-air settings and damper targets come from the heater design, site procedures, OEM guidance and approved operating limits.</p></section>
+          <section className="radiant-warning draft-warning"><Wrench size={17} /><p><b>Training boundary.</b> Gas-particle speed, stretching and crowding visualize evacuation / pressure tendency only; they are not CFD velocity or mass-flow results. Draft, O₂ and CO values are representative signals chosen to teach direction and coupling. Actual acceptable ranges, analyzer alarms, burner-air settings and damper targets come from the heater design, site procedures, OEM guidance and approved operating limits.</p></section>
 
           <div className="radiant-path draft-path"><span>SYSTEM PATH</span><div>{systemPath.map((item, index) => <span key={item}>{item}{index < systemPath.length - 1 && <i>›</i>}</span>)}</div></div>
           <p className="draft-footnote">* CO number is a representative training cue only. NOx and SOx remain qualitative by design.</p>
