@@ -44,6 +44,9 @@ jobs:
       - name: TypeScript QA
         run: npx tsc --noEmit
 
+      - name: Navigation architecture QA
+        run: node scripts/qa-navigation-architecture.mjs
+
       - name: Physics V2 regression QA
         run: node scripts/qa-physics-v2.mjs
 
@@ -72,4 +75,4 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-# deployment refresh: checkpoint 21 physics-based combustion + draft simulator V2
+# deployment refresh: checkpoint 22 navigation architecture cleanup
