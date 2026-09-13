@@ -1,0 +1,2 @@
+Checkpoint 20 — Persistent mobile simulator Draft + O2 + CO readout.
+Source of truth remains floot-migration-dev; Pages workflow checks out that branch.
