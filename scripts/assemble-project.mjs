@@ -18,6 +18,7 @@ const patchStages = [
   './burner-fuel-path-continuity.mjs',
   './burner-fuel-path-mode-consistency.mjs',
   './integrated-combustion-draft-simulator-v1.mjs',
+  './simulator-live-readout.mjs',
   './typescript-cleanup.mjs',
 ];
 
