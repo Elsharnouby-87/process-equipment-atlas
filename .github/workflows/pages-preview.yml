@@ -44,6 +44,9 @@ jobs:
       - name: TypeScript QA
         run: npx tsc --noEmit
 
+      - name: Physics V2 regression QA
+        run: node scripts/qa-physics-v2.mjs
+
       - name: Production build QA
         run: npm run build
 
@@ -69,4 +72,4 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-# deployment refresh: checkpoint 20 persistent mobile Draft + O2 + CO readout
+# deployment refresh: checkpoint 21 physics-based combustion + draft simulator V2
