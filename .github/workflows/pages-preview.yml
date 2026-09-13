@@ -69,4 +69,4 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-# deployment refresh: checkpoint 19 integrated combustion + draft simulator V1
+# deployment refresh: checkpoint 20 persistent mobile Draft + O2 + CO readout
