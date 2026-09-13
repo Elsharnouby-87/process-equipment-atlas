@@ -69,4 +69,4 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-# deployment refresh: code cleanup and QA stabilization checkpoint
+# deployment refresh: checkpoint 17 burner fuel-path continuity
