@@ -116,4 +116,7 @@ burner = burner.replace(
 
 fs.writeFileSync(burnerPath, burner);
 
-console.log('[navigation-architecture-cleanup] COMPONENTS hub + SIMULATOR route applied without physics or 3D changes.');
+// 4) Checkpoint 23 follows the navigation refactor and consolidates the existing Operation engine.
+await import('./operation-state-machine-consolidation.mjs');
+
+console.log('[navigation-architecture-cleanup] COMPONENTS hub + SIMULATOR route + Operation consolidation applied without physics or Heater3D geometry changes.');
