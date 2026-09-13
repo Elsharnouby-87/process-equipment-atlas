@@ -15,6 +15,7 @@ const patchStages = [
   './burner-camera-geometry-refinement.mjs',
   './fuel-visibility-clearance-refinement.mjs',
   './restore-burner-exploded.mjs',
+  './burner-fuel-path-continuity.mjs',
   './typescript-cleanup.mjs',
 ];
 
