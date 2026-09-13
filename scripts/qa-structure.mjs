@@ -11,6 +11,7 @@ const requiredFiles = [
   'src/OperationPage.tsx',
   'src/TroubleshootingPage.tsx',
   'src/heater3d/viewConfig.ts',
+  'scripts/burner-fuel-path-mode-consistency.mjs',
 ];
 
 const failures = [];
@@ -28,14 +29,18 @@ function requireText(file, text, label) {
 requireText('src/App.tsx', "useState('')", 'Free Explore default selection');
 requireText('src/App.tsx', 'Draft Instruments', 'Draft instruments registry');
 requireText('src/App.tsx', 'Stack Analyzers', 'Stack analyzers registry');
+requireText('src/App.tsx', 'burnerFuelPathLocked', 'Atlas burner fuel-path mode lock');
 requireText('src/Heater3D.tsx', 'semanticExplodeOffsets', 'Semantic burner explode support');
 requireText('src/Heater3D.tsx', "burnerStudyMode === 'exploded'", 'Burner exploded mode');
 requireText('src/Heater3D.tsx', 'createDraftInstrumentation3D', 'Draft instrumentation runtime');
 requireText('src/Heater3D.tsx', 'heroFuelPath', 'Fuel-path visualization');
 requireText('src/Heater3D.tsx', "contextualBurnerExplode ? burnerFlow === 'fuel'", 'Contextual burner explode fuel-path visibility');
+requireText('src/Heater3D.tsx', 'atlasBurnerFuelPathActive', 'Atlas burner fuel-path continuity');
+requireText('src/Heater3D.tsx', 'referenceFuelPathActive', 'Reference-vs-live fuel-path distinction');
 requireText('src/BurnerPage.tsx', 'Burner Exploded', 'Burner exploded study tab');
 requireText('src/BurnerPage.tsx', 'Pilot & Ignition', 'Pilot study tab');
-requireText('src/BurnerPage.tsx', "study === 'exploded' ? 'Fuel Path' : 'Fuel Gas'", 'Study-aware fuel-path legend');
+requireText('src/BurnerPage.tsx', 'Reference Fuel Path', 'Exploded reference fuel-path legend');
+requireText('src/BurnerPage.tsx', 'Pilot Fuel Path', 'Pilot fuel-path legend');
 
 for (const file of requiredFiles) {
   if (!fs.existsSync(file)) continue;
@@ -50,4 +55,5 @@ if (failures.length) {
 console.log('[qa:structure] PASS');
 console.log(` - ${requiredFiles.length} required modules present`);
 console.log(' - free-explore, draft instrumentation, burner exploded and fuel-path guards present');
+console.log(' - burner fuel path remains readable across Atlas and dedicated study modes');
 for (const note of notes) console.log(` - maintenance: ${note}`);
