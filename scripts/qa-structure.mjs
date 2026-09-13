@@ -12,6 +12,7 @@ const requiredFiles = [
   'src/TroubleshootingPage.tsx',
   'src/heater3d/viewConfig.ts',
   'scripts/burner-fuel-path-mode-consistency.mjs',
+  'scripts/simulator-live-readout.mjs',
 ];
 
 const failures = [];
@@ -41,6 +42,9 @@ requireText('src/BurnerPage.tsx', 'Burner Exploded', 'Burner exploded study tab'
 requireText('src/BurnerPage.tsx', 'Pilot & Ignition', 'Pilot study tab');
 requireText('src/BurnerPage.tsx', 'Reference Fuel Path', 'Exploded reference fuel-path legend');
 requireText('src/BurnerPage.tsx', 'Pilot Fuel Path', 'Pilot fuel-path legend');
+requireText('src/BurnerPage.tsx', 'burner-sim-mobile-readouts', 'Persistent mobile Draft O2 CO readout');
+requireText('src/BurnerPage.tsx', 'metrics.draftMmH2O', 'Live draft metric');
+requireText('src/BurnerPage.tsx', 'metrics.coPpm', 'Live CO metric');
 
 for (const file of requiredFiles) {
   if (!fs.existsSync(file)) continue;
@@ -56,4 +60,5 @@ console.log('[qa:structure] PASS');
 console.log(` - ${requiredFiles.length} required modules present`);
 console.log(' - free-explore, draft instrumentation, burner exploded and fuel-path guards present');
 console.log(' - burner fuel path remains readable across Atlas and dedicated study modes');
+console.log(' - mobile simulator keeps Draft, O2 and CO visible with tuning controls collapsed');
 for (const note of notes) console.log(` - maintenance: ${note}`);
