@@ -11,8 +11,13 @@ const requiredFiles = [
   'src/OperationPage.tsx',
   'src/TroubleshootingPage.tsx',
   'src/heater3d/viewConfig.ts',
+  'src/physicsCalibration.ts',
+  'src/combustionTrainingLogic.ts',
+  'src/simulatorV2.css',
   'scripts/burner-fuel-path-mode-consistency.mjs',
   'scripts/simulator-live-readout.mjs',
+  'scripts/physics-simulator-v2-ui.mjs',
+  'scripts/qa-physics-v2.mjs',
 ];
 
 const failures = [];
@@ -43,8 +48,15 @@ requireText('src/BurnerPage.tsx', 'Pilot & Ignition', 'Pilot study tab');
 requireText('src/BurnerPage.tsx', 'Reference Fuel Path', 'Exploded reference fuel-path legend');
 requireText('src/BurnerPage.tsx', 'Pilot Fuel Path', 'Pilot fuel-path legend');
 requireText('src/BurnerPage.tsx', 'burner-sim-mobile-readouts', 'Persistent mobile Draft O2 CO readout');
-requireText('src/BurnerPage.tsx', 'metrics.draftMmH2O', 'Live draft metric');
-requireText('src/BurnerPage.tsx', 'metrics.coPpm', 'Live CO metric');
+requireText('src/BurnerPage.tsx', 'PHYSICS-BASED COMBUSTION + DRAFT SIMULATOR V2', 'Simulator V2 heading');
+requireText('src/BurnerPage.tsx', 'metrics.radiantOxygenPct', 'Radiant O2 readout');
+requireText('src/BurnerPage.tsx', 'metrics.stackOxygenPct', 'Stack O2 readout');
+requireText('src/BurnerPage.tsx', 'metrics.heatInputPctRef', 'Relative heat-input readout');
+requireText('src/combustionTrainingLogic.ts', 'for (let index = 0; index < MAX_ITERATIONS', 'Iterative V2 solver loop');
+requireText('src/combustionTrainingLogic.ts', 'methaneLikeDryOxygenPct', 'Transparent lambda-to-O2 relation');
+requireText('src/combustionTrainingLogic.ts', 'trampAirFraction', 'Tramp-air stack O2 distinction');
+requireText('src/physicsCalibration.ts', 'referenceArchPressureMmH2O: -3.2', 'Balanced draft calibration');
+requireText('src/physicsCalibration.ts', 'referenceLambda: 1.18', 'Balanced lambda calibration');
 
 for (const file of requiredFiles) {
   if (!fs.existsSync(file)) continue;
@@ -60,5 +72,7 @@ console.log('[qa:structure] PASS');
 console.log(` - ${requiredFiles.length} required modules present`);
 console.log(' - free-explore, draft instrumentation, burner exploded and fuel-path guards present');
 console.log(' - burner fuel path remains readable across Atlas and dedicated study modes');
-console.log(' - mobile simulator keeps Draft, O2 and CO visible with tuning controls collapsed');
+console.log(' - mobile simulator keeps Draft, radiant O2 and CO visible with tuning controls collapsed');
+console.log(' - simulator V2 exposes heat input, actual air, excess air, radiant/stack O2, CO, draft and representative stack temperature');
+console.log(' - V2 physics calibration, iterative draft-air loop and tramp-air distinction are structurally guarded');
 for (const note of notes) console.log(` - maintenance: ${note}`);
