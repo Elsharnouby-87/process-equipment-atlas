@@ -20,6 +20,7 @@ const patchStages = [
   './integrated-combustion-draft-simulator-v1.mjs',
   './simulator-live-readout.mjs',
   './physics-simulator-v2-ui.mjs',
+  './navigation-architecture-cleanup.mjs',
   './typescript-cleanup.mjs',
 ];
 
