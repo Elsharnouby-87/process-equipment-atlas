@@ -34,3 +34,13 @@ source = replaceOnce(
 );
 
 fs.writeFileSync(heaterPath, source);
+
+const burnerPath = 'src/BurnerPage.tsx';
+let burnerPage = fs.readFileSync(burnerPath, 'utf8');
+burnerPage = replaceOnce(
+  burnerPage,
+  "          {(controlActive || (flow && study !== 'exploded')) && <div className=\"burner-flow-legend\"><span className=\"air\">Combustion Air</span><span className=\"fuel\">Fuel Gas</span>{study !== 'pilot' && <span className=\"hot\">Hot Products</span>}</div>}",
+  "          {(controlActive || flow) && <div className=\"burner-flow-legend\">{(study === 'external' || study === 'internal') && <span className=\"air\">Combustion Air</span>}<span className=\"fuel\">{study === 'exploded' ? 'Fuel Path' : 'Fuel Gas'}</span>{(study === 'external' || study === 'internal') && <span className=\"hot\">Hot Products</span>}</div>}",
+  'study-aware burner flow legend'
+);
+fs.writeFileSync(burnerPath, burnerPage);
