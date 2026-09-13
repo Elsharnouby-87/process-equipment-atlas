@@ -1,4 +1,4 @@
-import { getDraftTrainingMetrics } from './draftTrainingLogic';
+import { physicsCalibration } from './physicsCalibration';
 
 export type CombustionTrainingState = 'balanced' | 'air-starved' | 'fuel-rich' | 'excess-air' | 'draft-concern';
 
@@ -7,9 +7,23 @@ export type CombustionTrainingMetrics = {
   airRegisterPct: number;
   damperRestrictionPct: number;
   damperOpeningPct: number;
+  fuelFlowPctRef: number;
+  heatInputPctRef: number;
+  actualAirPctStoich: number;
+  excessAirPct: number;
+  lambda: number;
   draftMmH2O: number;
+  radiantOxygenPct: number;
+  stackOxygenPct: number;
   oxygenPct: number;
   coPpm: number;
+  stackTemperatureC: number;
+  flueGasFlowPctRef: number;
+  chimneyPullMmH2O: number;
+  pressureLossMmH2O: number;
+  trampAirPctFlue: number;
+  converged: boolean;
+  iterations: number;
   airFuelIndex: number;
   state: CombustionTrainingState;
   stateLabel: string;
@@ -32,22 +46,76 @@ export type CombustionTrainingMetrics = {
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
+const AIR_DENSITY_AT_25C = 1.184;
+const FLUE_GAS_DENSITY_FACTOR = 0.98;
+const REFERENCE_HEATER_LOSS_SHARE = 0.57;
+const REFERENCE_DAMPER_LOSS_SHARE = 0.43;
+const MAX_ITERATIONS = 24;
+const CONVERGENCE_MM_H2O = 0.015;
+
+function methaneLikeDryOxygenPct(lambda: number) {
+  if (lambda <= 1) return 0;
+  const denominator = 9.52 * lambda - 1;
+  if (denominator <= 0) return 0;
+  return clamp((200 * (lambda - 1)) / denominator, 0, 12);
+}
+
+function relativeFuelFlow(fuelValvePct: number) {
+  const reference = physicsCalibration.referenceFuelValvePct;
+  return clamp((Math.max(fuelValvePct, 1) / reference) ** 1.10, 0.04, 1.90);
+}
+
+function relativeRegisterArea(airRegisterPct: number) {
+  const reference = physicsCalibration.referenceAirRegisterPct;
+  const normalized = Math.max(airRegisterPct, 0) / reference;
+  return clamp(0.08 + 0.92 * normalized ** 0.85, 0.08, 1.55);
+}
+
+function airDensity(ambientTemperatureC: number) {
+  const kelvin = ambientTemperatureC + 273.15;
+  return AIR_DENSITY_AT_25C * (298.15 / kelvin);
+}
+
+function chimneyPullMmH2O(stackTemperatureC: number, ambientTemperatureC: number) {
+  const ambientK = ambientTemperatureC + 273.15;
+  const stackK = stackTemperatureC + 273.15;
+  const rhoAir = airDensity(ambientTemperatureC);
+  const rhoFlue = rhoAir * (ambientK / stackK) * FLUE_GAS_DENSITY_FACTOR;
+  return Math.max(0, physicsCalibration.representativeStackHeightM * (rhoAir - rhoFlue));
+}
+
+const referenceChimneyPull = chimneyPullMmH2O(
+  physicsCalibration.referenceStackTemperatureC,
+  physicsCalibration.ambientTemperatureC,
+);
+const referenceTotalLoss = Math.max(
+  0.5,
+  referenceChimneyPull + physicsCalibration.referenceArchPressureMmH2O,
+);
+const referenceHeaterLoss = referenceTotalLoss * REFERENCE_HEATER_LOSS_SHARE;
+const referenceDamperLoss = referenceTotalLoss * REFERENCE_DAMPER_LOSS_SHARE;
+
+function relativeDamperLoss(restrictionPct: number) {
+  const reference = physicsCalibration.referenceDamperRestrictionPct / 100;
+  const restriction = clamp(restrictionPct / 100, 0, 1);
+  return 0.18 + 0.82 * (restriction / Math.max(reference, 0.05)) ** 2;
+}
+
 /**
- * Integrated combustion + draft training model for the Atlas.
+ * Physics-based causal training kernel for a representative natural-draft heater.
  *
- * IMPORTANT TRAINING BOUNDARY
- * - fuelValvePct is a relative firing-demand command, NOT calibrated fuel mass flow.
- * - airRegisterPct is a relative register opening, NOT measured combustion-air flow.
- * - damperRestrictionPct follows the Atlas convention: 0 = most open, 100 = most closed.
- * - O2, CO and draft are representative response signals selected to teach direction and coupling.
- * - The model is not a burner curve, heat balance, emissions guarantee, control-loop model or plant operating procedure.
+ * Training boundary:
+ * - Fuel-valve % is an operator command, not calibrated fuel mass flow.
+ * - Air-register % is geometry command, not measured air flow.
+ * - Stack-damper % is restriction command: 0 = most open, 100 = most closed.
+ * - Absolute stack temperature, stack height, fuel AFR and the reference draft/O2 point are
+ *   transparent calibration assumptions, not site design data or operating limits.
+ * - The solver teaches causal direction and coupling. It is not CFD, a burner guarantee,
+ *   a heater heat balance, an emissions model, a BMS logic solver or an operating procedure.
  *
- * Directional behavior follows the project reference basis for natural-draft heaters:
- * - the stack damper and burner air register are adjusted together to manage draft and excess oxygen;
- * - closing burner registers reduces air / flue-gas throughput and friction loss, so draft may become more negative at unchanged stack-damper position;
- * - increasing fuel without adequate available air drives oxygen downward and CO upward, eventually giving a fuel-rich tendency;
- * - excessive draft / air admission drives oxygen upward and can increase efficiency loss / leakage-air sensitivity;
- * - satisfactory operation requires stable flame patterns and adequate flame-to-tube clearance.
+ * Causal loop solved iteratively:
+ * arch pressure -> burner air -> lambda -> flue-gas flow / temperature -> chimney pull +
+ * pressure losses -> new arch pressure -> repeat until stable.
  */
 export function getCombustionTrainingMetrics(
   fuelValvePct: number,
@@ -59,56 +127,118 @@ export function getCombustionTrainingMetrics(
   const damperRestriction = clamp(damperRestrictionPct, 0, 100);
   const damperOpening = 100 - damperRestriction;
 
-  const baseDraft = getDraftTrainingMetrics(damperRestriction).draftMmH2O;
+  const fuelFlowRel = relativeFuelFlow(fuel);
+  const heatInputRel = fuelFlowRel;
+  const registerAreaRel = relativeRegisterArea(air);
+  const afrStoich = physicsCalibration.representativeStoichAirFuelMassRatio;
+  const referenceLambda = physicsCalibration.referenceLambda;
 
-  // More fuel / air raises total gas throughput and friction loss. Keep this correction modest:
-  // the stack damper remains the dominant draft-control input in the training model.
-  const flowLoadCorrection = 0.55 * ((fuel - 55) / 45) + 0.45 * ((air - 60) / 40);
-  const draft = clamp(baseDraft + 0.95 * flowLoadCorrection, -15, 8);
+  let archPressure = physicsCalibration.referenceArchPressureMmH2O;
+  let actualAirRel = referenceLambda;
+  let flueGasFlowRel = 1;
+  let stackTemperatureC = physicsCalibration.referenceStackTemperatureC;
+  let chimneyPull = referenceChimneyPull;
+  let pressureLoss = referenceTotalLoss;
+  let iterations = 0;
+  let converged = false;
 
-  // Natural-draft pull changes how much air a given register opening can admit.
-  const draftPullFactor = clamp(0.92 + (-draft - 3.2) * 0.055, 0.35, 1.35);
-  const effectiveAir = (air / 60) * (0.76 + 0.24 * draftPullFactor);
-  const fuelDemand = Math.max(0.18, fuel / 55);
-  const airFuelIndex = effectiveAir / fuelDemand;
+  for (let index = 0; index < MAX_ITERATIONS; index += 1) {
+    iterations = index + 1;
 
-  let oxygen = clamp(3.5 + (airFuelIndex - 1) * 5.7, 0.5, 8.5);
-  if (draft > 0) oxygen = clamp(oxygen - Math.min(0.8, draft * 0.12), 0.5, 8.5);
+    // Arch pressure is not identical to burner-floor suction. A representative burner-floor
+    // head remains even when the arch approaches zero; the arch draft modifies that head.
+    const draftPull = Math.max(0, -archPressure);
+    const burnerPressureRatio = clamp(
+      0.78 + 0.22 * (draftPull / Math.max(-physicsCalibration.referenceArchPressureMmH2O, 0.2)),
+      0.30,
+      1.60,
+    );
 
-  const richPenalty = Math.max(0, 0.99 - airFuelIndex);
-  const lowOxygenPenalty = Math.max(0, 2.0 - oxygen);
-  const co = Math.round(clamp(22 + richPenalty * richPenalty * 3200 + lowOxygenPenalty * 25, 15, 900));
+    actualAirRel = referenceLambda * registerAreaRel * Math.sqrt(burnerPressureRatio);
+
+    // Mass-flow relation normalized to the balanced calibration point. Air dominates the mass.
+    flueGasFlowRel = clamp(
+      (fuelFlowRel + afrStoich * actualAirRel) / (1 + afrStoich * referenceLambda),
+      0.08,
+      2.4,
+    );
+
+    // Representative stack-temperature response: higher heat input raises temperature while
+    // higher gas throughput dilutes the temperature rise. Exponent is deliberately mild.
+    const temperatureRatio = (heatInputRel / Math.max(flueGasFlowRel, 0.25)) ** 0.22;
+    stackTemperatureC = clamp(
+      physicsCalibration.ambientTemperatureC
+        + (physicsCalibration.referenceStackTemperatureC - physicsCalibration.ambientTemperatureC) * temperatureRatio,
+      135,
+      380,
+    );
+
+    chimneyPull = chimneyPullMmH2O(stackTemperatureC, physicsCalibration.ambientTemperatureC);
+
+    const damperLossFactor = relativeDamperLoss(damperRestriction);
+    pressureLoss = (referenceHeaterLoss + referenceDamperLoss * damperLossFactor) * flueGasFlowRel ** 2;
+
+    const newArchPressure = clamp(pressureLoss - chimneyPull, -15, 8);
+    if (Math.abs(newArchPressure - archPressure) <= CONVERGENCE_MM_H2O) {
+      archPressure = newArchPressure;
+      converged = true;
+      break;
+    }
+
+    // Relaxation prevents the teaching solver from oscillating near strong damper restrictions.
+    archPressure = 0.65 * archPressure + 0.35 * newArchPressure;
+  }
+
+  const lambda = clamp(actualAirRel / Math.max(fuelFlowRel, 0.05), 0.45, 2.0);
+  const excessAirPct = Math.max(0, (lambda - 1) * 100);
+  const radiantOxygenPct = methaneLikeDryOxygenPct(lambda);
+
+  // CO is intentionally a tendency curve, not an emissions prediction. It remains low with
+  // adequate air and rises steeply as lambda approaches / falls below the practical rich region.
+  const richDeficit = Math.max(0, 1.08 - lambda);
+  const co = Math.round(clamp(20 + 12000 * richDeficit ** 2, 15, 900));
+
+  // Downstream leakage / tramp air raises stack O2 without improving burner-zone combustion.
+  const draftPullRatio = Math.max(0.05, -archPressure) / Math.max(-physicsCalibration.referenceArchPressureMmH2O, 0.2);
+  const trampAirFraction = archPressure < 0
+    ? physicsCalibration.referenceTrampAirFractionOfFlue * Math.sqrt(draftPullRatio)
+    : 0;
+  const stackOxygenPct = clamp(
+    (radiantOxygenPct * flueGasFlowRel + 20.9 * trampAirFraction) / Math.max(flueGasFlowRel + trampAirFraction, 0.05),
+    0,
+    12,
+  );
 
   let state: CombustionTrainingState;
-  if (draft >= 0 || draft < -9.0) state = 'draft-concern';
-  else if (airFuelIndex < 0.72 || oxygen < 1.1 || co >= 350) state = 'fuel-rich';
-  else if (airFuelIndex < 0.96 || oxygen < 2.2 || co >= 100) state = 'air-starved';
-  else if (oxygen > 5.0 || draft < -6.0) state = 'excess-air';
+  if (archPressure >= 0 || archPressure < -7.5) state = 'draft-concern';
+  else if (lambda < 0.90 || co >= 350) state = 'fuel-rich';
+  else if (lambda < 1.05 || co >= 100) state = 'air-starved';
+  else if (lambda > 1.32 || radiantOxygenPct > 5.0) state = 'excess-air';
   else state = 'balanced';
 
   const stateLabel = state === 'draft-concern'
-    ? draft >= 0 ? 'Draft Concern · Positive Pressure Tendency' : 'Draft Concern · Excess Negative Draft'
+    ? archPressure >= 0 ? 'Draft Concern · Positive Pressure Tendency' : 'Draft Concern · Excess Negative Draft'
     : state === 'fuel-rich'
       ? 'Fuel-Rich Tendency'
       : state === 'air-starved'
         ? 'Air-Starved Tendency'
         : state === 'excess-air'
           ? 'Excess-Air Tendency'
-          : 'Balanced Training Zone';
+          : 'Balanced Physics Zone';
 
   const stateNote = state === 'draft-concern'
-    ? draft >= 0
-      ? 'Representative firebox pressure has reached zero or positive. Hot-gas containment margin is reduced; this is not a normal target condition.'
-      : 'Draft pull is deliberately excessive in this training state. O2 / leakage-air tendency rises and useful heat can be carried out with unnecessary flue-gas flow.'
+    ? archPressure >= 0
+      ? 'The solved arch pressure has reached zero or positive because gas-path resistance is too high for the available chimney pull. Burner air admission and hot-gas containment margin deteriorate.'
+      : 'The solved arch pressure is deliberately more negative than the representative training band. Strong suction can increase leakage-air influence and unnecessary gas throughput.'
     : state === 'fuel-rich'
-      ? 'Fuel demand substantially exceeds the available-air cue. O2 is driven very low, CO rises strongly and the flame becomes longer / less settled. This is a training tendency, not an alarm model.'
+      ? 'Fuel flow exceeds the combustion air supported by the register / draft combination. Lambda collapses, radiant O2 approaches zero and the CO tendency rises sharply.'
       : state === 'air-starved'
-        ? 'Available combustion air is becoming low relative to fuel demand. O2 falls, CO begins to rise and the flame becomes progressively lazier.'
+        ? 'Combustion air is becoming insufficient relative to fuel demand. Radiant O2 falls and the nonlinear CO tendency begins to rise.'
         : state === 'excess-air'
-          ? 'Available air / draft is high relative to fuel demand. O2 rises and the flame tightens; excess air and leakage-air sensitivity can reduce efficiency.'
-          : 'Fuel demand, burner-air admission and stack draft are in a representative balanced relationship for training.';
+          ? 'Actual combustion air is high relative to stoichiometric demand. Radiant O2 and flue-gas mass flow rise, increasing sensible heat carried toward the stack.'
+          : 'Fuel flow, combustion-air admission, stack resistance and chimney pull have converged around the representative calibration point.';
 
-  const oxygenLabel = oxygen < 2.2 ? 'LOW' : oxygen <= 4.2 ? 'REPRESENTATIVE BAND' : 'HIGH';
+  const oxygenLabel = radiantOxygenPct < 2.0 ? 'LOW' : radiantOxygenPct <= 4.5 ? 'REPRESENTATIVE BAND' : 'HIGH';
   const coLabel = co >= 350 ? 'HIGH TRAINING CUE' : co >= 100 ? 'ELEVATED TRAINING CUE' : co >= 50 ? 'RISING TRAINING CUE' : 'LOW TRAINING CUE';
   const flameLabel = state === 'fuel-rich'
     ? 'Long / luminous / unsettled tendency'
@@ -124,43 +254,58 @@ export function getCombustionTrainingMetrics(
   const airStarved = state === 'air-starved';
   const excessAir = state === 'excess-air';
   const draftConcern = state === 'draft-concern';
-  const firing01 = fuel / 100;
-  const completeCombustion = clamp(Math.min(fuelDemand, effectiveAir), 0.05, 1.55);
+  const firing01 = clamp(heatInputRel / 1.9, 0, 1);
+  const completeCombustion = clamp(Math.min(fuelFlowRel, actualAirRel), 0.05, 1.55);
+  const normalizedAirFlow = clamp(actualAirRel / 1.65, 0, 1);
 
   return {
     fuelValvePct: fuel,
     airRegisterPct: air,
     damperRestrictionPct: damperRestriction,
     damperOpeningPct: damperOpening,
-    draftMmH2O: Number(draft.toFixed(1)),
-    oxygenPct: Number(oxygen.toFixed(1)),
+    fuelFlowPctRef: Number((fuelFlowRel * 100).toFixed(0)),
+    heatInputPctRef: Number((heatInputRel * 100).toFixed(0)),
+    actualAirPctStoich: Number((lambda * 100).toFixed(0)),
+    excessAirPct: Number(excessAirPct.toFixed(0)),
+    lambda: Number(lambda.toFixed(2)),
+    draftMmH2O: Number(archPressure.toFixed(1)),
+    radiantOxygenPct: Number(radiantOxygenPct.toFixed(1)),
+    stackOxygenPct: Number(stackOxygenPct.toFixed(1)),
+    oxygenPct: Number(radiantOxygenPct.toFixed(1)),
     coPpm: co,
-    airFuelIndex: Number(airFuelIndex.toFixed(2)),
+    stackTemperatureC: Number(stackTemperatureC.toFixed(0)),
+    flueGasFlowPctRef: Number((flueGasFlowRel * 100).toFixed(0)),
+    chimneyPullMmH2O: Number(chimneyPull.toFixed(1)),
+    pressureLossMmH2O: Number(pressureLoss.toFixed(1)),
+    trampAirPctFlue: Number((trampAirFraction * 100).toFixed(1)),
+    converged,
+    iterations,
+    airFuelIndex: Number((lambda / referenceLambda).toFixed(2)),
     state,
     stateLabel,
     stateNote,
     oxygenLabel,
     coLabel,
     flameLabel,
-    flameHeightScale: clamp((0.62 + firing01 * 0.82) * (fuelRich ? 1.20 : airStarved ? 1.10 : excessAir ? 0.94 : draftConcern ? 1.05 : 1), 0.35, 1.58),
-    flameWidthScale: clamp((0.76 + firing01 * 0.34) * (fuelRich ? 1.28 : airStarved ? 1.18 : excessAir ? 0.92 : draftConcern ? 1.10 : 1), 0.45, 1.46),
+    flameHeightScale: clamp((0.62 + firing01 * 0.96) * (fuelRich ? 1.20 : airStarved ? 1.10 : excessAir ? 0.94 : draftConcern ? 1.05 : 1), 0.30, 1.62),
+    flameWidthScale: clamp((0.76 + firing01 * 0.42) * (fuelRich ? 1.28 : airStarved ? 1.18 : excessAir ? 0.92 : draftConcern ? 1.10 : 1), 0.42, 1.48),
     flameWobbleRad: fuelRich ? 0.15 : airStarved ? 0.10 : draftConcern ? 0.11 : excessAir ? 0.035 : 0.018,
-    airParticleSpeed: lerp(0.45, 1.55, clamp((air / 100) * (0.72 + 0.28 * draftPullFactor), 0, 1)),
-    fuelParticleSpeed: lerp(0.28, 1.55, firing01),
-    hotParticleSpeed: lerp(0.34, 1.42, clamp(completeCombustion / 1.15, 0, 1)),
-    airParticleScale: lerp(0.58, 1.18, air / 100),
-    fuelParticleScale: lerp(0.45, 1.22, firing01),
-    hotParticleScale: lerp(0.5, 1.18, clamp(completeCombustion / 1.15, 0, 1)),
-    hotProductStrength: clamp(completeCombustion / 1.05, 0.12, 1.25),
+    airParticleSpeed: lerp(0.40, 1.58, normalizedAirFlow),
+    fuelParticleSpeed: lerp(0.25, 1.58, firing01),
+    hotParticleSpeed: lerp(0.32, 1.45, clamp(flueGasFlowRel / 1.45, 0, 1)),
+    airParticleScale: lerp(0.50, 1.22, normalizedAirFlow),
+    fuelParticleScale: lerp(0.42, 1.24, firing01),
+    hotParticleScale: lerp(0.48, 1.20, clamp(completeCombustion / 1.15, 0, 1)),
+    hotProductStrength: clamp(completeCombustion / 1.05, 0.10, 1.25),
   };
 }
 
 export const combustionTrainingPresets = {
   balanced: { label: 'Balanced', fuel: 55, air: 60, damperRestriction: 50 },
-  airStarved: { label: 'Air-Starved', fuel: 58, air: 34, damperRestriction: 50 },
-  fuelRich: { label: 'Fuel-Rich', fuel: 88, air: 34, damperRestriction: 56 },
-  excessAir: { label: 'Excess Air', fuel: 42, air: 82, damperRestriction: 30 },
-  draftConcern: { label: 'Draft Concern', fuel: 55, air: 58, damperRestriction: 88 },
+  airStarved: { label: 'Air-Starved', fuel: 58, air: 45, damperRestriction: 50 },
+  fuelRich: { label: 'Fuel-Rich', fuel: 72, air: 45, damperRestriction: 55 },
+  excessAir: { label: 'Excess Air', fuel: 45, air: 66, damperRestriction: 35 },
+  draftConcern: { label: 'Draft Concern', fuel: 55, air: 60, damperRestriction: 90 },
   // Retained as a non-UI compatibility preset for earlier code paths.
-  higherFiring: { label: 'Higher Firing', fuel: 78, air: 82, damperRestriction: 46 },
+  higherFiring: { label: 'Higher Firing', fuel: 70, air: 90, damperRestriction: 25 },
 } as const;
