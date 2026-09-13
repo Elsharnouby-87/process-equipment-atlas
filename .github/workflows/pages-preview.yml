@@ -69,4 +69,4 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-# deployment refresh: checkpoint 18 burner fuel-path mode consistency
+# deployment refresh: checkpoint 19 integrated combustion + draft simulator V1
