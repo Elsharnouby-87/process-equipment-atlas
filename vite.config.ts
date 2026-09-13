@@ -8,6 +8,7 @@ export default defineConfig({
     outDir: process.env.APPDEPLOY_VITE_OUT_DIR || 'dist',
     sourcemap:
       process.env.APPDEPLOY_VITE_SOURCEMAP === 'hidden' ? 'hidden' : false,
+    chunkSizeWarningLimit: 520,
     rollupOptions: {
       maxParallelFileOps: 128,
       output: {
