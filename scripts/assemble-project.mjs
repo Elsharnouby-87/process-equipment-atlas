@@ -19,6 +19,7 @@ const patchStages = [
   './burner-fuel-path-mode-consistency.mjs',
   './integrated-combustion-draft-simulator-v1.mjs',
   './simulator-live-readout.mjs',
+  './physics-simulator-v2-ui.mjs',
   './typescript-cleanup.mjs',
 ];
 
