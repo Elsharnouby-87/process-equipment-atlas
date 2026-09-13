@@ -32,8 +32,10 @@ requireText('src/Heater3D.tsx', 'semanticExplodeOffsets', 'Semantic burner explo
 requireText('src/Heater3D.tsx', "burnerStudyMode === 'exploded'", 'Burner exploded mode');
 requireText('src/Heater3D.tsx', 'createDraftInstrumentation3D', 'Draft instrumentation runtime');
 requireText('src/Heater3D.tsx', 'heroFuelPath', 'Fuel-path visualization');
+requireText('src/Heater3D.tsx', "contextualBurnerExplode ? burnerFlow === 'fuel'", 'Contextual burner explode fuel-path visibility');
 requireText('src/BurnerPage.tsx', 'Burner Exploded', 'Burner exploded study tab');
 requireText('src/BurnerPage.tsx', 'Pilot & Ignition', 'Pilot study tab');
+requireText('src/BurnerPage.tsx', "study === 'exploded' ? 'Fuel Path' : 'Fuel Gas'", 'Study-aware fuel-path legend');
 
 for (const file of requiredFiles) {
   if (!fs.existsSync(file)) continue;
