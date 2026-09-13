@@ -16,6 +16,7 @@ const patchStages = [
   './fuel-visibility-clearance-refinement.mjs',
   './restore-burner-exploded.mjs',
   './burner-fuel-path-continuity.mjs',
+  './burner-fuel-path-mode-consistency.mjs',
   './typescript-cleanup.mjs',
 ];
 
