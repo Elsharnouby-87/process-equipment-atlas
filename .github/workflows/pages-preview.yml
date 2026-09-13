@@ -53,6 +53,9 @@ jobs:
       - name: Navigation architecture QA
         run: node scripts/qa-navigation-architecture.mjs
 
+      - name: Operation state machine QA
+        run: node scripts/qa-operation-state-v1.mjs
+
       - name: Physics V2 regression QA
         run: node scripts/qa-physics-v2.mjs
 
