@@ -50,5 +50,8 @@ jobs:
       - name: TypeScript QA
         run: npx tsc --noEmit
 
+      - name: Physics V2 regression QA
+        run: node scripts/qa-physics-v2.mjs
+
       - name: Production build QA
         run: npm run build
