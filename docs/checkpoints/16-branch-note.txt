@@ -1,1 +1,0 @@
-Branch checkpoint/16-code-cleanup-qa-stabilization should point to this stabilized source state.
