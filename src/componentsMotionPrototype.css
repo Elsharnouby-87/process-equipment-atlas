@@ -1,0 +1,175 @@
+.components-motion-prototype{
+  max-width:1180px;
+  margin:0 auto 18px;
+  padding:15px 16px 18px;
+  border:1px solid rgba(83,190,237,.16);
+  border-radius:16px;
+  background:linear-gradient(145deg,rgba(7,29,43,.72),rgba(3,16,25,.82));
+  overflow:hidden;
+}
+
+.cmp-motion-copy{
+  display:flex;
+  align-items:baseline;
+  gap:12px;
+  min-width:0;
+  margin-bottom:12px;
+}
+
+.cmp-motion-copy span{
+  flex:0 0 auto;
+  color:#66c9e8;
+  font:800 7px/1 'IBM Plex Mono',monospace;
+  letter-spacing:.14em;
+}
+
+.cmp-motion-copy strong{
+  color:#d9edf5;
+  font-size:10px;
+}
+
+.cmp-motion-copy p{
+  margin:0 0 0 auto;
+  color:#688e9f;
+  font-size:8px;
+  white-space:nowrap;
+}
+
+.cmp-motion-stage{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+  align-items:center;
+  min-height:142px;
+  perspective:1050px;
+  perspective-origin:50% 44%;
+}
+
+.cmp-motion-card{
+  position:relative;
+  min-width:0;
+  min-height:124px;
+  padding:14px 14px 12px;
+  border:1px solid rgba(90,192,235,.18);
+  border-radius:13px;
+  background:linear-gradient(155deg,rgba(12,45,62,.94),rgba(5,20,30,.96));
+  color:#dcecf3;
+  text-align:left;
+  cursor:pointer;
+  overflow:hidden;
+  transform-style:preserve-3d;
+  transition:border-color .18s ease,translate .18s ease,scale .18s ease,filter .18s ease;
+  animation:cmp-motion-float 6.8s ease-in-out infinite;
+  will-change:translate;
+}
+
+.cmp-motion-card::after{
+  content:'';
+  position:absolute;
+  inset:auto -24% -72% 30%;
+  height:120px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(71,194,235,.12),transparent 66%);
+  pointer-events:none;
+}
+
+.cmp-motion-card-0{transform:rotateY(15deg) translateY(8px) translateZ(-28px);animation-delay:-.5s}
+.cmp-motion-card-1{transform:rotateY(6deg) translateY(-2px) translateZ(10px);animation-delay:-2.2s}
+.cmp-motion-card-2{transform:rotateY(-6deg) translateY(-2px) translateZ(10px);animation-delay:-3.9s}
+.cmp-motion-card-3{transform:rotateY(-15deg) translateY(8px) translateZ(-28px);animation-delay:-5.6s}
+
+.cmp-motion-card:hover,.cmp-motion-card:focus-visible{
+  translate:0 -7px;
+  scale:1.02;
+  border-color:rgba(101,211,249,.5);
+  filter:brightness(1.06);
+  outline:none;
+}
+
+.cmp-motion-card.cmp-motion-burner:hover,.cmp-motion-card.cmp-motion-burner:focus-visible{
+  border-color:rgba(255,139,68,.62);
+}
+
+.cmp-motion-topline{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+
+.cmp-motion-icon{
+  width:34px;
+  height:34px;
+  display:grid;
+  place-items:center;
+  border:1px solid rgba(91,194,235,.23);
+  border-radius:10px;
+  color:#77d8f7;
+  background:rgba(22,74,96,.26);
+}
+
+.cmp-motion-burner .cmp-motion-icon{
+  color:#ff9a56;
+  border-color:rgba(255,142,70,.27);
+  background:rgba(148,66,23,.14);
+}
+
+.cmp-motion-number{
+  color:#496f80;
+  font:800 8px/1 'IBM Plex Mono',monospace;
+  letter-spacing:.08em;
+}
+
+.cmp-motion-card>span{
+  display:block;
+  margin-top:12px;
+  color:#6fb8d7;
+  font:800 6px/1 'IBM Plex Mono',monospace;
+  letter-spacing:.14em;
+}
+
+.cmp-motion-card h3{
+  margin:5px 0 7px;
+  font-size:16px;
+  line-height:1.05;
+  letter-spacing:-.015em;
+}
+
+.cmp-motion-path{
+  color:#7fa7b6;
+  font:700 7px/1.45 'IBM Plex Mono',monospace;
+}
+
+.cmp-motion-open{
+  position:absolute;
+  right:11px;
+  bottom:10px;
+  display:flex;
+  align-items:center;
+  gap:4px;
+  color:#bcd9e4;
+  font-size:7px;
+  font-weight:750;
+}
+
+@keyframes cmp-motion-float{
+  0%,100%{translate:0 0}
+  50%{translate:0 -4px}
+}
+
+@media(max-width:980px){
+  .components-motion-prototype{padding:13px 12px 14px;margin-bottom:14px}
+  .cmp-motion-copy{display:block;margin-bottom:10px}
+  .cmp-motion-copy strong{display:block;margin-top:5px;font-size:9px}
+  .cmp-motion-copy p{display:none}
+  .cmp-motion-stage{display:flex;min-height:0;overflow-x:auto;gap:9px;padding:2px 1px 7px;perspective:none;scroll-snap-type:x proximity}
+  .cmp-motion-card{flex:0 0 220px;min-height:118px;transform:none!important;animation:none;scroll-snap-align:start}
+}
+
+@media(max-width:520px){
+  .cmp-motion-card{flex-basis:78%;min-width:218px}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .cmp-motion-card{animation:none;transition:none}
+}
