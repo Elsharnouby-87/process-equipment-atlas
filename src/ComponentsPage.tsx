@@ -1,6 +1,7 @@
 import { ArrowLeft, ArrowRight, Boxes, Flame, Layers3, Thermometer, Wind } from 'lucide-react';
 import GlobalNavigation from './GlobalNavigation';
 import type { NavigationTarget } from './GlobalNavigation';
+import './componentsMotionPrototype.css';
 
 export type ComponentModuleId = 'burner' | 'radiant' | 'heatRecovery' | 'draftStack';
 
@@ -68,6 +69,34 @@ export default function ComponentsPage({ onBack, onNavigate, onOpenModule }: Pro
           <h1>Choose the system you want to study in depth.</h1>
           <p>The Atlas answers <b>where it is</b>. These modules answer <b>how it is built, what it does, what to observe and what can go wrong</b>.</p>
         </div>
+
+        <section className="components-motion-prototype" aria-label="Experimental spatial module preview">
+          <div className="cmp-motion-copy">
+            <span>MOTION CONCEPT TEST · EXPERIMENTAL</span>
+            <strong>A lightweight spatial preview before the full study cards.</strong>
+            <p>Same modules · no engineering logic changed</p>
+          </div>
+
+          <div className="cmp-motion-stage">
+            {modules.map((module, index) => (
+              <button
+                key={`motion-${module.id}`}
+                className={`cmp-motion-card cmp-motion-card-${index} cmp-motion-${module.id}`}
+                onClick={() => onOpenModule(module.id)}
+                aria-label={`Open ${module.title} study`}
+              >
+                <div className="cmp-motion-topline">
+                  <div className="cmp-motion-icon"><ModuleIcon id={module.id} /></div>
+                  <div className="cmp-motion-number">0{index + 1}</div>
+                </div>
+                <span>{module.eyebrow}</span>
+                <h3>{module.title}</h3>
+                <div className="cmp-motion-path">{module.path}</div>
+                <div className="cmp-motion-open">Open <ArrowRight size={12} /></div>
+              </button>
+            ))}
+          </div>
+        </section>
 
         <div className="component-module-grid">
           {modules.map((module, index) => (
