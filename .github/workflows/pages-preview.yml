@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - floot-migration-dev
+      - experiment-components-motion-v1
     paths:
       - 'src/**'
       - 'scripts/**'
