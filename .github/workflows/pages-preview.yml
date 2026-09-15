@@ -22,7 +22,7 @@ jobs:
       - name: Checkout development source
         uses: actions/checkout@v4
         with:
-          ref: experiment-components-exploded-stack-v4
+          ref: checkpoint-pre-components-motion-prototype-2026-09-14
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -78,4 +78,4 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-# preview target only: experiment-components-exploded-stack-v4 @ 84393d9
+# preview target only: checkpoint-pre-components-motion-prototype-2026-09-14
