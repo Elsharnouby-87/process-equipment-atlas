@@ -65,7 +65,7 @@ app = replaceOnce(
 app = replaceOnce(
   app,
   "const [activeModule, setActiveModule] = useState<'atlas' | 'burner' | 'radiant' | 'heatRecovery' | 'draftStack' | 'heaterTypes' | 'operation' | 'troubleshooting'>('atlas');",
-  "const [activeModule, setActiveModule] = useState<'atlas' | 'componentsHub' | 'simulator' | 'burner' | 'radiant' | 'heatRecovery' | 'draftStack' | 'heaterTypes' | 'operation' | 'troubleshooting'>('atlas');",
+  "const [activeModule, setActiveModule] = useState<'atlas' | 'componentsHub' | 'simulator' | 'burner' | 'radiant' | 'heatRecovery' | 'draftStack' | 'heaterTypes' | 'operation' | 'troubleshooting'>('componentsHub');",
   'App active module union',
 );
 
