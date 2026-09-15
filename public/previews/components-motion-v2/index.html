@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#03131e" />
+  <title>Components Motion Study V2</title>
+  <style>
+    *{box-sizing:border-box}html,body{margin:0;background:#03131e;color:#e8f5fa;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}body{min-height:100vh;overflow-x:hidden}.page{min-height:100vh;padding:28px 18px 42px;background:radial-gradient(circle at 50% 30%,rgba(37,143,185,.16),transparent 35%),linear-gradient(180deg,#041824,#021019)}.eyebrow{font:800 11px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.18em;color:#6bd6f5}.title{max-width:760px;margin:13px auto 9px;text-align:center;font-size:clamp(34px,7vw,66px);line-height:.98;letter-spacing:-.045em}.sub{max-width:620px;margin:0 auto;text-align:center;color:#87aab8;font-size:14px;line-height:1.6}.intro{text-align:center}.stageWrap{max-width:980px;margin:30px auto 0;padding:20px 0 26px;border-top:1px solid rgba(100,203,239,.14);border-bottom:1px solid rgba(100,203,239,.14)}.stage{position:relative;height:390px;perspective:1100px;perspective-origin:50% 44%;overflow:hidden;touch-action:pan-y}.card{position:absolute;left:50%;top:50%;width:min(66vw,360px);height:300px;margin:-150px 0 0 calc(min(66vw,360px)/-2);padding:24px;border:1px solid rgba(99,205,241,.25);border-radius:22px;background:linear-gradient(155deg,rgba(10,52,70,.97),rgba(3,22,34,.98));box-shadow:0 24px 80px rgba(0,0,0,.38);transform-style:preserve-3d;transition:transform .72s cubic-bezier(.2,.75,.2,1),opacity .5s ease,filter .5s ease,border-color .35s ease;will-change:transform;cursor:pointer;overflow:hidden}.card:after{content:"";position:absolute;inset:45% -35% -50% 22%;border-radius:50%;background:radial-gradient(circle,rgba(80,207,245,.18),transparent 62%);pointer-events:none}.card.burner:after{background:radial-gradient(circle,rgba(255,130,48,.22),transparent 62%)}.card[data-pos="0"]{transform:translate3d(0,0,125px) rotateY(0) scale(1);opacity:1;z-index:5;border-color:rgba(109,219,255,.58)}.card[data-pos="-1"]{transform:translate3d(-68%,15px,-80px) rotateY(35deg) scale(.83);opacity:.72;z-index:4;filter:saturate(.8)}.card[data-pos="1"]{transform:translate3d(68%,15px,-80px) rotateY(-35deg) scale(.83);opacity:.72;z-index:4;filter:saturate(.8)}.card[data-pos="-2"]{transform:translate3d(-118%,28px,-230px) rotateY(50deg) scale(.7);opacity:.22;z-index:2}.card[data-pos="2"]{transform:translate3d(118%,28px,-230px) rotateY(-50deg) scale(.7);opacity:.22;z-index:2}.top{display:flex;justify-content:space-between;align-items:center}.icon{width:52px;height:52px;border:1px solid rgba(99,205,241,.3);border-radius:15px;display:grid;place-items:center;font-size:25px;background:rgba(39,111,137,.2)}.burner .icon{border-color:rgba(255,142,74,.34);background:rgba(163,72,21,.17)}.num{font:800 15px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#5f8c9e}.tag{display:block;margin-top:29px;color:#72d3ef;font:800 9px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.15em}.card h2{margin:9px 0 10px;font-size:31px;letter-spacing:-.03em}.card p{margin:0;color:#8dacb9;font-size:12px;line-height:1.55}.path{position:absolute;left:24px;right:24px;bottom:24px;padding-top:13px;border-top:1px solid rgba(91,183,217,.17);color:#7fb0c1;font:700 9px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace}.controls{display:flex;justify-content:center;align-items:center;gap:10px;margin-top:12px}.control{width:48px;height:48px;border:1px solid rgba(91,195,232,.32);border-radius:14px;background:rgba(7,37,51,.85);color:#dff7ff;font-size:22px;cursor:pointer}.control:active{transform:scale(.96)}.dots{display:flex;gap:7px;padding:0 8px}.dot{width:8px;height:8px;border:0;border-radius:999px;background:#305f70;padding:0;transition:width .25s ease,background .25s ease}.dot.active{width:26px;background:#69d4f2}.caption{text-align:center;margin-top:13px;color:#6f93a1;font-size:11px}.caption strong{color:#d9eef6}.motionHint{margin-top:11px;text-align:center;color:#ff9a55;font:800 9px/1.35 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em}.pulse{animation:pulse 2.1s ease-in-out infinite}@keyframes pulse{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}@media(max-width:600px){.page{padding:24px 12px 34px}.title{font-size:42px}.sub{font-size:13px;padding:0 8px}.stageWrap{margin-top:22px}.stage{height:350px}.card{width:72vw;height:276px;margin-top:-138px;margin-left:-36vw;padding:20px}.card[data-pos="-1"]{transform:translate3d(-62%,14px,-70px) rotateY(38deg) scale(.82)}.card[data-pos="1"]{transform:translate3d(62%,14px,-70px) rotateY(-38deg) scale(.82)}.card h2{font-size:28px}.path{left:20px;right:20px;bottom:20px}.icon{width:48px;height:48px}.caption{font-size:10px}}@media(prefers-reduced-motion:reduce){.card,.pulse{transition:none!important;animation:none!important}}
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="intro">
+      <div class="eyebrow">COMPONENTS · MOTION STUDY V2</div>
+      <h1 class="title">Now the motion is the interface.</h1>
+      <p class="sub">A deliberately stronger Animos-style concept test. The four engineering modules occupy a spatial 3D rail instead of behaving like ordinary flat cards.</p>
+    </section>
+
+    <section class="stageWrap" aria-label="3D component carousel">
+      <div class="stage" id="stage">
+        <button class="card burner" data-index="0" type="button">
+          <div class="top"><div class="icon">🔥</div><div class="num">01</div></div>
+          <span class="tag">COMBUSTION SYSTEM</span><h2>Burner Assembly</h2>
+          <p>Fuel, air, pilot, ignition and the flame root as one combustion system.</p>
+          <div class="path">Fuel + air → burner → flame root → radiant section</div>
+        </button>
+        <button class="card" data-index="1" type="button">
+          <div class="top"><div class="icon">🌡️</div><div class="num">02</div></div>
+          <span class="tag">RADIANT SECTION</span><h2>Radiant Tubes</h2>
+          <p>Process tubes, flame clearance, supports, heat flux and inspection context.</p>
+          <div class="path">Firebox → tube surface → tube wall → process fluid</div>
+        </button>
+        <button class="card" data-index="2" type="button">
+          <div class="top"><div class="icon">▤</div><div class="num">03</div></div>
+          <span class="tag">UPPER HEAT RECOVERY</span><h2>Shield + Convection</h2>
+          <p>Bare shield rows, finned banks, gas-side flow and recovered duty.</p>
+          <div class="path">Radiant outlet → shield → convection → breeching</div>
+        </button>
+        <button class="card" data-index="3" type="button">
+          <div class="top"><div class="icon">↟</div><div class="num">04</div></div>
+          <span class="tag">DRAFT & FLUE GAS</span><h2>Breeching + Stack</h2>
+          <p>Draft, damper, analyzers and the flue-gas pressure path to atmosphere.</p>
+          <div class="path">Convection outlet → breeching → damper → stack</div>
+        </button>
+      </div>
+
+      <div class="controls">
+        <button class="control" id="prev" type="button" aria-label="Previous module">‹</button>
+        <div class="dots" id="dots" aria-label="Module position"></div>
+        <button class="control" id="next" type="button" aria-label="Next module">›</button>
+      </div>
+      <div class="motionHint pulse">SWIPE LEFT / RIGHT · AUTO-ROTATES EVERY 2.4 s</div>
+      <div class="caption">This is a <strong>motion-language prototype only</strong> — no heater engineering logic is changed.</div>
+    </section>
+  </main>
+  <script>
+    (()=>{
+      const cards=[...document.querySelectorAll('.card')];
+      const stage=document.getElementById('stage');
+      const dots=document.getElementById('dots');
+      let active=0, timer=null, downX=null;
+      cards.forEach((_,i)=>{const d=document.createElement('button');d.type='button';d.className='dot';d.setAttribute('aria-label',`Show module ${i+1}`);d.addEventListener('click',()=>{active=i;render();restart()});dots.appendChild(d)});
+      const dotEls=[...dots.children];
+      const signed=(i)=>{let d=i-active;if(d>cards.length/2)d-=cards.length;if(d<-cards.length/2)d+=cards.length;return d};
+      function render(){cards.forEach((c,i)=>{let p=signed(i);if(p<-2)p=-2;if(p>2)p=2;c.dataset.pos=String(p);c.setAttribute('aria-current',p===0?'true':'false')});dotEls.forEach((d,i)=>d.classList.toggle('active',i===active))}
+      function move(dir){active=(active+dir+cards.length)%cards.length;render()}
+      function restart(){if(timer)clearInterval(timer);timer=setInterval(()=>move(1),2400)}
+      document.getElementById('prev').addEventListener('click',()=>{move(-1);restart()});
+      document.getElementById('next').addEventListener('click',()=>{move(1);restart()});
+      cards.forEach((c,i)=>c.addEventListener('click',()=>{if(i!==active){active=i;render();restart()}}));
+      stage.addEventListener('pointerdown',e=>{downX=e.clientX});
+      stage.addEventListener('pointerup',e=>{if(downX==null)return;const dx=e.clientX-downX;downX=null;if(Math.abs(dx)>36){move(dx<0?1:-1);restart()}});
+      stage.addEventListener('pointercancel',()=>{downX=null});
+      if(matchMedia('(prefers-reduced-motion: reduce)').matches){render()}else{render();restart()}
+    })();
+  </script>
+</body>
+</html>
