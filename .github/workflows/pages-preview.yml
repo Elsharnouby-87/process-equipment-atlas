@@ -22,7 +22,7 @@ jobs:
       - name: Checkout development source
         uses: actions/checkout@v4
         with:
-          ref: experiment-components-motion-v1
+          ref: experiment-components-exploded-stack-v4
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -78,4 +78,4 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-# deployment refresh: Components motion prototype V2 (strong mobile 3D carousel)
+# preview target only: experiment-components-exploded-stack-v4
