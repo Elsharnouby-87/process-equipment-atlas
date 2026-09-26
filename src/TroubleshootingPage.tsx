@@ -284,6 +284,26 @@ export default function TroubleshootingPage({ onBack, onNavigate }: Props) {
         if (phaseIndex < 2) setPhase('contact');
         setTab('inspect');
         cameraAction('troubleStackTemperature');
+      } else if (kind === 'firing') {
+        setPhase('consequence');
+        setTab('causes');
+        cameraAction('burnerInternal');
+      } else if (kind === 'restriction') {
+        setPhase('consequence');
+        setTab('causes');
+        cameraAction('troubleConvection');
+      } else if (kind === 'bypass') {
+        setPhase('consequence');
+        setTab('causes');
+        cameraAction('heatFlue');
+      } else if (kind === 'excessAir') {
+        setPhase('consequence');
+        setTab('causes');
+        cameraAction('draftStack');
+      } else if (kind === 'tubeSide') {
+        setPhase('consequence');
+        setTab('causes');
+        cameraAction('radiantPass');
       } else {
         setPhase('consequence');
         setTab('causes');
