@@ -10,6 +10,8 @@ const requiredFiles = [
   'src/HeaterTypesPage.tsx',
   'src/OperationPage.tsx',
   'src/TroubleshootingPage.tsx',
+  'src/PurgeAirPage.tsx',
+  'src/purgeAirStudy.css',
   'src/heater3d/viewConfig.ts',
   'src/physicsCalibration.ts',
   'src/combustionTrainingLogic.ts',
@@ -43,6 +45,15 @@ requireText('src/Heater3D.tsx', 'heroFuelPath', 'Fuel-path visualization');
 requireText('src/Heater3D.tsx', "contextualBurnerExplode ? burnerFlow === 'fuel'", 'Contextual burner explode fuel-path visibility');
 requireText('src/Heater3D.tsx', 'atlasBurnerFuelPathActive', 'Atlas burner fuel-path continuity');
 requireText('src/Heater3D.tsx', 'referenceFuelPathActive', 'Reference-vs-live fuel-path distinction');
+requireText('src/Heater3D.tsx', "cameraCommand.action === 'purgeOverview'", 'Purge overview camera');
+requireText('src/Heater3D.tsx', "cameraCommand.action === 'purgeFlow'", 'Purge full-flow camera');
+requireText('src/PurgeAirPage.tsx', "id: 'blower'", 'Purge blower study');
+requireText('src/PurgeAirPage.tsx', "id: 'damper'", 'Purge damper study');
+requireText('src/PurgeAirPage.tsx', "id: 'proof'", 'Purge airflow-proof study');
+requireText('src/PurgeAirPage.tsx', "id: 'riser'", 'Purge riser study');
+requireText('src/PurgeAirPage.tsx', "id: 'entries'", 'Purge two-entry study');
+requireText('src/PurgeAirPage.tsx', "id: 'flow'", 'Purge full-flow study');
+requireText('src/PurgeAirPage.tsx', "id: 'bms'", 'Purge BMS/permissive study');
 requireText('src/BurnerPage.tsx', 'Burner Exploded', 'Burner exploded study tab');
 requireText('src/BurnerPage.tsx', 'Pilot & Ignition', 'Pilot study tab');
 requireText('src/BurnerPage.tsx', 'Reference Fuel Path', 'Exploded reference fuel-path legend');
@@ -70,7 +81,7 @@ if (failures.length) {
 
 console.log('[qa:structure] PASS');
 console.log(` - ${requiredFiles.length} required modules present`);
-console.log(' - free-explore, draft instrumentation, burner exploded and fuel-path guards present');
+console.log(' - free-explore, draft instrumentation, burner exploded, purge-air learning module and fuel-path guards present');
 console.log(' - burner fuel path remains readable across Atlas and dedicated study modes');
 console.log(' - mobile simulator keeps Draft, radiant O2 and CO visible with tuning controls collapsed');
 console.log(' - simulator V2 exposes heat input, actual air, excess air, radiant/stack O2, CO, draft and representative stack temperature');
