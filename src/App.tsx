@@ -43,6 +43,7 @@ type Detail = {
 
 const componentGroups = [
   { label: 'Combustion', components: ['Burners'] },
+  { label: 'Purge / Ventilation', components: ['Purge Air Blower'] },
   { label: 'Radiant Section', components: ['Radiant Tubes', 'Refractory'] },
   { label: 'Shield / Transition', components: ['Shield Tubes'] },
   { label: 'Convection Section', components: ['Convection Bank'] },
@@ -61,6 +62,17 @@ const details: Record<string, Detail> = {
     issues: ['Unstable or uneven flame pattern', 'Fouled or damaged burner tips', 'Air-distribution problems', 'Flame impingement'],
     inspection: ['Burner tile and throat', 'Fuel tip / gas gun condition', 'Air register movement', 'Pilot and ignition hardware'],
     related: ['Radiant Tubes', 'Refractory', 'Casing & Structure'],
+  },
+  'Purge Air Blower': {
+    group: 'Purge / Ventilation System',
+    location: 'Low-level external skid beside the heater, connected to two lower-radiant sidewall purge-air entries through a dedicated duct, damper and proof section.',
+    summary: 'Representative low-pressure purge fan / blower package based on the V13.6 Blender Atlas design, including inlet guard, motor, main duct, isolation damper, airflow proof, external riser and two lower-radiant entries.',
+    function: 'Provide a dedicated airflow source for the heater purge sequence where this configuration is used, sweeping the enclosure before ignition eligibility is considered.',
+    why: 'A forced purge source makes the purge-air path and airflow-proving concept visible and separates purge air from burner combustion air and process flow.',
+    observe: ['Blower running / stopped state', 'Isolation-damper / actuator status', 'Airflow or pressure proof indication', 'Clear duct path to both heater entries'],
+    issues: ['Blower unavailable', 'Damper not in the required state', 'Airflow proof not established', 'Duct or entry restriction'],
+    inspection: ['Blower casing / inlet guard', 'Motor and shaft', 'Main purge-air duct and damper', 'Proof device and two casing penetrations'],
+    related: ['Burners', 'Casing & Structure', 'Breeching', 'Stack'],
   },
   'Radiant Tubes': {
     group: 'Radiant Section',
@@ -165,6 +177,7 @@ const details: Record<string, Detail> = {
 
 const smartMode: Record<string, ViewMode> = {
   Burners: 'cutaway',
+  'Purge Air Blower': 'normal',
   'Radiant Tubes': 'cutaway',
   'Shield Tubes': 'cutaway',
   'Convection Bank': 'cutaway',
