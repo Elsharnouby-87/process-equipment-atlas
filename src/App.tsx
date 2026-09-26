@@ -342,7 +342,6 @@ function App() {
       </header>
       <section className="atlas-contextbar">
         <div><span>INTERACTIVE 3D REFERENCE</span><strong>Box Heater · Up-fired · Vertical Tube Configuration</strong></div>
-        <p>Training visualization · Schematic geometry · Not a certified plant design</p>
       </section>
       <section className="atlas-workspace">
         <aside className={`component-navigator ${mobileNavigatorOpen ? 'mobile-open' : ''}`}>
