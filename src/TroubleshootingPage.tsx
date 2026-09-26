@@ -255,6 +255,42 @@ export default function TroubleshootingPage({ onBack, onNavigate }: Props) {
       }
       return;
     }
+    if (scenario === 'convectionFouling') {
+      if (kind === 'deposit') {
+        if (phase === 'normal') setPhase('deviation');
+        setTab('observe');
+        cameraAction('troubleConvection');
+      } else if (kind === 'restriction') {
+        if (phaseIndex < 2) setPhase('contact');
+        setTab('inspect');
+        cameraAction('troubleConvection');
+      } else if (kind === 'deltaP') {
+        setPhase('consequence');
+        setTab('why');
+        cameraAction('troubleConvectionDp');
+      } else {
+        setPhase('consequence');
+        setTab('causes');
+        cameraAction('troubleStackTemperature');
+      }
+      return;
+    }
+    if (scenario === 'highStackTemperature') {
+      if (kind === 'stackTemp' || kind === 'primary') {
+        if (phase === 'normal') setPhase('deviation');
+        setTab('observe');
+        cameraAction('troubleStackTemperature');
+      } else if (kind === 'secondary') {
+        if (phaseIndex < 2) setPhase('contact');
+        setTab('inspect');
+        cameraAction('troubleStackTemperature');
+      } else {
+        setPhase('consequence');
+        setTab('causes');
+        cameraAction('troubleStackBranches');
+      }
+      return;
+    }
     if (kind === 'primary') {
       if (phase === 'normal') setPhase('deviation');
       setTab('observe');
@@ -275,7 +311,8 @@ export default function TroubleshootingPage({ onBack, onNavigate }: Props) {
     <button className={scenario === 'flameImpingement' ? 'active' : 'available'} onClick={() => chooseScenario('flameImpingement')}><b>T-01</b><span><strong>Flame Impingement</strong><small>Interactive 3D scenario</small></span><Flame size={17} /></button>
     <button className={scenario === 'tubeHotArea' ? 'active' : 'available'} onClick={() => chooseScenario('tubeHotArea')}><b>T-02</b><span><strong>Tube Hot Area</strong><small>Thermal pattern lab</small></span><Thermometer size={17} /></button>
     <button className={scenario === 'draftPressure' ? 'active' : 'available'} onClick={() => chooseScenario('draftPressure')}><b>T-03</b><span><strong>Draft Pressure Concern</strong><small>Pressure-direction 3D lab</small></span><Wind size={17} /></button>
-    {!mobile && futureScenarios.map((item, index) => <button key={item} disabled><b>T-0{index + 4}</b><span><strong>{item}</strong><small>Next scenario</small></span><em>NEXT</em></button>)}
+    <button className={scenario === 'convectionFouling' ? 'active' : 'available'} onClick={() => chooseScenario('convectionFouling')}><b>T-04</b><span><strong>Convection Fouling</strong><small>Deposit / restriction / ΔP lab</small></span><Layers3 size={17} /></button>
+    <button className={scenario === 'highStackTemperature' ? 'active' : 'available'} onClick={() => chooseScenario('highStackTemperature')}><b>T-05</b><span><strong>High Stack Temperature</strong><small>Multi-branch diagnostic lab</small></span><Thermometer size={17} /></button>
   </div>;
 
   const renderDiagnostic = () => <>
@@ -302,6 +339,21 @@ export default function TroubleshootingPage({ onBack, onNavigate }: Props) {
       <button className={phaseIndex >= 3 ? 'available danger' : ''} onClick={() => focusEvidence('thermal')}><ShieldAlert size={15} /><b>{compact ? 'Leakage' : 'Hot-Gas Leakage'}</b></button>
       <button className={phaseIndex >= 3 ? 'available danger' : ''} onClick={() => focusEvidence('backfire')}><Flame size={15} /><b>{compact ? 'Backfire' : 'Premix Backfire Risk'}</b></button>
       <button className={phaseIndex >= 2 ? 'available' : ''} onClick={() => focusEvidence('context')}><CircleDot size={15} /><b>{compact ? 'Pressure' : 'Pressure Zones'}</b></button>
+    </>;
+    if (scenario === 'convectionFouling') return <>
+      <button className={phaseIndex >= 1 ? 'available' : ''} onClick={() => focusEvidence('deposit')}><Layers3 size={15} /><b>{compact ? 'Deposits' : 'Deposit Build-Up'}</b></button>
+      <button className={phaseIndex >= 2 ? 'available' : ''} onClick={() => focusEvidence('restriction')}><Wind size={15} /><b>{compact ? 'Restriction' : 'Restricted Gas Path'}</b></button>
+      <button className={phaseIndex >= 3 ? 'available danger' : ''} onClick={() => focusEvidence('deltaP')}><Gauge size={15} /><b>{compact ? 'ΔP' : 'Convection ΔP'}</b></button>
+      <button className={phaseIndex >= 3 ? 'available' : ''} onClick={() => focusEvidence('stackTemp')}><Thermometer size={15} /><b>{compact ? 'Stack-T' : 'Stack-T Consequence'}</b></button>
+    </>;
+    if (scenario === 'highStackTemperature') return <>
+      <button className={phaseIndex >= 1 ? 'available danger' : ''} onClick={() => focusEvidence('stackTemp')}><Thermometer size={15} /><b>{compact ? 'Stack-T' : 'Stack Temperature'}</b></button>
+      <button className={phaseIndex >= 2 ? 'available' : ''} onClick={() => focusEvidence('secondary')}><ScanLine size={15} /><b>{compact ? 'Correlate' : 'Correlate Trends'}</b></button>
+      <button className={phaseIndex >= 3 ? 'available' : ''} onClick={() => focusEvidence('firing')}><Flame size={15} /><b>{compact ? 'Firing' : 'Firing / Duty'}</b></button>
+      <button className={phaseIndex >= 3 ? 'available' : ''} onClick={() => focusEvidence('restriction')}><Layers3 size={15} /><b>{compact ? 'Convection' : 'Dirty Convection'}</b></button>
+      <button className={phaseIndex >= 3 ? 'available' : ''} onClick={() => focusEvidence('bypass')}><Wind size={15} /><b>{compact ? 'Bypass' : 'Flue-Gas Bypass'}</b></button>
+      <button className={phaseIndex >= 3 ? 'available' : ''} onClick={() => focusEvidence('excessAir')}><CircleDot size={15} /><b>{compact ? 'Air / O₂' : 'Excess Air / Leakage'}</b></button>
+      <button className={phaseIndex >= 3 ? 'available' : ''} onClick={() => focusEvidence('tubeSide')}><Wrench size={15} /><b>{compact ? 'Tube Side' : 'Process / Tube Side'}</b></button>
     </>;
     return <>
       <button className={phaseIndex >= 1 ? 'available' : ''} onClick={() => focusEvidence('primary')}><ScanLine size={15} /><b>{compact ? 'Scan' : 'Scan Tube'}</b></button>
