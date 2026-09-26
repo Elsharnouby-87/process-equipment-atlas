@@ -579,13 +579,14 @@ export default function HeaterTypes3D({ heaterType, view, compare, cameraCommand
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.25;
     renderer.shadowMap.enabled = !mobile;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     host.appendChild(renderer.domElement);
 
     const materials: Materials = {
-      shell: new THREE.MeshPhysicalMaterial({ color: '#68757c', metalness: 0.78, roughness: 0.42, clearcoat: 0.06 }),
-      shellDark: new THREE.MeshPhysicalMaterial({ color: '#283239', metalness: 0.84, roughness: 0.37 }),
-      steel: new THREE.MeshPhysicalMaterial({ color: '#4e5b62', metalness: 0.86, roughness: 0.34 }),
-      tube: new THREE.MeshPhysicalMaterial({ color: '#3d454a', metalness: 0.93, roughness: 0.24, emissive: '#130a05', emissiveIntensity: 0.12 }),
+      shell: new THREE.MeshPhysicalMaterial({ color: '#5b6971', metalness: 0.74, roughness: 0.40, clearcoat: 0.08 }),
+      shellDark: new THREE.MeshPhysicalMaterial({ color: '#232e35', metalness: 0.82, roughness: 0.36 }),
+      steel: new THREE.MeshPhysicalMaterial({ color: '#536168', metalness: 0.84, roughness: 0.32 }),
+      tube: new THREE.MeshPhysicalMaterial({ color: '#485157', metalness: 0.92, roughness: 0.23, emissive: '#160b06', emissiveIntensity: 0.13 }),
       tubeFocus: new THREE.MeshPhysicalMaterial({ color: '#69777d', metalness: 0.9, roughness: 0.2, emissive: '#133447', emissiveIntensity: 0.5 }),
       refractory: new THREE.MeshStandardMaterial({ color: '#a68d6d', roughness: 0.95, emissive: '#281008', emissiveIntensity: 0.08 }),
       burner: new THREE.MeshPhysicalMaterial({ color: '#8d4d24', metalness: 0.82, roughness: 0.34 }),
@@ -667,8 +668,9 @@ export default function HeaterTypes3D({ heaterType, view, compare, cameraCommand
       camera.lookAt(orbit.target);
     };
     const fit = (type: HeaterType, isCompare: boolean) => {
-      const targetY = type === 'box' ? 12.5 : type === 'cabin' ? 11.2 : 11.8;
-      desired = { yaw: -0.72, pitch: 0.08, radius: isCompare ? (mobile ? 61 : 54) : type === 'cabin' ? 32 : 30, target: new THREE.Vector3(0, isCompare ? 11.5 : targetY, 0) };
+      const targetY = type === 'box' ? 13.2 : type === 'cabin' ? 11.4 : 13.0;
+      const singleRadius = type === 'box' ? 38 : type === 'cabin' ? 34 : 37;
+      desired = { yaw: -0.72, pitch: 0.075, radius: isCompare ? (mobile ? 64 : 58) : singleRadius, target: new THREE.Vector3(0, isCompare ? 12.5 : targetY, 0) };
     };
     const cameraAction = (command: CameraCommand, type: HeaterType, isCompare: boolean) => {
       if (command.action === 'fit' || command.action === 'reset') fit(type, isCompare);
