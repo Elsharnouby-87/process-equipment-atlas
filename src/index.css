@@ -815,7 +815,6 @@ button { -webkit-tap-highlight-color: transparent; }
 .trouble-diagnostic-card ul { margin: 8px 0 0; padding-left: 16px; color: #b7a49a; font-size: 8px; line-height: 1.5; }
 .trouble-diagnostic-card li { margin: 4px 0; }
 .trouble-diagnostic-card li::marker { color: #ff8645; }
-.trouble-guardrail { margin-top: 9px; }
 .trouble-mobile-actions, .trouble-mobile-sheet { display: none; }
 .trouble-mobile-evidence { margin-top: 14px; }
 .trouble-mobile-evidence-buttons button { display: inline-flex; align-items: center; gap: 5px; }
