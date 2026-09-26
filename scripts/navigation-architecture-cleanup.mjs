@@ -51,7 +51,7 @@ let app = fs.readFileSync(appPath, 'utf8');
 app = replaceOnce(
   app,
   "import TroubleshootingPage from './TroubleshootingPage';\nimport GlobalNavigation from './GlobalNavigation';",
-  "import TroubleshootingPage from './TroubleshootingPage';\nimport ComponentsPage from './ComponentsPage';\nimport SimulatorPage from './SimulatorPage';\nimport GlobalNavigation from './GlobalNavigation';",
+  "import TroubleshootingPage from './TroubleshootingPage';\nimport ComponentsPage from './ComponentsPage';\nimport SimulatorPage from './SimulatorPage';\nimport PurgeAirPage from './PurgeAirPage';\nimport GlobalNavigation from './GlobalNavigation';",
   'App architecture page imports',
 );
 
@@ -65,7 +65,7 @@ app = replaceOnce(
 app = replaceOnce(
   app,
   "const [activeModule, setActiveModule] = useState<'atlas' | 'burner' | 'radiant' | 'heatRecovery' | 'draftStack' | 'heaterTypes' | 'operation' | 'troubleshooting'>('atlas');",
-  "const [activeModule, setActiveModule] = useState<'atlas' | 'componentsHub' | 'simulator' | 'burner' | 'radiant' | 'heatRecovery' | 'draftStack' | 'heaterTypes' | 'operation' | 'troubleshooting'>('atlas');",
+  "const [activeModule, setActiveModule] = useState<'atlas' | 'componentsHub' | 'simulator' | 'purgeAir' | 'burner' | 'radiant' | 'heatRecovery' | 'draftStack' | 'heaterTypes' | 'operation' | 'troubleshooting'>('atlas');",
   'App active module union',
 );
 
@@ -80,7 +80,7 @@ app = app.replace(
 app = replaceOnce(
   app,
   "  if (activeModule === 'burner') return <BurnerPage onBack={() => setActiveModule('atlas')} onNavigate={navigateGlobal} />;",
-  "  if (activeModule === 'componentsHub') return <ComponentsPage onBack={() => setActiveModule('atlas')} onNavigate={navigateGlobal} onOpenModule={module => setActiveModule(module)} />;\n  if (activeModule === 'simulator') return <SimulatorPage onBack={() => setActiveModule('atlas')} onNavigate={navigateGlobal} />;\n  if (activeModule === 'burner') return <BurnerPage onBack={() => setActiveModule('componentsHub')} onNavigate={navigateGlobal} />;",
+  "  if (activeModule === 'componentsHub') return <ComponentsPage onBack={() => setActiveModule('atlas')} onNavigate={navigateGlobal} onOpenModule={module => setActiveModule(module)} />;\n  if (activeModule === 'simulator') return <SimulatorPage onBack={() => setActiveModule('atlas')} onNavigate={navigateGlobal} />;\n  if (activeModule === 'purgeAir') return <PurgeAirPage onBack={() => setActiveModule('componentsHub')} onNavigate={navigateGlobal} />;\n  if (activeModule === 'burner') return <BurnerPage onBack={() => setActiveModule('componentsHub')} onNavigate={navigateGlobal} />;",
   'App components hub and simulator routes',
 );
 
