@@ -341,6 +341,53 @@
     backfireRing.userData.troubleshootingCue = 't3-backfire';
     backfireRing.userData.troubleshootingPulse = true;
     troubleshootingOverlay.add(backfireRing);
+
+    // T-04 — Convection fouling: qualitative restriction / ΔP / stack-temperature consequence cues.
+    for (const x of [-3.9, -1.95, 0, 1.95, 3.9]) {
+      const restrictionBar = new THREE.Mesh(
+        new THREE.BoxGeometry(0.42, 4.85, 0.34),
+        new THREE.MeshBasicMaterial({ color: '#b97136', transparent: true, opacity: 0.22, depthWrite: false })
+      );
+      restrictionBar.position.set(x, 21.55, 0.0);
+      restrictionBar.userData.troubleshootingCue = 't4-restriction';
+      restrictionBar.userData.troubleshootingPulse = true;
+      troubleshootingOverlay.add(restrictionBar);
+    }
+    addTroubleDraftArrow(new THREE.Vector3(-4.4, 18.5, 2.7), new THREE.Vector3(0, 1, -0.1), 2.3, 0x65d9ff, 't4-dp');
+    addTroubleDraftArrow(new THREE.Vector3(4.4, 24.2, 2.7), new THREE.Vector3(0, 1, -0.1), 1.15, 0xffaa55, 't4-dp');
+    const t4StackRing = new THREE.Mesh(
+      new THREE.TorusGeometry(1.18, 0.075, 10, 46),
+      new THREE.MeshBasicMaterial({ color: '#ff8a42', transparent: true, opacity: 0.72, depthWrite: false, blending: THREE.AdditiveBlending })
+    );
+    t4StackRing.rotation.x = Math.PI / 2;
+    t4StackRing.position.set(0, 35.1, 0);
+    t4StackRing.userData.troubleshootingCue = 't4-stacktemp';
+    t4StackRing.userData.troubleshootingPulse = true;
+    troubleshootingOverlay.add(t4StackRing);
+
+    // T-05 — stack-temperature symptom and multi-branch diagnostic map.
+    const t5StackHalo = new THREE.Mesh(
+      new THREE.CylinderGeometry(1.46, 1.46, 3.5, 32, 1, true),
+      new THREE.MeshBasicMaterial({ color: '#ff5f32', transparent: true, opacity: 0.18, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending })
+    );
+    t5StackHalo.position.set(0, 35.6, 0);
+    t5StackHalo.userData.troubleshootingCue = 't5-stacktemp';
+    t5StackHalo.userData.troubleshootingPulse = true;
+    troubleshootingOverlay.add(t5StackHalo);
+    const t5StackLight = new THREE.PointLight('#ff6a36', 13, 8.5, 2);
+    t5StackLight.position.set(0, 35.2, 0);
+    t5StackLight.userData.troubleshootingCue = 't5-stacktemp';
+    troubleshootingOverlay.add(t5StackLight);
+
+    const branchSpecs: { origin: [number, number, number]; direction: [number, number, number]; color: number; cue: string }[] = [
+      { origin: [-2.8, 8.0, -1.0], direction: [-1, -0.1, 0], color: 0xff8b42, cue: 't5-firing' },
+      { origin: [3.4, 21.4, 0.4], direction: [1, 0.1, 0], color: 0xb88954, cue: 't5-convection' },
+      { origin: [2.0, 26.4, 1.6], direction: [0.8, 0.35, 0.3], color: 0xffb05e, cue: 't5-bypass' },
+      { origin: [-2.2, 30.6, -1.4], direction: [-0.8, 0.35, -0.2], color: 0x69d8ff, cue: 't5-excessair' },
+      { origin: [4.7, 12.0, -0.8], direction: [0.95, 0.05, 0], color: 0x8ad7c2, cue: 't5-tubeside' },
+    ];
+    branchSpecs.forEach(spec => addTroubleDraftArrow(new THREE.Vector3(...spec.origin), new THREE.Vector3(...spec.direction), 1.55, spec.color, spec.cue));
+
     const troubleLabels: { text: string; pos: [number, number, number]; cue: string }[] = [
       { text: 'FLAME ENVELOPE SHIFT', pos: [6.0, 8.75, -1.35], cue: 't1-deviation' },
       { text: 'FLAME / TUBE CONTACT', pos: [7.15, 10.45, -1.4], cue: 't1-contact' },
@@ -354,6 +401,17 @@
       { text: 'DAMPER RESTRICTION · QUALITATIVE', pos: [5.85, 31.35, 0.0], cue: 't3-damper' },
       { text: 'HOT GAS LEAKAGE CONCERN', pos: [6.5, 15.85, 4.4], cue: 't3-leak' },
       { text: 'PREMIX BURNER FLASHBACK / BACKFIRE AWARENESS', pos: [5.8, 6.0, -1.35], cue: 't3-backfire' },
+      { text: 'CONVECTION DEPOSIT BUILD-UP', pos: [6.3, 21.0, 1.4], cue: 't4-deposit' },
+      { text: 'RESTRICTED GAS PATH · QUALITATIVE', pos: [6.7, 22.2, 0.7], cue: 't4-restriction' },
+      { text: 'CONVECTION ΔP / DRAFT LOSS ↑', pos: [6.4, 24.2, 2.6], cue: 't4-dp' },
+      { text: 'STACK-T CONSEQUENCE · TREND ONLY', pos: [5.4, 35.2, 0.0], cue: 't4-stacktemp' },
+      { text: 'RISING STACK TEMPERATURE · SYMPTOM', pos: [5.4, 35.6, 0.0], cue: 't5-stacktemp' },
+      { text: 'CORRELATE TRENDS BEFORE ROOT CAUSE', pos: [6.3, 28.1, 0.0], cue: 't5-correlate' },
+      { text: 'FIRING / DUTY CHECK', pos: [-5.1, 7.7, -1.0], cue: 't5-firing' },
+      { text: 'DIRTY / DAMAGED CONVECTION', pos: [6.4, 21.8, 0.4], cue: 't5-convection' },
+      { text: 'FLUE-GAS BYPASS / MALDISTRIBUTION', pos: [6.3, 27.0, 1.8], cue: 't5-bypass' },
+      { text: 'EXCESS AIR / LEAKAGE', pos: [-5.0, 31.2, -1.5], cue: 't5-excessair' },
+      { text: 'PROCESS / TUBE-SIDE HEAT PICKUP', pos: [7.0, 12.1, -0.8], cue: 't5-tubeside' },
     ];
     troubleLabels.forEach(spec => {
       const label = makeLabel(spec.text);
