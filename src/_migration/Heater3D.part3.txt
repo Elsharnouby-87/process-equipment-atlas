@@ -183,37 +183,23 @@
       const purgeActive = activeOperationState === 'purgeActive';
       const purgeComplete = activeOperationState === 'purgeComplete';
       purgeMat.opacity = purgeActive ? 0.92 : purgeComplete ? 0.34 : 0.92;
+      purgeRotor.rotation.x = purgeActive ? t * 7.4 : 0;
       for (const p of purgeParticles) {
         p.visible = purgeActive || purgeComplete;
         if (!p.visible) continue;
         const baseT = p.userData.t as number;
         const lane = p.userData.lane as number;
-        const u = purgeActive ? (baseT + t * 0.046) % 1 : baseT;
-        let y = 4.5;
-        let width = 2.7;
-        if (u < 0.12) {
-          const r = u / 0.12;
-          y = 4.5 + r * 2.3;
-          width = THREE.MathUtils.lerp(3.2, 2.45, r);
-        } else if (u < 0.5) {
-          const r = (u - 0.12) / 0.38;
-          y = 6.8 + r * 10.3;
-          width = 2.55 + Math.sin(r * Math.PI) * 0.8;
-        } else if (u < 0.74) {
-          const r = (u - 0.5) / 0.24;
-          y = 17.1 + r * 8.0;
-          width = THREE.MathUtils.lerp(2.8, 2.35, r);
-        } else if (u < 0.86) {
-          const r = (u - 0.74) / 0.12;
-          y = 25.1 + r * 4.4;
-          width = THREE.MathUtils.lerp(2.35, 0.72, r);
-        } else {
-          const r = (u - 0.86) / 0.14;
-          y = 29.5 + r * 9.0;
-          width = 0.68;
-        }
-        const phase = baseT * 21 + u * 5.3;
-        p.position.set(lane * width + Math.sin(phase) * 0.28, y, Math.cos(phase * 0.83) * width * 0.34);
+        const branch = (p.userData.branch as number | undefined) ?? 0;
+        const curve = purgeFlowCurves[branch % purgeFlowCurves.length];
+        const u = purgeActive ? (baseT + t * 0.052) % 1 : baseT;
+        p.position.copy(curve.getPoint(u));
+        const tangent = curve.getTangent(u).normalize();
+        const side = new THREE.Vector3(-tangent.z, 0, tangent.x).normalize();
+        const vertical = new THREE.Vector3().crossVectors(tangent, side).normalize();
+        const spread = u < 0.54 ? 0.055 : 0.18;
+        const phase = baseT * 23 + u * 7.1;
+        p.position.addScaledVector(side, Math.sin(phase) * spread * (0.55 + Math.abs(lane)));
+        p.position.addScaledVector(vertical, Math.cos(phase * 0.82) * spread * 0.55);
       }
       const restriction = damperPositionRef.current / 100;
       const flowSpeed = flowSelection === 'Stack Damper' && contextual ? 0.062 * (1 - restriction * 0.42) : 0.066;
