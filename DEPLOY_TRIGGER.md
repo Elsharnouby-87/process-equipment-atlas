@@ -1,9 +1,11 @@
 # GitHub Pages Deployment Trigger
 
-Deploy source branch: `floot-migration-dev`
+Preview source branch: `checkpoint-pre-components-motion-prototype-2026-09-14`
 
-Patch: **09 — Global Draft Dynamics & Live Instrument Response**
+Preview addition: **Refero Style Lab V1**
 
-Source head at trigger: `2e18b799131f661935c7c514825b6114b6ed4172`
+This trigger republishes the unchanged production Atlas plus the isolated style sandbox at:
 
-This file is only used to trigger the GitHub Pages workflow on `main`. The deployed application source remains on `floot-migration-dev`.
+`/process-equipment-atlas/previews/refero-style-lab-v1/`
+
+The production application source itself is not restyled by this trigger.
