@@ -23,3 +23,5 @@ Production update: **Troubleshooting T-04 / T-05 expansion** — activates Conve
 Production update: **Global typography readability pass** — enlarges instructional/body copy, diagnostic text, simulator labels, component-study notes, operation status text and mobile learning sheets while preserving headline sizes and large simulator numeric readouts.
 
 Production update: **Troubleshooting content cleanup** — removes Learning Chain and Technical Basis / Sources / References cards from T-01 through T-05, while keeping the diagnostic content and training boundary.
+
+Production update: **Troubleshooting declutter pass** — removes the repeated Training Boundary card from T-01 through T-05 to keep the diagnostic panels concise and reduce non-essential visual noise.
