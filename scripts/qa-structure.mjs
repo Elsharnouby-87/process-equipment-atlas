@@ -87,6 +87,12 @@ requireText('src/Heater3D.tsx', "troubleshootingCue = 't4-restriction'", 'T-04 r
 requireText('src/Heater3D.tsx', "troubleshootingCue = 't5-stacktemp'", 'T-05 stack-temperature overlay');
 requireText('src/Heater3D.tsx', "cameraCommand.action === 'troubleConvection'", 'T-04 camera');
 requireText('src/Heater3D.tsx', "cameraCommand.action === 'troubleStackTemperature'", 'T-05 camera');
+requireText('src/HeaterTypes3D.tsx', 'function rectangularFrustum', 'Heater types stack-transition geometry');
+requireText('src/HeaterTypes3D.tsx', 'function addPlatform', 'Heater types service-platform cue');
+requireText('src/HeaterTypes3D.tsx', 'function addLadder', 'Heater types ladder cue');
+requireText('src/HeaterTypes3D.tsx', 'addCylindricalPlatform', 'Cylindrical heater platform cue');
+requireText('src/HeaterTypes3D.tsx', 'const turns = 5.25', 'Cylindrical helical-coil refinement');
+requireText('src/HeaterTypes3D.tsx', 'addRectBands', 'Rectangular heater structural-band refinement');
 requireText('src/BurnerPage.tsx', 'PHYSICS-BASED COMBUSTION + DRAFT SIMULATOR V2', 'Simulator V2 heading');
 requireText('src/BurnerPage.tsx', 'metrics.radiantOxygenPct', 'Radiant O2 readout');
 requireText('src/BurnerPage.tsx', 'metrics.stackOxygenPct', 'Stack O2 readout');
@@ -109,7 +115,7 @@ if (failures.length) {
 
 console.log('[qa:structure] PASS');
 console.log(` - ${requiredFiles.length} required modules present`);
-console.log(' - free-explore, draft instrumentation, burner exploded, purge-air learning module, T-04/T-05 troubleshooting, global readability pass and fuel-path guards present');
+console.log(' - free-explore, draft instrumentation, burner exploded, purge-air learning module, T-04/T-05 troubleshooting, refined heater-family geometry, global readability pass and fuel-path guards present');
 console.log(' - burner fuel path remains readable across Atlas and dedicated study modes');
 console.log(' - mobile simulator keeps Draft, radiant O2 and CO visible with tuning controls collapsed');
 console.log(' - simulator V2 exposes heat input, actual air, excess air, radiant/stack O2, CO, draft and representative stack temperature');
