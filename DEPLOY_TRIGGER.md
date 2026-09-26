@@ -29,3 +29,5 @@ Production update: **Troubleshooting declutter pass** — removes the repeated T
 Production update: **Atlas context declutter** — removes the redundant `Training visualization · Schematic geometry · Not a certified plant design` line from the main Atlas context bar.
 
 Production update: **Free Explore declutter** — removes the entire right-side Free Explore inspector, hides its mobile Details action, and expands the 3D workspace until a real component is selected.
+
+Production update: **Heater Types visual refinement** — upgrades Box, Cabin and Vertical Cylindrical models with cleaner proportions, shell panel thickness, stack/breeching transitions, structural bands, support framing, platforms/ladders, clearer burners and coil layouts, plus improved materials, shadows and camera framing.
