@@ -15,3 +15,5 @@ Production update: **V13.6 purge fan / blower integration** — adds the source-
 Deployment retry: purge fan integration QA-anchor compatibility fix applied.
 
 Deployment retry: TypeScript cleanup for purge fan integration.
+
+Production update: **Purge Air System detailed learning module** — adds Overview, Blower, Isolation Damper, Airflow Proof, External Riser, Two Entries, Full Purge Flow and BMS/Permissive studies, plus explicit O-04 FAN RUNNING / DAMPER PROVED / AIRFLOW PROVED visual-state cues.
