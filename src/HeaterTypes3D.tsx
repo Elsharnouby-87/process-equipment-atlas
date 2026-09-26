@@ -293,58 +293,63 @@ function buildBox(materials: Materials): ModelVisual {
   const flames: THREE.Mesh[] = [];
 
   const buildShell = (group: THREE.Group, cutaway: boolean) => {
-    group.add(meshBox([10.4, 0.35, 6.6], [0, 4.8, 0], materials.shellDark));
-    group.add(meshBox([10.5, 10.4, 0.18], [0, 10.0, -3.3], materials.shell));
-    group.add(meshBox([0.18, 10.4, 6.5], [-5.2, 10.0, 0], materials.shell));
-    group.add(meshBox([0.18, 10.4, 6.5], [5.2, 10.0, 0], materials.shell));
-    if (!cutaway) group.add(meshBox([10.5, 10.4, 0.18], [0, 10.0, 3.3], materials.shell));
-    group.add(meshBox([10.6, 4.6, 6.6], [0, 17.5, 0], materials.shell));
-    if (cutaway) group.add(meshBox([10.0, 4.1, 0.14], [0, 17.5, -3.27], materials.shellDark));
-    group.add(cylinder(1.28, 5.1, [0, 22.2, 0], materials.shell, 30));
+    group.add(meshBox([10.8, 0.34, 6.8], [0, 4.78, 0], materials.shellDark));
+    addRectShell(group, 10.6, 10.4, 6.6, 10.0, materials.shell, cutaway);
+    addRectShell(group, 10.8, 4.2, 6.6, 17.3, materials.shell, cutaway);
+    group.add(rectangularFrustum(10.8, 6.6, 4.0, 3.4, 1.5, 20.15, materials.shellDark, cutaway));
+    group.add(meshBox([4.0, 0.42, 3.4], [0, 20.92, 0], materials.shellDark));
+    group.add(cylinder(1.28, 4.6, [0, 23.22, 0], materials.shell, 32));
+    addRectBands(group, 10.6, 6.6, [7.1, 9.9, 12.7, 15.05], materials.steel, cutaway);
+    addRectBands(group, 10.8, 6.6, [16.1, 18.25], materials.steel, cutaway);
+    addStackFlanges(group, 1.31, [20.98, 25.43], materials.steel);
+    addPlatform(group, 14.75, 11.8, 1.25, 3.82, materials);
+    addLadder(group, 5.55, 4.28, 4.65, 14.75, materials);
   };
   buildShell(exteriorShell, false);
   buildShell(cutawayShell, true);
-  addFrame(exteriorShell, [-5.6, 5.6], [-3.65, 3.65], 4.8, materials);
-  addFrame(cutawayShell, [-5.6, 5.6], [-3.65, 3.65], 4.8, materials);
+  addFrame(exteriorShell, [-5.6, 5.6], [-3.65, 3.65], 4.75, materials);
+  addFrame(cutawayShell, [-5.6, 5.6], [-3.65, 3.65], 4.75, materials);
 
   for (const x of [-4.55, 4.55]) {
     for (const z of [-2.25, -0.75, 0.75, 2.25]) {
-      radiant.add(cylinderBetween(new THREE.Vector3(x, 5.6, z), new THREE.Vector3(x, 14.3, z), 0.16, materials.tube, 12));
+      radiant.add(cylinderBetween(new THREE.Vector3(x, 5.55, z), new THREE.Vector3(x, 14.25, z), 0.17, materials.tube, 12));
     }
-  }
-  for (const x of [-4.55, 4.55]) {
     for (const z of [-2.25, 0.75]) {
       radiant.add(tube([
-        new THREE.Vector3(x, 14.3, z),
-        new THREE.Vector3(x, 14.65, z + 0.75),
-        new THREE.Vector3(x, 14.3, z + 1.5),
-      ], 0.16, materials.tube, 22));
+        new THREE.Vector3(x, 14.25, z),
+        new THREE.Vector3(x, 14.62, z + 0.75),
+        new THREE.Vector3(x, 14.25, z + 1.5),
+      ], 0.17, materials.tube, 24));
     }
   }
-  for (const x of [-2.4, 0, 2.4]) for (const z of [-1.45, 1.45]) addFloorBurner(burners, x, z, 5.0, materials, flames);
-  addFinnedBank(convection, 16.1, 9.2, [-2.3, -0.8, 0.8, 2.3], materials, 5);
+
+  for (const x of [-2.4, 0, 2.4]) {
+    for (const z of [-1.45, 1.45]) addFloorBurner(burners, x, z, 4.98, materials, flames);
+  }
+  addFinnedBank(convection, 15.85, 9.2, [-2.3, -0.8, 0.8, 2.3], materials, 5);
   internals.add(radiant, burners, convection);
 
   const processCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(4.55, 5.7, -2.25),
+    new THREE.Vector3(4.55, 5.65, -2.25),
     new THREE.Vector3(4.55, 9.8, -2.25),
-    new THREE.Vector3(4.55, 14.3, -2.25),
+    new THREE.Vector3(4.55, 14.25, -2.25),
     new THREE.Vector3(4.55, 14.6, -1.5),
-    new THREE.Vector3(4.55, 14.3, -0.75),
+    new THREE.Vector3(4.55, 14.25, -0.75),
     new THREE.Vector3(4.55, 9.8, -0.75),
-    new THREE.Vector3(4.55, 5.7, -0.75),
+    new THREE.Vector3(4.55, 5.65, -0.75),
   ], false, 'centripetal', 0.18);
   const flueCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(0, 6.0, 0),
-    new THREE.Vector3(0.4, 11.5, -0.2),
-    new THREE.Vector3(-0.3, 16.2, 0.3),
-    new THREE.Vector3(0, 19.6, 0),
-    new THREE.Vector3(0, 24.5, 0),
+    new THREE.Vector3(0, 5.9, 0),
+    new THREE.Vector3(0.35, 11.2, -0.2),
+    new THREE.Vector3(-0.25, 16.1, 0.3),
+    new THREE.Vector3(0, 19.4, 0),
+    new THREE.Vector3(0, 21.3, 0),
+    new THREE.Vector3(0, 25.2, 0),
   ], false, 'centripetal', 0.18);
   const processParticles = createParticles(flow, processCurve, materials.process, 18, 0.095);
-  const flueParticles = createParticles(flow, flueCurve, materials.flue, 22, 0.105);
+  const flueParticles = createParticles(flow, flueCurve, materials.flue, 24, 0.105);
   const label = makeLabel(typeLabels.box);
-  label.position.set(0, 26.2, 0);
+  label.position.set(0, 27.0, 0);
   root.add(exteriorShell, cutawayShell, internals, flow, label);
   rememberMaterials(root);
   return { type: 'box', root, exteriorShell, cutawayShell, internals, radiant, burners, convection, flow, label, processCurve, flueCurve, processParticles, flueParticles, flames };
@@ -362,60 +367,67 @@ function buildCabin(materials: Materials): ModelVisual {
   const flames: THREE.Mesh[] = [];
 
   const buildShell = (group: THREE.Group, cutaway: boolean) => {
-    group.add(meshBox([12.8, 0.34, 7.3], [0, 3.8, 0], materials.shellDark));
-    group.add(meshBox([12.8, 8.6, 0.18], [0, 8.1, -3.65], materials.shell));
-    group.add(meshBox([0.18, 8.6, 7.2], [-6.4, 8.1, 0], materials.shell));
-    group.add(meshBox([0.18, 8.6, 7.2], [6.4, 8.1, 0], materials.shell));
-    if (!cutaway) group.add(meshBox([12.8, 8.6, 0.18], [0, 8.1, 3.65], materials.shell));
-    const leftRoof = meshBox([6.8, 0.28, 7.25], [-3.15, 13.0, 0], materials.shellDark);
-    leftRoof.rotation.z = -0.16;
+    group.add(meshBox([13.8, 0.34, 7.5], [0, 3.88, 0], materials.shellDark));
+    addRectShell(group, 13.6, 8.4, 7.35, 8.08, materials.shell, cutaway);
+    const leftRoof = meshBox([7.15, 0.30, 7.35], [-3.3, 12.48, 0], materials.shellDark);
+    leftRoof.rotation.z = -0.17;
     group.add(leftRoof);
-    const rightRoof = meshBox([6.8, 0.28, 7.25], [3.15, 13.0, 0], materials.shellDark);
-    rightRoof.rotation.z = 0.16;
+    const rightRoof = meshBox([7.15, 0.30, 7.35], [3.3, 12.48, 0], materials.shellDark);
+    rightRoof.rotation.z = 0.17;
     group.add(rightRoof);
-    group.add(meshBox([8.2, 4.0, 6.4], [0, 15.3, 0], materials.shell));
-    group.add(cylinder(1.18, 4.4, [0, 19.5, 0], materials.shell, 28));
+    addRectShell(group, 9.6, 3.25, 6.25, 14.45, materials.shell, cutaway);
+    group.add(rectangularFrustum(9.6, 6.25, 3.8, 3.2, 1.35, 16.75, materials.shellDark, cutaway));
+    group.add(cylinder(1.18, 4.1, [0, 19.45, 0], materials.shell, 30));
+    addRectBands(group, 13.6, 7.35, [5.7, 7.9, 10.1], materials.steel, cutaway);
+    addRectBands(group, 9.6, 6.25, [13.45, 15.45], materials.steel, cutaway);
+    addStackFlanges(group, 1.21, [17.42, 21.45], materials.steel);
+    addPlatform(group, 12.15, 14.5, 1.25, 4.2, materials);
+    addLadder(group, 6.85, 4.68, 3.8, 12.15, materials);
   };
   buildShell(exteriorShell, false);
   buildShell(cutawayShell, true);
-  addFrame(exteriorShell, [-6.8, 6.8], [-4.0, 4.0], 3.8, materials);
-  addFrame(cutawayShell, [-6.8, 6.8], [-4.0, 4.0], 3.8, materials);
+  addFrame(exteriorShell, [-6.9, 6.9], [-4.0, 4.0], 3.85, materials);
+  addFrame(cutawayShell, [-6.9, 6.9], [-4.0, 4.0], 3.85, materials);
 
   const coilZ = -3.05;
-  const ys = [5.0, 6.35, 7.7, 9.05, 10.4, 11.75];
+  const ys = [4.9, 6.05, 7.2, 8.35, 9.5, 10.65, 11.8];
   ys.forEach((y, index) => {
-    radiant.add(cylinderBetween(new THREE.Vector3(-5.35, y, coilZ), new THREE.Vector3(5.35, y, coilZ), 0.16, materials.tube, 12));
+    radiant.add(cylinderBetween(new THREE.Vector3(-5.55, y, coilZ), new THREE.Vector3(5.55, y, coilZ), 0.18, materials.tube, 12));
     if (index < ys.length - 1) {
-      const side = index % 2 === 0 ? 5.35 : -5.35;
+      const side = index % 2 === 0 ? 5.55 : -5.55;
       radiant.add(tube([
         new THREE.Vector3(side, y, coilZ),
-        new THREE.Vector3(side + (side > 0 ? 0.35 : -0.35), (y + ys[index + 1]) / 2, coilZ),
+        new THREE.Vector3(side + (side > 0 ? 0.38 : -0.38), (y + ys[index + 1]) / 2, coilZ),
         new THREE.Vector3(side, ys[index + 1], coilZ),
-      ], 0.16, materials.tube, 22));
+      ], 0.18, materials.tube, 24));
     }
   });
-  for (const x of [-4.2, -1.4, 1.4, 4.2]) for (const z of [-1.55, 1.55]) addFloorBurner(burners, x, z, 4.0, materials, flames);
-  addFinnedBank(convection, 14.1, 7.3, [-2.0, -0.7, 0.7, 2.0], materials, 5);
+
+  for (const x of [-4.35, -1.45, 1.45, 4.35]) {
+    for (const z of [-1.55, 1.55]) addFloorBurner(burners, x, z, 4.05, materials, flames);
+  }
+  addFinnedBank(convection, 13.35, 8.5, [-2.0, -0.7, 0.7, 2.0], materials, 5);
   internals.add(radiant, burners, convection);
 
   const processPoints: THREE.Vector3[] = [];
   ys.forEach((y, index) => {
-    const from = index % 2 === 0 ? -5.35 : 5.35;
+    const from = index % 2 === 0 ? -5.55 : 5.55;
     const to = -from;
     processPoints.push(new THREE.Vector3(from, y, coilZ), new THREE.Vector3(to, y, coilZ));
   });
   const processCurve = new THREE.CatmullRomCurve3(processPoints, false, 'centripetal', 0.08);
   const flueCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(-1.5, 5.0, 0),
-    new THREE.Vector3(0.7, 9.2, 0.4),
-    new THREE.Vector3(0, 13.0, -0.2),
-    new THREE.Vector3(0, 17.1, 0),
-    new THREE.Vector3(0, 21.4, 0),
+    new THREE.Vector3(-1.6, 5.0, 0),
+    new THREE.Vector3(0.8, 8.8, 0.45),
+    new THREE.Vector3(0, 12.3, -0.15),
+    new THREE.Vector3(0, 15.7, 0),
+    new THREE.Vector3(0, 17.5, 0),
+    new THREE.Vector3(0, 21.25, 0),
   ], false, 'centripetal', 0.18);
-  const processParticles = createParticles(flow, processCurve, materials.process, 20, 0.095);
-  const flueParticles = createParticles(flow, flueCurve, materials.flue, 22, 0.105);
+  const processParticles = createParticles(flow, processCurve, materials.process, 22, 0.095);
+  const flueParticles = createParticles(flow, flueCurve, materials.flue, 24, 0.105);
   const label = makeLabel(typeLabels.cabin);
-  label.position.set(0, 23.3, 0);
+  label.position.set(0, 23.0, 0);
   root.add(exteriorShell, cutawayShell, internals, flow, label);
   rememberMaterials(root);
   return { type: 'cabin', root, exteriorShell, cutawayShell, internals, radiant, burners, convection, flow, label, processCurve, flueCurve, processParticles, flueParticles, flames };
@@ -432,50 +444,90 @@ function buildCylindrical(materials: Materials): ModelVisual {
   const flow = new THREE.Group();
   const flames: THREE.Mesh[] = [];
 
-  const fullShell = new THREE.Mesh(new THREE.CylinderGeometry(4.3, 4.3, 10.8, 44, 1, true), materials.shell);
-  fullShell.position.y = 9.2;
+  const fullShell = new THREE.Mesh(new THREE.CylinderGeometry(4.35, 4.35, 11.2, 48, 1, true), materials.shell);
+  fullShell.position.y = 9.6;
+  fullShell.castShadow = true;
+  fullShell.receiveShadow = true;
   exteriorShell.add(fullShell);
-  exteriorShell.add(cylinder(4.38, 0.32, [0, 3.8, 0], materials.shellDark, 44));
-  exteriorShell.add(cylinder(4.38, 0.28, [0, 14.65, 0], materials.shellDark, 44));
+  exteriorShell.add(cylinder(4.43, 0.30, [0, 4.0, 0], materials.shellDark, 48));
+  exteriorShell.add(cylinder(4.43, 0.26, [0, 15.2, 0], materials.shellDark, 48));
 
-  const cutShell = new THREE.Mesh(new THREE.CylinderGeometry(4.3, 4.3, 10.8, 44, 1, true, -0.18, Math.PI * 1.48), materials.shell);
-  cutShell.position.y = 9.2;
+  const cutShell = new THREE.Mesh(new THREE.CylinderGeometry(4.35, 4.35, 11.2, 48, 1, true, -0.18, Math.PI * 1.48), materials.shell);
+  cutShell.position.y = 9.6;
+  cutShell.castShadow = true;
   cutawayShell.add(cutShell);
-  cutawayShell.add(cylinder(4.38, 0.32, [0, 3.8, 0], materials.shellDark, 44));
+  cutawayShell.add(cylinder(4.43, 0.30, [0, 4.0, 0], materials.shellDark, 48));
 
   for (const shell of [exteriorShell, cutawayShell]) {
-    shell.add(meshBox([7.1, 4.1, 7.1], [0, 16.7, 0], materials.shell));
-    shell.add(cylinder(1.1, 4.1, [0, 20.75, 0], materials.shell, 28));
-    for (const x of [-4.7, 4.7]) for (const z of [-2.4, 2.4]) shell.add(meshBox([0.2, 3.7, 0.2], [x, 1.85, z], materials.steel));
+    const cutaway = shell === cutawayShell;
+    const roof = new THREE.Mesh(new THREE.CylinderGeometry(2.5, 4.35, 1.5, 48, 1, true, -0.18, cutaway ? Math.PI * 1.48 : Math.PI * 2), materials.shellDark);
+    roof.position.y = 15.95;
+    roof.castShadow = true;
+    shell.add(roof);
+
+    const upper = new THREE.Mesh(new THREE.CylinderGeometry(3.0, 3.0, 3.0, 40, 1, true, -0.18, cutaway ? Math.PI * 1.48 : Math.PI * 2), materials.shell);
+    upper.position.y = 18.15;
+    upper.castShadow = true;
+    shell.add(upper);
+
+    const transition = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 3.0, 1.2, 36), materials.shellDark);
+    transition.position.y = 20.25;
+    transition.castShadow = true;
+    shell.add(transition);
+    shell.add(cylinder(1.15, 4.2, [0, 22.95, 0], materials.shell, 32));
+    addStackFlanges(shell, 1.18, [20.88, 25.0], materials.steel);
+
+    for (const y of [6.4, 9.1, 11.8, 14.5]) {
+      const band = new THREE.Mesh(new THREE.TorusGeometry(4.39, 0.065, 8, 48), materials.steel);
+      band.rotation.x = Math.PI / 2;
+      band.position.y = y;
+      shell.add(band);
+    }
+
+    for (let i = 0; i < 6; i += 1) {
+      const a = (i / 6) * Math.PI * 2;
+      const x = Math.cos(a) * 4.65;
+      const z = Math.sin(a) * 4.65;
+      shell.add(meshBox([0.22, 3.8, 0.22], [x, 1.9, z], materials.steel));
+      shell.add(meshBox([0.55, 0.14, 0.55], [x, 0.06, z], materials.shellDark));
+    }
+    addCylindricalPlatform(shell, 14.85, 4.42, 5.02, materials);
+    addLadder(shell, 5.05, 0, 4.0, 14.85, materials);
   }
 
   const helixPoints: THREE.Vector3[] = [];
-  const turns = 5.5;
-  for (let i = 0; i <= 140; i += 1) {
-    const u = i / 140;
-    const a = u * Math.PI * 2 * turns + 0.5;
-    helixPoints.push(new THREE.Vector3(Math.cos(a) * 3.45, 4.8 + u * 8.8, Math.sin(a) * 3.45));
+  const turns = 5.25;
+  for (let i = 0; i <= 150; i += 1) {
+    const u = i / 150;
+    const a = u * Math.PI * 2 * turns + 0.48;
+    helixPoints.push(new THREE.Vector3(Math.cos(a) * 3.52, 4.9 + u * 8.9, Math.sin(a) * 3.52));
   }
-  radiant.add(tube(helixPoints, 0.16, materials.tube, 150));
-  for (let i = 0; i < 5; i += 1) {
-    const a = (i / 5) * Math.PI * 2;
-    addFloorBurner(burners, Math.cos(a) * 1.65, Math.sin(a) * 1.65, 4.0, materials, flames);
+  radiant.add(tube(helixPoints, 0.17, materials.tube, 170));
+  const helixStart = helixPoints[0];
+  const helixEnd = helixPoints[helixPoints.length - 1];
+  radiant.add(cylinderBetween(new THREE.Vector3(helixStart.x, 4.25, helixStart.z), helixStart, 0.17, materials.tube, 12));
+  radiant.add(cylinderBetween(helixEnd, new THREE.Vector3(helixEnd.x, 14.45, helixEnd.z), 0.17, materials.tube, 12));
+
+  for (let i = 0; i < 6; i += 1) {
+    const a = (i / 6) * Math.PI * 2;
+    addFloorBurner(burners, Math.cos(a) * 1.75, Math.sin(a) * 1.75, 4.05, materials, flames);
   }
-  addFinnedBank(convection, 15.55, 6.2, [-2.1, -0.7, 0.7, 2.1], materials, 5);
+  addFinnedBank(convection, 16.95, 5.2, [-1.8, -0.6, 0.6, 1.8], materials, 4);
   internals.add(radiant, burners, convection);
 
   const processCurve = new THREE.CatmullRomCurve3(helixPoints, false, 'centripetal', 0.12);
   const flueCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(0, 4.8, 0),
-    new THREE.Vector3(0.4, 9.0, -0.2),
-    new THREE.Vector3(-0.3, 13.9, 0.3),
-    new THREE.Vector3(0, 17.7, 0),
-    new THREE.Vector3(0, 22.7, 0),
+    new THREE.Vector3(0, 4.9, 0),
+    new THREE.Vector3(0.45, 9.2, -0.2),
+    new THREE.Vector3(-0.3, 14.0, 0.3),
+    new THREE.Vector3(0, 17.6, 0),
+    new THREE.Vector3(0, 20.4, 0),
+    new THREE.Vector3(0, 24.9, 0),
   ], false, 'centripetal', 0.18);
-  const processParticles = createParticles(flow, processCurve, materials.process, 22, 0.09);
-  const flueParticles = createParticles(flow, flueCurve, materials.flue, 22, 0.105);
+  const processParticles = createParticles(flow, processCurve, materials.process, 24, 0.09);
+  const flueParticles = createParticles(flow, flueCurve, materials.flue, 24, 0.105);
   const label = makeLabel(typeLabels.cylindrical);
-  label.position.set(0, 24.5, 0);
+  label.position.set(0, 26.7, 0);
   root.add(exteriorShell, cutawayShell, internals, flow, label);
   rememberMaterials(root);
   return { type: 'cylindrical', root, exteriorShell, cutawayShell, internals, radiant, burners, convection, flow, label, processCurve, flueCurve, processParticles, flueParticles, flames };
