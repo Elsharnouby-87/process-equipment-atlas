@@ -13,3 +13,5 @@ Production update: **isolated heater study view** — removed non-essential indu
 Production update: **V13.6 purge fan / blower integration** — adds the source-based purge-air package, two lower-radiant entries, selectable Atlas component, animated fan-to-stack airflow, and O-03/O-04/O-05 operation training integration.
 
 Deployment retry: purge fan integration QA-anchor compatibility fix applied.
+
+Deployment retry: TypeScript cleanup for purge fan integration.
