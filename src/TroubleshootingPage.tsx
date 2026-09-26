@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ArrowLeft, CircleDot, Eye, Flame, Focus, Info, Layers3, Pause, Play, Rotate3D, ScanLine, ShieldAlert, Thermometer, Wind, Wrench, X, ZoomIn, ZoomOut } from 'lucide-react';
+import { ArrowLeft, CircleDot, Eye, Flame, Focus, Gauge, Info, Layers3, Pause, Play, Rotate3D, ScanLine, ShieldAlert, Thermometer, Wind, Wrench, X, ZoomIn, ZoomOut } from 'lucide-react';
 import Heater3D from './Heater3D';
 import GlobalNavigation from './GlobalNavigation';
 import type { NavigationTarget } from './GlobalNavigation';
@@ -364,7 +364,7 @@ export default function TroubleshootingPage({ onBack, onNavigate }: Props) {
   };
 
   return (
-    <main className={`app-shell radiant-page trouble-page ${scenario === 'tubeHotArea' ? 'hot-area-mode' : scenario === 'draftPressure' ? 'draft-pressure-mode' : ''}`}> 
+    <main className={`app-shell radiant-page trouble-page ${scenario === 'tubeHotArea' ? 'hot-area-mode' : scenario === 'draftPressure' ? 'draft-pressure-mode' : scenario === 'convectionFouling' ? 'convection-fouling-mode' : scenario === 'highStackTemperature' ? 'high-stack-temperature-mode' : ''}`}> 
       <header className="atlas-topbar radiant-topbar trouble-topbar">
         <button className="back-atlas" onClick={onBack}><ArrowLeft size={16} /> Atlas</button>
         <div className="brand-lockup"><strong>FIRED HEATER <em>ATLAS</em></strong><span>TROUBLESHOOTING · INTERACTIVE 3D LAB</span></div>
@@ -381,7 +381,23 @@ export default function TroubleshootingPage({ onBack, onNavigate }: Props) {
         </aside>
 
         <div className="radiant-viewer hero-viewer trouble-viewer">
-          <Heater3D mode="cutaway" selected={scenario === 'draftPressure' ? 'Breeching' : 'Radiant Tubes'} labels={labels} flow={flow} explode={false} contextMode="full" damperPosition={18} draftStudyMode={scenario === 'draftPressure' ? 'pressure' : null} draftPressureScenario={scenario === 'draftPressure' && phaseIndex >= 2 ? 'positive' : 'negative'} troubleshootingScenario={scenario} troubleshootingPhase={phase} cameraCommand={cameraCommand} onSelect={noSelect} />
+          <Heater3D
+            mode="cutaway"
+            selected={scenarioComponent}
+            labels={labels}
+            flow={flow}
+            explode={false}
+            contextMode="full"
+            damperPosition={18}
+            heatRecoveryStudyMode={scenario === 'convectionFouling' ? 'fouling' : scenario === 'highStackTemperature' ? 'flue' : null}
+            heatRecoveryScenario={scenario === 'convectionFouling' ? phase === 'normal' ? 'clean' : phase === 'deviation' ? 'fouled' : 'plugged' : 'clean'}
+            draftStudyMode={scenario === 'draftPressure' ? 'pressure' : null}
+            draftPressureScenario={scenario === 'draftPressure' && phaseIndex >= 2 ? 'positive' : 'negative'}
+            troubleshootingScenario={scenario}
+            troubleshootingPhase={phase}
+            cameraCommand={cameraCommand}
+            onSelect={noSelect}
+          />
 
           <div className="trouble-phase-rail" aria-label={`${currentScenario.title} scenario phases`}>
             {currentScenario.phases.map((item, index) => <button key={item.id} className={`${phase === item.id ? 'active' : ''} phase-${item.id}`} onClick={() => choosePhase(item.id)}><i>{index + 1}</i><span><b>{item.title}</b><small>{item.short}</small></span></button>)}
@@ -398,14 +414,14 @@ export default function TroubleshootingPage({ onBack, onNavigate }: Props) {
             <button onClick={() => cameraAction('zoomIn')}><ZoomIn size={17} /> Zoom +</button>
             <button onClick={() => cameraAction('zoomOut')}><ZoomOut size={17} /> Zoom −</button>
             <button className={labels ? 'active' : ''} onClick={() => setLabels(value => !value)}><Eye size={17} /> Labels</button>
-            <button className={flow ? 'active' : ''} onClick={() => setFlow(value => !value)}><Layers3 size={17} /> {scenario === 'draftPressure' ? 'Flue Path' : 'Process Flow'}</button>
+            <button className={flow ? 'active' : ''} onClick={() => setFlow(value => !value)}><Layers3 size={17} /> {scenario === 'draftPressure' || scenario === 'convectionFouling' || scenario === 'highStackTemperature' ? 'Flue Path' : 'Process Flow'}</button>
             <button onClick={resetScenario}><Rotate3D size={17} /> Reset</button>
           </div>
 
           <div className="study-mobile-actions trouble-mobile-actions"><button className={mobileSheet === 'scenarios' ? 'active' : ''} onClick={() => setMobileSheet('scenarios')}><Thermometer size={17} /> Scenarios</button><button className={mobileSheet === 'diagnose' ? 'active' : ''} onClick={() => setMobileSheet('diagnose')}><Info size={17} /> Diagnose</button><button className={mobileSheet === 'layers' ? 'active' : ''} onClick={() => setMobileSheet('layers')}><Layers3 size={17} /> Layers</button></div>
           <div className={`study-mobile-sheet trouble-mobile-sheet ${mobileSheet ? 'open' : ''}`}>
             <button className="study-mobile-close" onClick={() => setMobileSheet(null)} aria-label="Close troubleshooting panel"><X size={17} /></button>
-            {mobileSheet === 'scenarios' ? <><span className="sheet-eyebrow">TROUBLESHOOTING SCENARIOS</span><h3>Choose the 3D problem lab</h3>{renderScenarioButtons(true)}</> : mobileSheet === 'diagnose' ? <><span className="sheet-eyebrow">{currentScenario.code} · {currentPhase.title}</span>{renderDiagnostic()}<div className="trouble-mobile-evidence"><span className="sheet-subhead">FOCUS EVIDENCE</span><div className="sheet-chip-row trouble-mobile-evidence-buttons">{renderEvidenceButtons(true)}</div></div></> : <><span className="sheet-eyebrow">3D EXPLORATION · {currentScenario.code}</span><h3>Control the learning view</h3><p>The visual cue stays qualitative while you rotate, zoom and compare the heater geometry.</p><div className="sheet-view-grid"><button className={labels ? 'active' : ''} onClick={() => setLabels(value => !value)}><strong>Labels</strong><small>{labels ? 'Visible' : 'Hidden'}</small></button><button className={flow ? 'active' : ''} onClick={() => setFlow(value => !value)}><strong>{scenario === 'draftPressure' ? 'Flue Path' : 'Process Flow'}</strong><small>{flow ? 'Visible' : 'Hidden'}</small></button><button onClick={() => cameraAction(fitAction())}><strong>Fit Scenario</strong><small>Return camera to evidence</small></button><button onClick={() => { if (phaseIndex >= currentScenario.phases.length - 1) setPhase('normal'); setPlaying(value => !value); }}><strong>{playing ? 'Pause Tour' : 'Play Tour'}</strong><small>Automatic phase progression</small></button><button onClick={resetScenario}><strong>Reset Scenario</strong><small>Return to baseline</small></button></div></>}
+            {mobileSheet === 'scenarios' ? <><span className="sheet-eyebrow">TROUBLESHOOTING SCENARIOS</span><h3>Choose the 3D problem lab</h3>{renderScenarioButtons(true)}</> : mobileSheet === 'diagnose' ? <><span className="sheet-eyebrow">{currentScenario.code} · {currentPhase.title}</span>{renderDiagnostic()}<div className="trouble-mobile-evidence"><span className="sheet-subhead">FOCUS EVIDENCE</span><div className="sheet-chip-row trouble-mobile-evidence-buttons">{renderEvidenceButtons(true)}</div></div></> : <><span className="sheet-eyebrow">3D EXPLORATION · {currentScenario.code}</span><h3>Control the learning view</h3><p>The visual cue stays qualitative while you rotate, zoom and compare the heater geometry.</p><div className="sheet-view-grid"><button className={labels ? 'active' : ''} onClick={() => setLabels(value => !value)}><strong>Labels</strong><small>{labels ? 'Visible' : 'Hidden'}</small></button><button className={flow ? 'active' : ''} onClick={() => setFlow(value => !value)}><strong>{scenario === 'draftPressure' || scenario === 'convectionFouling' || scenario === 'highStackTemperature' ? 'Flue Path' : 'Process Flow'}</strong><small>{flow ? 'Visible' : 'Hidden'}</small></button><button onClick={() => cameraAction(fitAction())}><strong>Fit Scenario</strong><small>Return camera to evidence</small></button><button onClick={() => { if (phaseIndex >= currentScenario.phases.length - 1) setPhase('normal'); setPlaying(value => !value); }}><strong>{playing ? 'Pause Tour' : 'Play Tour'}</strong><small>Automatic phase progression</small></button><button onClick={resetScenario}><strong>Reset Scenario</strong><small>Return to baseline</small></button></div></>}
           </div>
         </div>
 
