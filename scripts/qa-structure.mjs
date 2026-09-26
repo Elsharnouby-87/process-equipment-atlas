@@ -45,6 +45,10 @@ requireText('src/readability.css', '.trouble-diagnostic-card p', 'Troubleshootin
 requireText('src/readability.css', '.simulator-console-head p', 'Simulator readability overrides');
 requireText('src/readability.css', '.operation-system-strip small', 'Operation readability overrides');
 requireText('src/App.tsx', "useState('')", 'Free Explore default selection');
+requireText('src/App.tsx', "free-explore-active", 'Free Explore shell state');
+requireText('src/index.css', '.app-shell.free-explore-active .inspector-panel{display:none!important}', 'Free Explore inspector hidden');
+forbidText('src/App.tsx', 'Whole fired heater · unrestricted spatial orientation mode.', 'Verbose Free Explore location copy removed');
+forbidText('src/App.tsx', 'Spatial freedom makes it easier', 'Verbose Free Explore rationale removed');
 requireText('src/App.tsx', 'Draft Instruments', 'Draft instruments registry');
 requireText('src/App.tsx', 'Stack Analyzers', 'Stack analyzers registry');
 requireText('src/App.tsx', 'burnerFuelPathLocked', 'Atlas burner fuel-path mode lock');
