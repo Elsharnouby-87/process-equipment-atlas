@@ -2,7 +2,7 @@ import { ArrowLeft, ArrowRight, Boxes, Flame, Layers3, Thermometer, Wind } from 
 import GlobalNavigation from './GlobalNavigation';
 import type { NavigationTarget } from './GlobalNavigation';
 
-export type ComponentModuleId = 'burner' | 'radiant' | 'heatRecovery' | 'draftStack';
+export type ComponentModuleId = 'burner' | 'radiant' | 'heatRecovery' | 'draftStack' | 'purgeAir';
 
 type Props = {
   onBack: () => void;
@@ -39,12 +39,20 @@ const modules: { id: ComponentModuleId; eyebrow: string; title: string; descript
     description: 'Read the breeching, internal damper, draft instruments, analyzers and stack as one connected pressure and flue-gas path.',
     path: 'Convection outlet → breeching → damper → stack',
   },
+  {
+    id: 'purgeAir',
+    eyebrow: 'PURGE / VENTILATION SYSTEM',
+    title: 'Purge Air System',
+    description: 'Study the V13.6 purge blower, isolation damper, airflow proof, external riser, twin lower-radiant entries, full fan-to-stack flow and BMS permissive concept.',
+    path: 'Blower → damper → proof → riser → two entries → heater → stack',
+  },
 ];
 
 function ModuleIcon({ id }: { id: ComponentModuleId }) {
   if (id === 'burner') return <Flame size={23} />;
   if (id === 'radiant') return <Thermometer size={23} />;
   if (id === 'heatRecovery') return <Layers3 size={23} />;
+  if (id === 'purgeAir') return <Wind size={23} />;
   return <Wind size={23} />;
 }
 
@@ -59,7 +67,7 @@ export default function ComponentsPage({ onBack, onNavigate, onOpenModule }: Pro
 
       <section className="architecture-contextbar">
         <div><span>COMPONENT STUDIES</span><strong>Move from whole-heater location context into dedicated system learning</strong></div>
-        <p>Four detailed modules available now · More component studies can be added without changing the Atlas</p>
+        <p>Five detailed modules available now · Purge Air System is integrated with Atlas and Operation</p>
       </section>
 
       <section className="components-hub-content">
