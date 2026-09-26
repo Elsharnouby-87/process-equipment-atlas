@@ -14,7 +14,11 @@ if (!operation.includes(expectedStateOrder)) failures.push('O-00 → O-14 state 
 requireText('operationVisualStates', 'visual-state model missing');
 requireText('operation-system-strip', '3D visual-state strip missing');
 requireText("title: 'PROCESS FLOW'", 'process-flow visual status missing');
-requireText("title: 'PURGE CUE'", 'purge visual status missing');
+requireText("title: 'PURGE FAN'", 'purge fan visual status missing');
+requireText("title: 'PURGE DAMPER'", 'purge damper visual status missing');
+requireText("title: 'AIRFLOW PROOF'", 'purge airflow-proof visual status missing');
+requireText("state === 'purgeActive' ? 'RUNNING'", 'O-04 fan running cue missing');
+requireText("state === 'purgeActive' ? 'PROVED'", 'O-04 purge proof cues missing');
 requireText("title: 'PILOT CUE'", 'pilot visual status missing');
 requireText("title: 'MAIN FLAME'", 'main-flame visual status missing');
 requireText("title: 'HOT GAS'", 'hot-gas visual status missing');
@@ -36,7 +40,7 @@ if (failures.length) throw new Error(`[qa:operation-state-v1] ${failures.join(' 
 
 console.log('[qa:operation-state-v1] PASS');
 console.log(' - O-00 → O-14 sequence preserved');
-console.log(' - 3D visual-state strip synchronized to process / purge / pilot / main flame / hot-gas cues');
+console.log(' - 3D visual-state strip synchronized to process / purge fan / purge damper / airflow proof / pilot / main flame / hot-gas cues');
 console.log(' - duplicate center navigation and right-panel WHAT CHANGES reduced');
 console.log(' - Normal Operation hands off to the independent Combustion & Draft Simulator');
 console.log(' - physics V2, calibration and Heater3D are outside this patch scope');
