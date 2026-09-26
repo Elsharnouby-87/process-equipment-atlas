@@ -140,12 +140,18 @@ function applyMaterial(group: THREE.Object3D, material: THREE.Material) {
 }
 
 function addFloorBurner(group: THREE.Group, x: number, z: number, floorY: number, materials: Materials, flames: THREE.Mesh[]) {
-  const register = cylinder(0.46, 0.42, [x, floorY - 0.28, z], materials.burner, 18);
+  const register = cylinder(0.48, 0.34, [x, floorY - 0.30, z], materials.burner, 20);
   group.add(register);
-  const throat = cylinder(0.32, 0.24, [x, floorY + 0.1, z], materials.refractory, 18);
+  const registerRing = new THREE.Mesh(new THREE.TorusGeometry(0.43, 0.065, 8, 24), materials.steel);
+  registerRing.rotation.x = Math.PI / 2;
+  registerRing.position.set(x, floorY - 0.10, z);
+  group.add(registerRing);
+  const throat = cylinder(0.34, 0.22, [x, floorY + 0.08, z], materials.refractory, 18);
   group.add(throat);
-  const flame = new THREE.Mesh(new THREE.ConeGeometry(0.5, 3.7, 18, 1, true), materials.flame);
-  flame.position.set(x, floorY + 2.0, z);
+  const tip = cylinder(0.075, 0.42, [x, floorY + 0.18, z], materials.steel, 12);
+  group.add(tip);
+  const flame = new THREE.Mesh(new THREE.ConeGeometry(0.48, 3.55, 18, 1, true), materials.flame);
+  flame.position.set(x, floorY + 1.96, z);
   flame.userData.baseY = flame.position.y;
   flame.userData.phase = flames.length * 0.81;
   group.add(flame);
@@ -173,6 +179,94 @@ function addFrame(root: THREE.Group, xs: number[], zs: number[], topY: number, m
     for (const z of zs) root.add(meshBox([0.22, topY, 0.22], [x, topY / 2, z], materials.steel));
   }
   for (const z of zs) root.add(meshBox([Math.abs(xs[1] - xs[0]) + 0.5, 0.2, 0.25], [0, topY - 0.1, z], materials.steel));
+}
+
+function addRectShell(group: THREE.Group, width: number, height: number, depth: number, centerY: number, material: THREE.Material, cutaway = false) {
+  const t = 0.18;
+  group.add(meshBox([width, height, t], [0, centerY, -depth / 2], material));
+  group.add(meshBox([t, height, depth], [-width / 2, centerY, 0], material));
+  group.add(meshBox([t, height, depth], [width / 2, centerY, 0], material));
+  if (!cutaway) group.add(meshBox([width, height, t], [0, centerY, depth / 2], material));
+}
+
+function rectangularFrustum(bottomWidth: number, bottomDepth: number, topWidth: number, topDepth: number, height: number, centerY: number, material: THREE.Material, cutaway = false) {
+  const y0 = centerY - height / 2;
+  const y1 = centerY + height / 2;
+  const corners = [
+    [-bottomWidth / 2, y0, -bottomDepth / 2], [bottomWidth / 2, y0, -bottomDepth / 2],
+    [bottomWidth / 2, y0, bottomDepth / 2], [-bottomWidth / 2, y0, bottomDepth / 2],
+    [-topWidth / 2, y1, -topDepth / 2], [topWidth / 2, y1, -topDepth / 2],
+    [topWidth / 2, y1, topDepth / 2], [-topWidth / 2, y1, topDepth / 2],
+  ];
+  const positions = new Float32Array(corners.flat());
+  const faces = cutaway
+    ? [0, 1, 5, 0, 5, 4, 0, 4, 7, 0, 7, 3, 1, 2, 6, 1, 6, 5]
+    : [0, 1, 5, 0, 5, 4, 0, 4, 7, 0, 7, 3, 1, 2, 6, 1, 6, 5, 3, 7, 6, 3, 6, 2];
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  geometry.setIndex(faces);
+  geometry.computeVertexNormals();
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  return mesh;
+}
+
+function addRectBands(group: THREE.Group, width: number, depth: number, ys: number[], material: THREE.Material, cutaway = false) {
+  for (const y of ys) {
+    group.add(meshBox([width + 0.18, 0.12, 0.12], [0, y, -depth / 2 - 0.04], material));
+    group.add(meshBox([0.12, 0.12, depth + 0.18], [-width / 2 - 0.04, y, 0], material));
+    group.add(meshBox([0.12, 0.12, depth + 0.18], [width / 2 + 0.04, y, 0], material));
+    if (!cutaway) group.add(meshBox([width + 0.18, 0.12, 0.12], [0, y, depth / 2 + 0.04], material));
+  }
+}
+
+function addPlatform(group: THREE.Group, y: number, width: number, depth: number, z: number, materials: Materials) {
+  group.add(meshBox([width, 0.16, depth], [0, y, z], materials.steel));
+  const frontZ = z + depth / 2 - 0.05;
+  const railY = y + 1.08;
+  const postXs = [-width / 2 + 0.2, 0, width / 2 - 0.2];
+  for (const x of postXs) {
+    group.add(cylinderBetween(new THREE.Vector3(x, y + 0.08, frontZ), new THREE.Vector3(x, railY, frontZ), 0.055, materials.rail, 8));
+  }
+  group.add(cylinderBetween(new THREE.Vector3(-width / 2 + 0.15, railY, frontZ), new THREE.Vector3(width / 2 - 0.15, railY, frontZ), 0.055, materials.rail, 8));
+  group.add(cylinderBetween(new THREE.Vector3(-width / 2 + 0.15, y + 0.58, frontZ), new THREE.Vector3(width / 2 - 0.15, y + 0.58, frontZ), 0.045, materials.rail, 8));
+}
+
+function addLadder(group: THREE.Group, x: number, z: number, y0: number, y1: number, materials: Materials) {
+  const railOffset = 0.28;
+  group.add(cylinderBetween(new THREE.Vector3(x - railOffset, y0, z), new THREE.Vector3(x - railOffset, y1, z), 0.055, materials.rail, 8));
+  group.add(cylinderBetween(new THREE.Vector3(x + railOffset, y0, z), new THREE.Vector3(x + railOffset, y1, z), 0.055, materials.rail, 8));
+  for (let y = y0 + 0.3; y < y1; y += 0.58) {
+    group.add(cylinderBetween(new THREE.Vector3(x - railOffset, y, z), new THREE.Vector3(x + railOffset, y, z), 0.045, materials.rail, 8));
+  }
+}
+
+function addStackFlanges(group: THREE.Group, radius: number, ys: number[], material: THREE.Material) {
+  for (const y of ys) {
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(radius, 0.07, 8, 30), material);
+    ring.rotation.x = Math.PI / 2;
+    ring.position.y = y;
+    group.add(ring);
+  }
+}
+
+function addCylindricalPlatform(group: THREE.Group, y: number, innerRadius: number, outerRadius: number, materials: Materials) {
+  const deck = new THREE.Mesh(new THREE.RingGeometry(innerRadius, outerRadius, 48), materials.steel);
+  deck.rotation.x = -Math.PI / 2;
+  deck.position.y = y;
+  group.add(deck);
+  const railRadius = outerRadius - 0.08;
+  const rail = new THREE.Mesh(new THREE.TorusGeometry(railRadius, 0.055, 8, 48), materials.rail);
+  rail.rotation.x = Math.PI / 2;
+  rail.position.y = y + 1.0;
+  group.add(rail);
+  for (let i = 0; i < 8; i += 1) {
+    const a = (i / 8) * Math.PI * 2;
+    const x = Math.cos(a) * railRadius;
+    const z = Math.sin(a) * railRadius;
+    group.add(cylinderBetween(new THREE.Vector3(x, y + 0.08, z), new THREE.Vector3(x, y + 1.0, z), 0.045, materials.rail, 8));
+  }
 }
 
 function createParticles(group: THREE.Group, curve: THREE.Curve<THREE.Vector3>, material: THREE.Material, count: number, radius: number) {
