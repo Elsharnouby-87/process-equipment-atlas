@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Fired Heater Atlas — Refero Style Lab V2</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;background:#000;color:#fff;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body{overflow:hidden}
+.shell{position:relative;width:100vw;height:100vh;background:#000}
+.stage{position:absolute;inset:0;display:grid;place-items:center;background:#000}
+.device{position:relative;width:100%;height:100%;overflow:hidden;background:#000;transition:width .35s ease,height .35s ease,border-radius .35s ease,box-shadow .35s ease}
+.device.tablet{width:min(1180px,94vw);height:92vh;border:1px solid #303236;border-radius:26px;box-shadow:0 28px 110px rgba(0,0,0,.62)}
+.device.mobile{width:min(430px,94vw);height:92vh;border:1px solid #34363a;border-radius:34px;box-shadow:0 28px 110px rgba(0,0,0,.72)}
+iframe{display:block;width:100%;height:100%;border:0;background:#06111b}
+.lab-toggle{position:absolute;top:14px;right:14px;z-index:30;border:1px solid rgba(255,255,255,.14);border-radius:999px;background:rgba(9,10,12,.76);backdrop-filter:blur(20px);color:#f4f5f6;padding:9px 13px;display:flex;align-items:center;gap:8px;cursor:pointer;font-size:11px;font-weight:600;letter-spacing:.02em;box-shadow:0 10px 35px rgba(0,0,0,.28)}
+.lab-toggle i{width:7px;height:7px;border-radius:50%;background:#ff7a18;box-shadow:0 0 14px rgba(255,122,24,.72)}
+.lab-panel{position:absolute;top:56px;right:14px;z-index:30;width:min(390px,calc(100vw - 28px));padding:12px;border:1px solid rgba(255,255,255,.14);border-radius:16px;background:rgba(7,8,10,.92);backdrop-filter:blur(24px) saturate(1.1);box-shadow:0 26px 90px rgba(0,0,0,.55);transform:translateY(-8px);opacity:0;pointer-events:none;transition:.22s ease}
+.lab-panel.open{transform:none;opacity:1;pointer-events:auto}
+.head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:4px 4px 11px;border-bottom:1px solid rgba(255,255,255,.08)}
+.head strong{display:block;font-size:13px;letter-spacing:-.01em}.head span{display:block;margin-top:4px;color:#80858c;font-size:9px;line-height:1.4}
+.pill{padding:5px 7px;border:1px solid rgba(255,122,24,.24);border-radius:999px;color:#ff9b58;background:rgba(255,122,24,.06);font-size:8px;white-space:nowrap}
+.section{padding:11px 4px 2px}.section>span{display:block;margin-bottom:8px;color:#777d84;font:700 8px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.15em;text-transform:uppercase}
+.options{display:grid;gap:7px}.options.directions{grid-template-columns:1fr}.options.devices{grid-template-columns:repeat(3,1fr)}
+.option{border:1px solid rgba(255,255,255,.09);border-radius:10px;background:#0d0f12;color:#aeb3b9;text-align:left;padding:9px 10px;cursor:pointer;transition:.18s ease}.option:hover{border-color:rgba(255,255,255,.2);color:#fff;background:#111418}.option.active{border-color:rgba(255,122,24,.52);background:linear-gradient(90deg,rgba(255,122,24,.12),rgba(255,122,24,.025));color:#fff;box-shadow:inset 2px 0 #ff7a18}
+.option b{display:block;font-size:10px;font-weight:650}.option small{display:block;margin-top:3px;color:#6f757c;font-size:8px;line-height:1.35}.option.active small{color:#9ca2a9}
+.options.devices .option{text-align:center;padding:8px 5px}
+.foot{margin:10px 4px 3px;padding-top:9px;border-top:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;gap:10px;color:#686e75;font-size:8px}.foot strong{color:#a9aeb4;font-weight:500}
+.badge{position:absolute;left:13px;bottom:12px;z-index:20;padding:7px 9px;border:1px solid rgba(255,255,255,.1);border-radius:8px;background:rgba(0,0,0,.56);backdrop-filter:blur(12px);color:#747a81;font:650 8px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.09em;pointer-events:none}
+@media(max-width:680px){.lab-toggle{top:8px;right:8px}.lab-panel{top:49px;right:8px;width:calc(100vw - 16px)}.badge{display:none}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <main class="stage">
+    <div class="device" id="device">
+      <iframe id="atlas" src="../../" title="Fired Heater Atlas design lab"></iframe>
+    </div>
+  </main>
+  <button class="lab-toggle" id="toggle"><i></i><span>Design Lab V2</span></button>
+  <aside class="lab-panel" id="panel">
+    <div class="head">
+      <div><strong>Choose a stronger direction</strong><span>Three distinct Refero-grounded treatments. No soft averaging.</span></div>
+      <div class="pill">PRODUCTION UNTOUCHED</div>
+    </div>
+    <div class="section">
+      <span>Visual Direction</span>
+      <div class="options directions">
+        <button class="option active" data-direction="precision"><b>01 · Precision Instrument</b><small>Near-black, machined, hairline geometry, orange only for action.</small></button>
+        <button class="option" data-direction="void"><b>02 · Immersive Void</b><small>The 3D world shouts; interface chrome almost disappears.</small></button>
+        <button class="option" data-direction="blueprint"><b>03 · Obsidian Blueprint</b><small>Architectural grid, crisp technical rules, restrained industrial density.</small></button>
+        <button class="option" data-direction="original"><b>00 · Original Atlas</b><small>Return to the current production styling for comparison.</small></button>
+      </div>
+    </div>
+    <div class="section">
+      <span>Preview Size</span>
+      <div class="options devices">
+        <button class="option active" data-device="desktop"><b>Desktop</b></button>
+        <button class="option" data-device="tablet"><b>Tablet</b></button>
+        <button class="option" data-device="mobile"><b>Mobile</b></button>
+      </div>
+    </div>
+    <div class="foot"><span>Target: <strong id="target">PRECISION INSTRUMENT</strong></span><span>Isolated CSS prototype</span></div>
+  </aside>
+  <div class="badge" id="badge">REFERO LAB V2 · PRECISION INSTRUMENT</div>
+</div>
+<script>
+var frame=document.getElementById('atlas');
+var panel=document.getElementById('panel');
+var toggle=document.getElementById('toggle');
+var device=document.getElementById('device');
+var badge=document.getElementById('badge');
+var target=document.getElementById('target');
+var direction='precision';
+toggle.addEventListener('click',function(){panel.classList.toggle('open')});
+
+function cssFor(mode){
+ if(mode==='original') return '';
+ var base="";
+ base+="@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;450;500;550;600&display=swap');";
+ base+="html,body,#root{background:#08090a!important}body,button,input{font-family:Inter,system-ui,sans-serif!important;color:#f5f6f7!important}";
+ base+=".app-shell,.architecture-page{background:#08090a!important;color:#f5f6f7!important}";
+ base+=".brand-lockup strong{font-weight:550!important;letter-spacing:-.025em!important}.brand-lockup span{font-family:'IBM Plex Mono',monospace!important;letter-spacing:.16em!important}";
+ base+="h1,h2,h3{font-weight:500!important;letter-spacing:-.026em!important}.navigator-head h2,.inspector-head h2{font-size:22px!important}.inspector-head p,.inspector-section p,.special-study-card p,.list-section ul,.navigator-head p{font-size:11px!important;line-height:1.55!important}";
+ base+=".primary-nav button{font-weight:500!important;font-size:10px!important;letter-spacing:.02em!important}.primary-nav button.active::after{height:2px!important;background:#ff7a18!important;box-shadow:none!important}";
+ base+=".component-btn,.view-pills button,.control-dock button,.study-buttons button,.inspector-actions button,.back-atlas,.simulator-presets button,[class*='tab'] button,[class*='dock'] button{transition:background .18s ease,border-color .18s ease,color .18s ease,transform .18s ease!important}";
+ base+=".component-btn:hover,.view-pills button:hover,.control-dock button:hover,.study-buttons button:hover,.inspector-actions button:hover,.back-atlas:hover,[class*='tab'] button:hover,[class*='dock'] button:hover{transform:translateY(-1px)!important}";
+ base+=".component-btn.active,.view-pills button.active,.inspector-actions button.active,[class*='tab'] button.active{border-color:rgba(255,122,24,.56)!important;background:rgba(255,122,24,.075)!important;color:#fff!important;box-shadow:inset 2px 0 #ff7a18!important}";
+ base+=".component-dot,.viewer-kicker i{background:#ff7a18!important;box-shadow:0 0 12px rgba(255,122,24,.4)!important}";
+ base+=".inspector-section>span,.related-section>span,.special-study-card>span,.burner-tech-section>span{color:#ff9850!important;font-family:'IBM Plex Mono',monospace!important;letter-spacing:.08em!important}";
+ base+=".global-search{border-color:rgba(255,255,255,.14)!important;background:rgba(255,255,255,.018)!important}";
+ base+=".global-search:focus-within{border-color:rgba(255,122,24,.58)!important;box-shadow:0 0 0 3px rgba(255,122,24,.05)!important}";
+ base+=".range-labels,.simulator-output-heading>span,.simulator-presets>span,.sim-range-control small,.viewer-kicker,.context-state span{font-family:'IBM Plex Mono',monospace!important}";
+ base+=".radiant-warning,.simulator-boundary-note,[class*='warning']{background:rgba(255,122,24,.028)!important;border-color:rgba(255,122,24,.16)!important}";
+ base+="@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}";
+
+ if(mode==='precision'){
+   base+="body{background:#08090a!important}";
+   base+=".atlas-topbar,.burner-topbar,.radiant-topbar,.heat-topbar,.architecture-topbar,[class*='topbar']{height:60px!important;background:#08090af2!important;border-bottom:1px solid rgba(255,255,255,.09)!important;backdrop-filter:blur(18px)!important}";
+   base+=".atlas-contextbar,.burner-contextbar,.architecture-contextbar,[class*='contextbar']{height:42px!important;background:#0b0c0e!important;border-color:rgba(255,255,255,.065)!important}";
+   base+=".atlas-workspace{height:calc(100vh - 102px)!important;grid-template-columns:214px minmax(0,1fr) 304px!important;gap:10px!important;padding:10px!important;background:#08090a!important}";
+   base+=".component-navigator,.inspector-panel,.burner-left,.burner-tech,.simulator-console{background:#0d0f11!important;border:1px solid rgba(255,255,255,.085)!important;border-radius:10px!important;box-shadow:none!important}";
+   base+=".hero-viewer,.burner-viewer,.simulator-viewer,[class*='viewer']{border:1px solid rgba(255,255,255,.07)!important;border-radius:10px!important;background:radial-gradient(circle at 50% 48%,rgba(45,75,91,.11),transparent 42%),#050607!important}";
+   base+=".component-btn,.study-buttons button,.inspector-actions button,.view-pills,.control-dock,.viewer-kicker,.context-state,.burner-view-state,.hero-burner-badge,.burner-flow-legend,.simulator-state-badge,.simulator-flow-legend,.simulator-camera-dock{border-color:rgba(255,255,255,.085)!important;background:#0b0d0fe8!important;border-radius:7px!important;box-shadow:none!important}";
+   base+=".component-btn{border-color:transparent!important}.component-btn:hover{background:#14171a!important;border-color:rgba(255,255,255,.08)!important}.component-btn.active{background:#15120f!important}";
+   base+=".inspector-head h2{font-size:25px!important;font-weight:500!important}.navigator-head h2{font-size:18px!important}.primary-nav button{color:#8d939a!important}.primary-nav button.active{color:#fff!important}";
+   base+=".section-key span{background:#0b0d0f!important;border-color:rgba(255,255,255,.08)!important;border-radius:5px!important}";
+ }
+ if(mode==='void'){
+   base+="html,body,#root,.app-shell,.architecture-page{background:#000!important}";
+   base+=".atlas-topbar,.burner-topbar,.radiant-topbar,.heat-topbar,.architecture-topbar,[class*='topbar']{height:58px!important;background:rgba(0,0,0,.68)!important;border-color:rgba(255,255,255,.08)!important;backdrop-filter:blur(22px)!important}";
+   base+=".atlas-contextbar,.burner-contextbar,.architecture-contextbar,[class*='contextbar']{height:36px!important;background:rgba(0,0,0,.55)!important;border-color:rgba(255,255,255,.055)!important}";
+   base+=".atlas-workspace{height:calc(100vh - 94px)!important;grid-template-columns:188px minmax(0,1fr) 286px!important;background:#000!important}";
+   base+=".component-navigator,.inspector-panel,.burner-left,.burner-tech,.simulator-console{background:rgba(0,0,0,.48)!important;border-color:rgba(255,255,255,.07)!important;backdrop-filter:blur(18px)!important}";
+   base+=".hero-viewer,.burner-viewer,.simulator-viewer,[class*='viewer']{background:radial-gradient(circle at 50% 48%,rgba(54,67,78,.15),transparent 39%),#000!important}";
+   base+=".component-navigator{margin:12px 0 12px 12px!important;border:1px solid rgba(255,255,255,.075)!important;border-radius:14px!important}.inspector-panel{margin:12px 12px 12px 0!important;border:1px solid rgba(255,255,255,.075)!important;border-radius:14px!important}";
+   base+=".component-btn{border-color:transparent!important;background:transparent!important}.component-btn:hover{background:rgba(255,255,255,.035)!important}.component-btn.active{background:rgba(255,255,255,.045)!important;border-color:transparent!important;box-shadow:inset 2px 0 #ff7a18!important}";
+   base+=".view-pills,.control-dock,.viewer-kicker,.context-state,.burner-view-state,.hero-burner-badge,.burner-flow-legend,.simulator-state-badge,.simulator-flow-legend,.simulator-camera-dock{background:rgba(0,0,0,.44)!important;border:1px solid rgba(255,255,255,.11)!important;border-radius:999px!important;backdrop-filter:blur(18px)!important;box-shadow:none!important}";
+   base+=".view-pills button,.control-dock button,.simulator-camera-dock button{border-radius:999px!important}.primary-nav button{color:#8a8a8d!important}.primary-nav button.active{color:#fff!important}.inspector-section,.related-section,.burner-tech-section{border-color:rgba(255,255,255,.055)!important}";
+   base+=".brand-lockup strong{font-weight:500!important}.inspector-head h2{font-size:26px!important}.inspector-head p,.inspector-section p,.list-section ul{color:#a2a3a7!important}";
+ }
+ if(mode==='blueprint'){
+   base+="html,body,#root,.app-shell,.architecture-page{background:#101010!important}";
+   base+=".atlas-topbar,.burner-topbar,.radiant-topbar,.heat-topbar,.architecture-topbar,[class*='topbar']{height:64px!important;background:#101010!important;border-color:#252525!important;backdrop-filter:none!important}";
+   base+=".atlas-contextbar,.burner-contextbar,.architecture-contextbar,[class*='contextbar']{height:44px!important;background:#101010!important;border-color:#212121!important}";
+   base+=".atlas-workspace{height:calc(100vh - 108px)!important;grid-template-columns:228px minmax(0,1fr) 324px!important;background:#101010!important}";
+   base+=".component-navigator,.inspector-panel,.burner-left,.burner-tech,.simulator-console{background:#101010!important;border-color:#212121!important;box-shadow:none!important}";
+   base+=".hero-viewer,.burner-viewer,.simulator-viewer,[class*='viewer']{background:#080808!important;border-left:1px solid #212121!important;border-right:1px solid #212121!important}";
+   base+=".component-btn,.study-buttons button,.inspector-actions button,.back-atlas,.view-pills,.control-dock,.viewer-kicker,.context-state,.burner-view-state,.hero-burner-badge,.burner-flow-legend,.simulator-state-badge,.simulator-flow-legend,.simulator-camera-dock,[class*='card']{border-color:#282828!important;background:#101010!important;border-radius:4px!important;box-shadow:none!important;backdrop-filter:none!important}";
+   base+=".component-btn:hover,.study-buttons button:hover,.inspector-actions button:hover{background:#151515!important;border-color:#383838!important}.component-btn.active{background:#14110e!important;border-color:#2c2926!important}";
+   base+=".brand-lockup strong,h1,h2,h3{font-weight:400!important}.brand-lockup strong{font-size:20px!important}.inspector-head h2{font-size:26px!important}.navigator-head h2{font-size:19px!important}";
+   base+=".primary-nav button{color:#9c9c9c!important}.primary-nav button.active{color:#f3f3f3!important}.primary-nav button.active::after{background:#ff7a18!important}";
+   base+=".inspector-section,.related-section,.burner-tech-section,.navigator-head,.component-group{border-color:#212121!important}.inspector-head p,.inspector-section p,.list-section ul,.navigator-head p{color:#9c9c9c!important}";
+   base+=".global-search{border-radius:4px!important;background:#101010!important;border-color:#292929!important}.section-key span{border-radius:3px!important;background:#101010!important;border-color:#292929!important}";
+ }
+ return base;
+}
+
+function apply(){
+ var doc=frame.contentDocument;
+ if(!doc) return;
+ var style=doc.getElementById('refero-style-lab-v2');
+ if(!style){style=doc.createElement('style');style.id='refero-style-lab-v2';doc.head.appendChild(style)}
+ style.textContent=cssFor(direction);
+ var label=direction==='precision'?'PRECISION INSTRUMENT':direction==='void'?'IMMERSIVE VOID':direction==='blueprint'?'OBSIDIAN BLUEPRINT':'ORIGINAL ATLAS';
+ badge.textContent='REFERO LAB V2 · '+label;
+ target.textContent=label;
+}
+
+document.querySelectorAll('[data-direction]').forEach(function(btn){
+ btn.addEventListener('click',function(){
+  direction=btn.dataset.direction;
+  document.querySelectorAll('[data-direction]').forEach(function(b){b.classList.remove('active')});
+  btn.classList.add('active');
+  apply();
+ });
+});
+document.querySelectorAll('[data-device]').forEach(function(btn){
+ btn.addEventListener('click',function(){
+  var d=btn.dataset.device;
+  document.querySelectorAll('[data-device]').forEach(function(b){b.classList.remove('active')});
+  btn.classList.add('active');
+  device.className='device'+(d==='desktop'?'':' '+d);
+ });
+});
+frame.addEventListener('load',function(){setTimeout(apply,180)});
+</script>
+</body>
+</html>
