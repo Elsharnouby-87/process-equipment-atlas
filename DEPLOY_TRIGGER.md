@@ -2,10 +2,10 @@
 
 Preview source branch: `checkpoint-pre-components-motion-prototype-2026-09-14`
 
-Preview addition: **Refero Style Lab V1**
+Preview addition: **Refero Style Lab V2**
 
-This trigger republishes the unchanged production Atlas plus the isolated style sandbox at:
+This trigger republishes the unchanged production Atlas plus the isolated V2 style sandbox at:
 
-`/process-equipment-atlas/previews/refero-style-lab-v1/`
+`/process-equipment-atlas/previews/refero-style-lab-v2/`
 
-The production application source itself is not restyled by this trigger.
+The production application itself is unchanged.
