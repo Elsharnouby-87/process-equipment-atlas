@@ -11,6 +11,7 @@ export type HeaterType = 'box' | 'cabin' | 'cylindrical';
 export type HeaterTypeView = 'exterior' | 'cutaway' | 'tubes' | 'burners' | 'flow';
 export type DraftStudy = 'overview' | 'breeching' | 'damper' | 'path' | 'stack' | 'pressure';
 export type DraftPressureScenario = 'negative' | 'positive';
+export type PurgeStudy = 'overview' | 'blower' | 'damper' | 'proof' | 'riser' | 'entries' | 'flow' | 'bms';
 export type OperationState = 'safeNonFiring' | 'readiness' | 'processReady' | 'purgeReady' | 'purgeActive' | 'purgeComplete' | 'pilotIgnition' | 'pilotProven' | 'mainBurnerLightOff' | 'firingStabilization' | 'controlledWarmUp' | 'normalOperation' | 'loadChange' | 'controlledShutdown' | 'coolDownNonFiring';
 
 export type CameraAction =
@@ -42,6 +43,14 @@ export type CameraAction =
   | 'draftPath'
   | 'draftStack'
   | 'draftPressure'
+  | 'purgeOverview'
+  | 'purgeBlower'
+  | 'purgeDamper'
+  | 'purgeProof'
+  | 'purgeRiser'
+  | 'purgeEntries'
+  | 'purgeFlow'
+  | 'purgeBms'
   | 'troubleDraft'
   | 'troubleDraftDamper'
   | 'troubleBackfire';
