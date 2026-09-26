@@ -152,12 +152,16 @@ export default function TroubleshootingPage({ onBack, onNavigate }: Props) {
   const currentPhase = currentScenario.phases[phaseIndex] ?? currentScenario.phases[0];
   const currentDiagnostic = currentScenario.diagnostics[tab];
 
+  const scenarioComponent = scenario === 'draftPressure' ? 'Breeching' : scenario === 'convectionFouling' ? 'Convection Bank' : scenario === 'highStackTemperature' ? 'Stack' : 'Radiant Tubes';
+
   const cameraAction = useCallback((action: CameraAction) => {
-    setCameraCommand(current => ({ id: current.id + 1, action, component: scenario === 'draftPressure' ? 'Breeching' : 'Radiant Tubes' }));
-  }, [scenario]);
+    setCameraCommand(current => ({ id: current.id + 1, action, component: scenarioComponent }));
+  }, [scenarioComponent]);
 
   const fitAction = useCallback((): CameraAction => {
     if (scenario === 'draftPressure') return phase === 'deviation' ? 'troubleDraftDamper' : 'troubleDraft';
+    if (scenario === 'convectionFouling') return phase === 'consequence' ? 'troubleConvectionDp' : 'troubleConvection';
+    if (scenario === 'highStackTemperature') return phase === 'consequence' ? 'troubleStackBranches' : 'troubleStackTemperature';
     if (scenario === 'tubeHotArea') return 'radiantInspection';
     return phase === 'normal' ? 'radiantFull' : phase === 'consequence' ? 'radiantInspection' : 'radiantClearance';
   }, [scenario, phase]);
@@ -186,9 +190,11 @@ export default function TroubleshootingPage({ onBack, onNavigate }: Props) {
     setPhase('normal');
     setTab('observe');
     setPlaying(false);
-    setFlow(next === 'draftPressure');
+    setFlow(next === 'draftPressure' || next === 'convectionFouling' || next === 'highStackTemperature');
     setLabels(true);
-    setCameraCommand(current => ({ id: current.id + 1, action: next === 'draftPressure' ? 'troubleDraft' : next === 'tubeHotArea' ? 'radiantInspection' : 'radiantFull', component: next === 'draftPressure' ? 'Breeching' : 'Radiant Tubes' }));
+    const nextAction: CameraAction = next === 'draftPressure' ? 'troubleDraft' : next === 'convectionFouling' ? 'troubleConvection' : next === 'highStackTemperature' ? 'troubleStackTemperature' : next === 'tubeHotArea' ? 'radiantInspection' : 'radiantFull';
+    const nextComponent = next === 'draftPressure' ? 'Breeching' : next === 'convectionFouling' ? 'Convection Bank' : next === 'highStackTemperature' ? 'Stack' : 'Radiant Tubes';
+    setCameraCommand(current => ({ id: current.id + 1, action: nextAction, component: nextComponent }));
   };
 
   const choosePhase = (next: TroubleshootingPhase) => {
@@ -200,9 +206,9 @@ export default function TroubleshootingPage({ onBack, onNavigate }: Props) {
     setPlaying(false);
     setPhase('normal');
     setTab('observe');
-    setFlow(scenario === 'draftPressure');
+    setFlow(scenario === 'draftPressure' || scenario === 'convectionFouling' || scenario === 'highStackTemperature');
     setLabels(true);
-    cameraAction(scenario === 'draftPressure' ? 'troubleDraft' : scenario === 'tubeHotArea' ? 'radiantInspection' : 'radiantFull');
+    cameraAction(scenario === 'draftPressure' ? 'troubleDraft' : scenario === 'convectionFouling' ? 'troubleConvection' : scenario === 'highStackTemperature' ? 'troubleStackTemperature' : scenario === 'tubeHotArea' ? 'radiantInspection' : 'radiantFull');
   };
 
   const focusEvidence = (kind: EvidenceKind) => {
