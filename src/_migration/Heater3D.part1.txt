@@ -63,7 +63,6 @@
     const purgeInstrumentMat = new THREE.MeshPhysicalMaterial({ color: '#5dbd8a', metalness: 0.32, roughness: 0.42, clearcoat: 0.08 });
     const purgeSafetyMat = new THREE.MeshPhysicalMaterial({ color: '#d58a2a', metalness: 0.52, roughness: 0.36 });
 
-    const purgeBlowerCenter = new THREE.Vector3(-11.2, 1.35, 0);
     const purgeRiserX = -6.72;
     const purgeHeaderY = 5.15;
     const purgeEntryZs = [-1.55, 1.55];
