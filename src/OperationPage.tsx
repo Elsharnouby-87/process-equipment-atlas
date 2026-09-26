@@ -8,7 +8,7 @@ import type { CameraAction, CameraCommand, OperationState } from './modelTypes';
 type Props = { onBack: () => void; onNavigate: (target: NavigationTarget) => void };
 type MobileSheet = 'states' | 'abnormal' | 'details' | null;
 type ReadinessZoneId = 'interior' | 'burners' | 'fuel' | 'draft' | 'protection';
-type PurgeTopicId = 'nonFiring' | 'fuelProtection' | 'purgePath' | 'monitoring' | 'controlLogic';
+type PurgeTopicId = 'nonFiring' | 'fuelProtection' | 'purgeEquipment' | 'purgePath' | 'monitoring' | 'controlLogic';
 type PilotOutcome = 'normal' | 'notEstablished' | 'notProven';
 type FiringOutcome = 'stable' | 'unstable' | 'impingement' | 'draftAbnormal';
 type WarmupView = 'early' | 'developing' | 'balanced' | 'uneven';
@@ -71,35 +71,35 @@ const stateCopy: Record<OperationState, StateCopy> = {
   purgeReady: {
     code: 'O-03',
     title: 'Purge Ready',
-    subtitle: 'Review the conditions that make purge meaningful',
-    purpose: 'Separate process-side readiness from purge eligibility by reviewing the non-firing state, fuel-admission protection concept, purge path, monitoring and BMS / procedure authority.',
-    changes: ['Process-fluid path remains visible in cyan', 'No purge-medium animation is active yet', 'Main and pilot flames remain absent', 'Five purge-readiness topics become available for training review'],
-    observe: ['No active firing state', 'Fuel admission is treated as a protected system responsibility', 'A continuous route exists through firebox, upper heater, breeching and stack', 'Draft / airflow monitoring concept is available', 'Actual BMS and approved procedure determine whether purge is permitted'],
-    why: 'Purge is not simply an animation or timer. It is meaningful only when the actual system has the required preconditions and a valid path for the approved purge medium.',
-    gate: 'View all five purge-readiness topics to unlock the Purge Active learning state. This training gate does not verify a real purge permissive.',
-    siteSpecific: ['Approved purge medium and route', 'Safety-shutoff valve / line-up requirements', 'Fan, steam or other purge-system conditions', 'Actual BMS purge permissives', 'Required airflow, volume changes, duration and damper / register positions'],
+    subtitle: 'Review the fan, protected fuel state, air path and proving concepts before purge',
+    purpose: 'Separate process-side readiness from purge eligibility by reviewing the non-firing condition, fuel-admission protection, the dedicated purge fan / blower package, its continuous air route, airflow / draft monitoring and BMS / procedure authority.',
+    changes: ['Process-fluid path remains visible in cyan', 'The V13.6 purge fan / blower, main duct, isolation damper, proof device, external riser and two lower-radiant entries are available for focused study', 'No purge-air animation is active yet', 'Main and pilot flames remain absent', 'Six purge-readiness topics become available for training review'],
+    observe: ['No active firing state', 'Fuel admission is treated as a protected system responsibility', 'Purge fan / blower availability and the dedicated duct path can be identified', 'The two sidewall entries lead into the lower radiant enclosure and the discharge route continues upward to the stack', 'Airflow / draft proof is a monitoring concept', 'Actual BMS and approved procedure determine whether purge is permitted'],
+    why: 'Purge is not simply an animation or timer. The training view now connects the physical air source to the complete enclosure path while keeping the real permissives, required flow and completion criteria under the approved site / OEM procedure.',
+    gate: 'View all six purge-readiness topics to unlock the Purge Active learning state. This training gate does not verify a real purge permissive.',
+    siteSpecific: ['Approved purge medium and route', 'Purge fan duty / availability and hazardous-area requirements', 'Isolation-damper position / proof requirements', 'Safety-shutoff valve / fuel-protection requirements', 'Actual BMS purge permissives', 'Required airflow, enclosure volume changes, duration and damper / register positions'],
   },
   purgeActive: {
     code: 'O-04',
     title: 'Purge Active',
-    subtitle: 'Representative enclosure sweep with no firing',
-    purpose: 'Visualize a purge-active state in which the approved purge medium sweeps through the heater enclosure toward discharge while firing remains absent.',
-    changes: ['Light-blue purge-medium particles move through the heater to the stack', 'Cyan process-fluid path remains separate', 'Main and pilot flames remain absent', 'Fuel and hot-products visualizations remain absent', 'No timer or completion percentage is shown'],
-    observe: ['Continuous qualitative path through the firebox and upper heater', 'Clear distinction between process fluid and purge medium', 'No flame during the purge-active training state', 'Draft / airflow indication as a monitoring concept', 'Completion is not inferred from visual animation duration'],
-    why: 'The training objective is to understand that purge removes or dilutes a potential combustible atmosphere before an ignition sequence can become eligible.',
+    subtitle: 'Purge fan running · air routed through two lower-radiant entries to the stack',
+    purpose: 'Visualize the V13.6 representative fan-purge configuration: the purge blower runs, air leaves the main discharge duct, passes the isolation-damper / proof section, rises outside the casing, divides into two lower-radiant sidewall entries and sweeps upward through the heater to the stack while firing remains absent.',
+    changes: ['The purge-fan impeller rotates as a running-state cue', 'Light-blue purge-air particles start at the blower inlet / discharge instead of appearing inside the firebox', 'The flow follows the physical duct, damper, proof point, riser, short manifold and both casing penetrations before entering the heater', 'Cyan process-fluid path remains visually separate', 'Main and pilot flames remain absent and no hot-products flow is shown', 'No timer or completion percentage is shown'],
+    observe: ['Air source and continuous flow path from blower to both heater entries', 'Isolation-damper and airflow-proof locations in the purge duct', 'Two symmetric lower-radiant entry streams joining the enclosure sweep', 'Upward path through radiant, shield, convection, breeching and stack', 'No flame during the purge-active training state', 'Completion is not inferred from visual animation duration'],
+    why: 'The training objective is to connect the physical purge-air equipment to the enclosure sweep concept: a forced-air source can clear or dilute a potential combustible atmosphere before ignition eligibility, but completion still depends on the approved proving logic and procedure.',
     gate: 'The next button only opens the Purge Completion learning concept. Actual purge completion must come from the approved BMS / procedure criteria, not from this animation or elapsed time.',
-    siteSpecific: ['Purge medium and supply arrangement', 'Minimum purge airflow or flow proof', 'Required air changes / enclosure volumes', 'Purge duration', 'Damper / register positions', 'BMS completion logic and trip response'],
+    siteSpecific: ['Purge fan duty and available airflow', 'Isolation-damper fail / proof philosophy', 'Airflow or pressure proving device and threshold', 'Required air changes / enclosure volumes', 'Purge duration', 'Stack / burner-register / other path positions', 'BMS completion logic and trip response'],
   },
   purgeComplete: {
     code: 'O-05',
     title: 'Purge Complete / Ignition Eligible',
-    subtitle: 'Completion concept only — ignition has not started',
-    purpose: 'Represent the conceptual state that exists only after the real system has accepted purge completion and any required pre-ignition conditions. No ignition action is performed here.',
-    changes: ['Purge route remains as a dim static reference instead of an active sweep', 'Process-fluid path remains visible', 'Pilot and main flames remain absent', 'No ignition source is activated', 'Pilot ignition becomes the next training concept only'],
-    observe: ['Purge completion is a verified system / procedure status, not a visual judgement', 'Ignition eligibility is not the same as ignition start', 'Pilot remains off in this state', 'Any additional pre-ignition checks are design and BMS specific'],
-    why: 'Keeping purge completion separate from pilot ignition prevents the training sequence from implying that finishing purge automatically causes fuel admission or ignition.',
+    subtitle: 'Fan-purge completion concept only — ignition has not started',
+    purpose: 'Represent the conceptual state that exists only after the real system has accepted the purge-air proof and completion criteria for the full fan-to-stack path. No ignition action is performed here.',
+    changes: ['The same blower-to-two-entry-to-stack purge route remains as a dim static reference instead of an active sweep', 'The purge-fan rotor is no longer shown rotating', 'Process-fluid path remains visible', 'Pilot and main flames remain absent', 'No ignition source is activated', 'Pilot ignition becomes the next training concept only'],
+    observe: ['Purge completion is a verified BMS / procedure status, not a visual judgement', 'The physical airflow route remains identifiable after the active sweep stops', 'Ignition eligibility is not the same as ignition start', 'Pilot remains off in this state', 'Any additional pre-ignition checks are design and BMS specific'],
+    why: 'Keeping purge completion separate from pilot ignition prevents the training sequence from implying that a visible fan or elapsed animation automatically authorizes fuel admission or ignition.',
     gate: 'Continue only to the Pilot Ignition learning state. This control does not command an igniter, open a valve or authorize a field action.',
-    siteSpecific: ['Exact purge-complete logic', 'Post-purge transition requirements', 'Pilot / igniter permissives', 'Trial-for-ignition timing', 'Retry / lockout philosophy', 'Flame-proving method and timing'],
+    siteSpecific: ['Exact airflow / pressure proof and purge-complete logic', 'Required volume changes and purge duration', 'Post-purge fan / damper state', 'Pilot / igniter permissives', 'Trial-for-ignition timing', 'Retry / lockout philosophy', 'Flame-proving method and timing'],
   },
   pilotIgnition: {
     code: 'O-06',
@@ -213,9 +213,10 @@ const readinessZones: { id: ReadinessZoneId; title: string; component: string; b
 const purgeTopics: { id: PurgeTopicId; title: string; component: string; body: string }[] = [
   { id: 'nonFiring', title: 'Non-Firing Condition', component: 'Burners', body: 'Confirm the training model remains non-firing: no pilot, no main flame and no fuel-flow visualization. This is a visual state, not field verification.' },
   { id: 'fuelProtection', title: 'Fuel Admission Protection', component: 'Burners', body: 'Study the principle that unintended fuel admission must be prevented during purge. Exact safety-shutoff valve arrangement and proof logic are site / BMS specific.' },
-  { id: 'purgePath', title: 'Continuous Purge Path', component: 'Breeching', body: 'Review the enclosure route from the lower heater through radiant, shield, convection, breeching and stack. The approved purge medium and actual route may differ by design.' },
-  { id: 'monitoring', title: 'Draft / Airflow Monitoring', component: 'Stack Damper', body: 'Study the need for valid airflow / draft information where the design requires it. No target, alarm value or damper position is supplied.' },
-  { id: 'controlLogic', title: 'BMS / Procedure Authority', component: 'Casing & Structure', body: 'The real BMS and approved site procedure determine whether purge conditions are satisfied and when a purge sequence may proceed.' },
+  { id: 'purgeEquipment', title: 'Purge Fan / Blower & Duct', component: 'Purge Air Blower', body: 'Review the V13.6 reference package: low-pressure blower, inlet guard, motor / shaft, main discharge duct, butterfly isolation damper, actuator / position proof and the representative airflow-proof device.' },
+  { id: 'purgePath', title: 'Continuous Purge-Air Path', component: 'Purge Air Blower', body: 'Trace the reference route from blower discharge through damper and proof, up the external riser, through the short side manifold and two lower-radiant casing penetrations, then upward through the heater to the stack.' },
+  { id: 'monitoring', title: 'Airflow / Draft Monitoring', component: 'Purge Air Blower', body: 'Study the need to prove the purge-air source / flow and maintain a valid discharge path. No airflow target, alarm value, purge time or damper position is supplied.' },
+  { id: 'controlLogic', title: 'BMS / Procedure Authority', component: 'Purge Air Blower', body: 'The real BMS and approved site procedure determine whether blower, damper, flow proof, fuel protection and enclosure-purge conditions are satisfied and when the sequence may proceed.' },
 ];
 
 const normalTopics: { id: NormalTopicId; title: string; component: string; body: string }[] = [
@@ -271,7 +272,7 @@ export default function OperationPage({ onBack, onNavigate }: Props) {
   const shutdownState = state === 'controlledShutdown';
   const cooldownState = state === 'coolDownNonFiring';
   const firingState = state === 'mainBurnerLightOff' || state === 'firingStabilization' || warmupState || normalState || loadState || shutdownState;
-  const selected = state === 'readiness' ? zone.component : state === 'purgeReady' ? purgeTopic.component : normalState ? normalTopic.component : state === 'processReady' || warmupState || cooldownState ? 'Radiant Tubes' : pilotState || firingState ? 'Burners' : 'Casing & Structure';
+  const selected = state === 'readiness' ? zone.component : state === 'purgeReady' ? purgeTopic.component : state === 'purgeActive' || state === 'purgeComplete' ? 'Purge Air Blower' : normalState ? normalTopic.component : state === 'processReady' || warmupState || cooldownState ? 'Radiant Tubes' : pilotState || firingState ? 'Burners' : 'Casing & Structure';
   const contextMode = state === 'readiness' || state === 'purgeReady' || pilotState ? 'focus' : 'full';
   const processFlowVisible = ['processReady', 'purgeReady', 'purgeActive', 'purgeComplete', 'mainBurnerLightOff', 'firingStabilization', 'controlledWarmUp', 'normalOperation', 'loadChange'].includes(state) || (state === 'controlledShutdown' && shutdownView !== 'firingRemoved');
   const purgePathVisible = state === 'purgeActive' || state === 'purgeComplete';
@@ -307,6 +308,7 @@ export default function OperationPage({ onBack, onNavigate }: Props) {
     if (state === 'safeNonFiring') issueCamera('fitHeater', 'Casing & Structure');
     else if (state === 'readiness') issueCamera('focusComponent', zone.component);
     else if (state === 'purgeReady') issueCamera('focusComponent', purgeTopic.component);
+    else if (state === 'purgeActive' || state === 'purgeComplete') issueCamera('focusComponent', 'Purge Air Blower');
     else if (state === 'pilotIgnition' || state === 'pilotProven') issueCamera('burnerPilot', 'Burners');
     else if (state === 'mainBurnerLightOff') issueCamera('focusComponent', 'Burners');
     else if (state === 'firingStabilization') issueCamera('fitHeater', 'Burners');
@@ -639,7 +641,7 @@ export default function OperationPage({ onBack, onNavigate }: Props) {
           {!abnormalLabOpen && state === 'loadChange' && <div className={`operation-zone-badge firing ${loadChangeView === 'notStabilized' ? 'blocked' : 'proven'}`}><b>{loadChangeView === 'notStabilized' ? 'RESPONSE NOT STABILIZED · BLOCKED' : loadChangeView === 'increase' ? 'HIGHER HEAT DEMAND · QUALITATIVE' : loadChangeView === 'decrease' ? 'LOWER HEAT DEMAND · QUALITATIVE' : 'STABLE BASELINE'}</b><span>{loadChangeView === 'increase' ? 'Heat-input response is shown increasing qualitatively while the same monitoring responsibilities remain active.' : loadChangeView === 'decrease' ? 'Heat-input response is shown decreasing qualitatively while flame and process stability remain monitored.' : loadChangeView === 'notStabilized' ? 'The visual response remains unsettled; no corrective control action is prescribed.' : 'Reference condition before studying a change in process heat demand.'}</span></div>}
           {!abnormalLabOpen && state === 'controlledShutdown' && <div className={`operation-zone-badge firing ${shutdownView === 'responseConcern' ? 'blocked' : 'proven'}`}><b>{shutdownView === 'responseConcern' ? 'SHUTDOWN RESPONSE CONCERN · BLOCKED' : shutdownView === 'firingRemoved' ? 'FIRING REMOVED CONCEPT' : shutdownView === 'reducedHeatInput' ? 'REDUCED HEAT INPUT · QUALITATIVE' : 'STABLE SHUTDOWN ENTRY'}</b><span>{shutdownView === 'stableEntry' ? 'Stable operating reference before the shutdown learning sequence begins.' : shutdownView === 'reducedHeatInput' ? 'Flame and heat cues reduce qualitatively without implying a rate, target or burner sequence.' : shutdownView === 'firingRemoved' ? 'Main flames are absent in this training view; actual fuel isolation and shutdown completion criteria are not asserted.' : 'Thermal / firing response is shown unsettled; approved site procedure governs evaluation and response.'}</span></div>}
           {!abnormalLabOpen && state === 'coolDownNonFiring' && <div className={`operation-zone-badge firing ${cooldownView === 'unevenCooling' ? 'blocked' : 'proven'}`}><b>{cooldownView === 'unevenCooling' ? 'UNEQUAL RESIDUAL-HEAT CONCERN' : cooldownView === 'nonFiringState' ? 'NON-FIRING · NOT MAINTENANCE RELEASE' : cooldownView === 'coolingProgress' ? 'COOLING PROGRESSION · QUALITATIVE' : 'RESIDUAL HEAT PRESENT'}</b><span>{cooldownView === 'residualHeat' ? 'Combustion is absent while residual heat remains visible in the heater.' : cooldownView === 'coolingProgress' ? 'Thermal glow reduces qualitatively without representing elapsed time or a temperature target.' : cooldownView === 'nonFiringState' ? 'The heater is non-firing, but this does not establish cool, isolated, gas-free or work-ready status.' : 'Asymmetric residual heat is shown as a procedure-review concern; no corrective action is prescribed.'}</span></div>}
-          {!abnormalLabOpen && processFlowVisible && <div className="radiant-flow-legend operation-flow-legend"><span className="process">PROCESS FLUID · REPRESENTATIVE TUBE / PASS FLOW</span>{purgePathVisible && <span className="purge">{state === 'purgeActive' ? 'PURGE MEDIUM · REPRESENTATIVE SWEEP' : 'PURGE PATH · COMPLETION CONCEPT'}</span>}{hotProductsVisible && <span className="hot">HOT PRODUCTS · REPRESENTATIVE PATH</span>}</div>}
+          {!abnormalLabOpen && processFlowVisible && <div className="radiant-flow-legend operation-flow-legend"><span className="process">PROCESS FLUID · REPRESENTATIVE TUBE / PASS FLOW</span>{purgePathVisible && <span className="purge">{state === 'purgeActive' ? 'PURGE AIR · FAN → DAMPER / PROOF → TWO LOWER-RADIANT ENTRIES → STACK' : 'PURGE AIR PATH · FAN-TO-STACK COMPLETION CONCEPT'}</span>}{hotProductsVisible && <span className="hot">HOT PRODUCTS · REPRESENTATIVE PATH</span>}</div>}
 
           {!abnormalLabOpen ? <div className="operation-step-controls">
             <button onClick={previous} disabled={currentIndex === 0}><ChevronLeft size={16} /> Previous</button>
