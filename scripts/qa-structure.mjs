@@ -35,6 +35,11 @@ function requireText(file, text, label) {
   if (!fs.readFileSync(file, 'utf8').includes(text)) failures.push(`${label}: missing in ${file}`);
 }
 
+function forbidText(file, text, label) {
+  if (!fs.existsSync(file)) return;
+  if (fs.readFileSync(file, 'utf8').includes(text)) failures.push(`${label}: unexpected text remains in ${file}`);
+}
+
 requireText('src/main.tsx', "import './readability.css';", 'Global readability stylesheet import');
 requireText('src/readability.css', '.trouble-diagnostic-card p', 'Troubleshooting readability overrides');
 requireText('src/readability.css', '.simulator-console-head p', 'Simulator readability overrides');
@@ -64,6 +69,9 @@ requireText('src/BurnerPage.tsx', 'Pilot & Ignition', 'Pilot study tab');
 requireText('src/BurnerPage.tsx', 'Reference Fuel Path', 'Exploded reference fuel-path legend');
 requireText('src/BurnerPage.tsx', 'Pilot Fuel Path', 'Pilot fuel-path legend');
 requireText('src/BurnerPage.tsx', 'burner-sim-mobile-readouts', 'Persistent mobile Draft O2 CO readout');
+forbidText('src/TroubleshootingPage.tsx', 'Technical basis', 'Troubleshooting technical-basis card removed');
+forbidText('src/TroubleshootingPage.tsx', 'trouble-source-note', 'Troubleshooting source/reference card removed');
+forbidText('src/TroubleshootingPage.tsx', 'trouble-learning-chain', 'Troubleshooting learning-chain card removed');
 requireText('src/TroubleshootingPage.tsx', "code: 'T-04'", 'T-04 Convection Fouling scenario');
 requireText('src/TroubleshootingPage.tsx', "code: 'T-05'", 'T-05 High Stack Temperature scenario');
 requireText('src/TroubleshootingPage.tsx', 'Deposit Formation', 'T-04 deposit progression');
