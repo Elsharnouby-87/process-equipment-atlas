@@ -8,4 +8,4 @@ This republishes the unchanged production Atlas plus the isolated radical layout
 
 `/process-equipment-atlas/previews/dynamic-cockpit-v3/`
 
-Production application source and behavior remain unchanged.
+Production update: **isolated heater study view** — removed non-essential industrial background towers/pipes while preserving the heater, true stack, breeching, burners, supports, UI and labels.
