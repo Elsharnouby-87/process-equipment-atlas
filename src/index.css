@@ -854,6 +854,28 @@ button { -webkit-tap-highlight-color: transparent; }
 .draft-pressure-mode .trouble-diagnostic-tabs button.active { border-color: rgba(91,200,243,.55); background: rgba(38,128,169,.14); color: #a6e7ff; }
 .draft-pressure-mode .trouble-scenario-list button.active { border-color: rgba(91,200,243,.58); background: linear-gradient(90deg, rgba(42,132,174,.18), rgba(22,40,49,.32)); box-shadow: inset 3px 0 #58c9f3; color: #9be7ff; }
 
+.convection-fouling-mode .trouble-viewer { background: radial-gradient(circle at 50% 46%, rgba(161,102,52,.13), transparent 34%), radial-gradient(circle at 50% 68%, rgba(255,120,48,.06), transparent 43%), #07141f; }
+.convection-fouling-mode .trouble-title-block > span, .convection-fouling-mode .trouble-tech-head > span { color: #d7aa73; }
+.convection-fouling-mode .trouble-phase-rail { border-color: rgba(190,135,77,.26); }
+.convection-fouling-mode .trouble-phase-rail button.active { border-color: rgba(205,145,83,.58); background: rgba(118,72,34,.17); }
+.convection-fouling-mode .trouble-phase-rail button.active > i { background: #b87b43; box-shadow: 0 0 16px rgba(184,123,67,.24); }
+.convection-fouling-mode .trouble-phase-rail button.phase-normal.active { border-color: rgba(83,218,148,.48); background: rgba(49,145,96,.12); }
+.convection-fouling-mode .trouble-phase-rail button.phase-normal.active > i { background: #55d695; }
+.convection-fouling-mode .trouble-progress i.filled { background: #c78a4a; box-shadow: 0 0 9px rgba(199,138,74,.28); }
+.convection-fouling-mode .trouble-diagnostic-tabs button.active { border-color: rgba(205,145,83,.55); background: rgba(118,72,34,.16); color: #f2c28f; }
+.convection-fouling-mode .trouble-scenario-list button.active { border-color: rgba(205,145,83,.58); background: linear-gradient(90deg, rgba(118,72,34,.2), rgba(42,32,26,.34)); box-shadow: inset 3px 0 #c78a4a; color: #f0bc82; }
+
+.high-stack-temperature-mode .trouble-viewer { background: radial-gradient(circle at 50% 30%, rgba(255,92,39,.13), transparent 32%), radial-gradient(circle at 54% 66%, rgba(255,151,69,.06), transparent 44%), #07141f; }
+.high-stack-temperature-mode .trouble-title-block > span, .high-stack-temperature-mode .trouble-tech-head > span { color: #ff9f68; }
+.high-stack-temperature-mode .trouble-phase-rail { border-color: rgba(255,116,66,.28); }
+.high-stack-temperature-mode .trouble-phase-rail button.active { border-color: rgba(255,116,66,.6); background: rgba(145,46,25,.18); }
+.high-stack-temperature-mode .trouble-phase-rail button.active > i { background: #ff653b; box-shadow: 0 0 16px rgba(255,101,59,.28); }
+.high-stack-temperature-mode .trouble-phase-rail button.phase-normal.active { border-color: rgba(83,218,148,.48); background: rgba(49,145,96,.12); }
+.high-stack-temperature-mode .trouble-phase-rail button.phase-normal.active > i { background: #55d695; }
+.high-stack-temperature-mode .trouble-progress i.filled { background: #ff6b3f; box-shadow: 0 0 9px rgba(255,107,63,.3); }
+.high-stack-temperature-mode .trouble-diagnostic-tabs button.active { border-color: rgba(255,116,66,.58); background: rgba(142,47,27,.17); color: #ffb18b; }
+.high-stack-temperature-mode .trouble-scenario-list button.active { border-color: rgba(255,116,66,.62); background: linear-gradient(90deg, rgba(145,46,25,.22), rgba(48,27,23,.34)); box-shadow: inset 3px 0 #ff653b; color: #ffae82; }
+
 @media (max-width: 980px) {
   .trouble-workspace { grid-template-columns: 220px minmax(0,1fr); }
   .trouble-tech { display: none; }
