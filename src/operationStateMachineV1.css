@@ -1,4 +1,4 @@
-.operation-system-strip{position:absolute;z-index:17;left:14px;right:14px;bottom:66px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;padding:6px;border:1px solid rgba(88,191,231,.22);border-radius:10px;background:rgba(3,17,28,.90);backdrop-filter:blur(13px);box-shadow:0 12px 34px rgba(0,0,0,.26)}
+.operation-system-strip{position:absolute;z-index:17;left:14px;right:14px;bottom:66px;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;padding:6px;border:1px solid rgba(88,191,231,.22);border-radius:10px;background:rgba(3,17,28,.90);backdrop-filter:blur(13px);box-shadow:0 12px 34px rgba(0,0,0,.26)}
 .operation-system-strip::before{content:'3D VISUAL STATE · NOT FIELD STATUS';position:absolute;left:8px;top:-15px;color:#5f9eb9;font:700 6px/1 'IBM Plex Mono',monospace;letter-spacing:.1em}
 .operation-system-strip>span{min-width:0;padding:6px 7px;border:1px solid rgba(91,176,211,.13);border-radius:7px;background:rgba(8,31,43,.68)}
 .operation-system-strip small,.operation-system-strip b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
