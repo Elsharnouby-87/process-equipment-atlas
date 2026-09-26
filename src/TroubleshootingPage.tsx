@@ -436,7 +436,7 @@ export default function TroubleshootingPage({ onBack, onNavigate }: Props) {
         <aside className="radiant-tech trouble-tech">
           <div className="radiant-tech-head trouble-tech-head"><span>{currentScenario.code} · {currentScenario.title.toUpperCase()}</span><h2>{currentPhase.title}</h2><p>{currentPhase.cue}</p></div>
           {renderDiagnostic()}
-          <section className="radiant-warning trouble-guardrail"><ShieldAlert size={17} /><p><b>Training boundary.</b> This lab teaches recognition and diagnostic context. It does not prescribe burner, fuel, air, damper, shutdown or maintenance actions. Approved site / OEM / BMS / SIS procedures and plant-specific engineering limits govern response.</p></section>
+
         </aside>
       </section>
     </main>
