@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Fired Heater Atlas — Style Lab V1</title>
+<style>
+:root{color-scheme:dark;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:#050608;color:#f4f6f8;overflow:hidden}
+.lab{height:100vh;display:grid;grid-template-rows:auto 1fr}
+.bar{display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center;padding:11px 16px;border-bottom:1px solid #24262a;background:rgba(7,8,10,.97);backdrop-filter:blur(18px);z-index:20}
+.brand{min-width:240px}.brand strong{display:block;font-size:14px;letter-spacing:.04em}.brand strong em{font-style:normal;color:#ff7a18}.brand small{display:block;margin-top:3px;color:#7e838a;font:600 9px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.16em}
+.groups{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}.group{display:flex;align-items:center;gap:6px}.group>span{margin-right:2px;color:#686d74;font:700 9px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.12em;text-transform:uppercase}
+button{border:1px solid #2b2e33;border-radius:8px;background:#101216;color:#aeb3ba;padding:7px 10px;font-size:11px;cursor:pointer;transition:.18s ease}button:hover{border-color:#565c64;color:#fff;transform:translateY(-1px)}button.active{border-color:#ff7a18;color:#fff;background:rgba(255,122,24,.12);box-shadow:inset 0 0 0 1px rgba(255,122,24,.15)}
+.status{display:flex;align-items:center;gap:9px;padding:8px 10px;border:1px solid #25282d;border-radius:9px;background:#0d0f12;color:#8e949b;font-size:10px;white-space:nowrap}.status i{width:7px;height:7px;border-radius:50%;background:#67d5a4;box-shadow:0 0 12px rgba(103,213,164,.6)}
+.stage{min-height:0;display:grid;place-items:center;padding:14px;background:radial-gradient(circle at 50% 0%,rgba(35,70,98,.17),transparent 38%),#050608}
+.device{position:relative;width:100%;height:100%;border:1px solid #242831;border-radius:16px;overflow:hidden;background:#000;box-shadow:0 28px 90px rgba(0,0,0,.48);transition:width .35s ease,border-radius .35s ease}.device.tablet{width:min(1120px,100%);height:94%;border-radius:22px}.device.mobile{width:min(430px,100%);height:94%;border-radius:30px}
+iframe{width:100%;height:100%;border:0;background:#06111b}.corner{position:absolute;right:11px;bottom:10px;z-index:5;pointer-events:none;padding:6px 8px;border:1px solid rgba(255,255,255,.12);border-radius:7px;background:rgba(0,0,0,.62);color:#8f959c;font:600 8px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em}
+@media(max-width:1100px){.bar{grid-template-columns:1fr}.brand{min-width:0}.status{position:absolute;right:12px;top:10px}.groups{padding-right:160px}}@media(max-width:720px){.status{display:none}.groups{padding-right:0}.bar{padding:9px}.group>span{display:none}.stage{padding:6px}}
+</style>
+</head>
+<body>
+<div class="lab">
+<header class="bar">
+<div class="brand"><strong>FIRED HEATER <em>ATLAS</em> · STYLE LAB V1</strong><small>ISOLATED PREVIEW · PRODUCTION UI UNCHANGED</small></div>
+<div class="groups">
+<div class="group" data-group="theme"><span>Style</span><button data-theme="original">Original</button><button class="active" data-theme="noir">Atlas Noir</button><button data-theme="cinematic">Cinematic</button><button data-theme="industrial">Industrial</button></div>
+<div class="group" data-group="font"><span>Font</span><button class="active" data-font="space">Space Grotesk</button><button data-font="manrope">Manrope</button><button data-font="tight">Inter Tight</button></div>
+<div class="group" data-group="motion"><span>Motion</span><button data-motion="calm">Calm</button><button class="active" data-motion="cinematic">Cinematic</button><button data-motion="snappy">Snappy</button></div>
+<div class="group" data-group="device"><span>Viewport</span><button class="active" data-device="desktop">Desktop</button><button data-device="tablet">Tablet</button><button data-device="mobile">Mobile</button></div>
+</div>
+<div class="status"><i></i><span>Live app inside style sandbox</span></div>
+</header>
+<main class="stage"><div class="device" id="device"><iframe id="atlas" src="../../" title="Fired Heater Atlas style preview"></iframe><div class="corner" id="corner">ATLAS NOIR · SPACE GROTESK · CINEMATIC</div></div></main>
+</div>
+<script>
+var frame=document.getElementById('atlas'),device=document.getElementById('device'),corner=document.getElementById('corner');
+var state={theme:'noir',font:'space',motion:'cinematic',device:'desktop'};
+var themes={
+noir:{bg:'#040506',panel:'#080a0d',panel2:'#0d1014',line:'rgba(255,255,255,.10)',strong:'rgba(255,255,255,.18)',text:'#f6f7f8',muted:'#858b92',accent:'#ff7a18',radius:'14px',blur:'18px',viewer:'radial-gradient(circle at 50% 45%,rgba(45,102,138,.13),transparent 45%),#030507'},
+cinematic:{bg:'#000000',panel:'rgba(12,12,13,.82)',panel2:'rgba(22,22,24,.78)',line:'rgba(255,255,255,.075)',strong:'rgba(255,255,255,.15)',text:'#f5f5f7',muted:'#929297',accent:'#ff7a18',radius:'22px',blur:'26px',viewer:'radial-gradient(circle at 50% 48%,rgba(83,109,127,.14),transparent 42%),linear-gradient(180deg,#050607,#000)'},
+industrial:{bg:'#07090b',panel:'#0a0d10',panel2:'#0f1317',line:'rgba(170,203,220,.16)',strong:'rgba(170,203,220,.28)',text:'#f0f4f6',muted:'#8da0aa',accent:'#ff7a18',radius:'2px',blur:'0px',viewer:'linear-gradient(180deg,#071019 0%,#04080c 100%)'}
+};
+var fonts={space:'"Space Grotesk",Inter,system-ui,sans-serif',manrope:'Manrope,Inter,system-ui,sans-serif',tight:'"Inter Tight",Inter,system-ui,sans-serif'};
+var motions={calm:'320ms',cinematic:'520ms',snappy:'150ms'};
+function makeCss(){
+ if(state.theme==='original')return '';
+ var v=themes[state.theme],font=fonts[state.font],dur=motions[state.motion];
+ var s='';
+ s+="@import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&family=Manrope:wght@400;500;600&family=Space+Grotesk:wght@400;500;600&display=swap');";
+ s+=":root{--lab-bg:"+v.bg+";--lab-panel:"+v.panel+";--lab-panel2:"+v.panel2+";--lab-line:"+v.line+";--lab-strong:"+v.strong+";--lab-text:"+v.text+";--lab-muted:"+v.muted+";--lab-accent:"+v.accent+";--lab-radius:"+v.radius+";--lab-dur:"+dur+"}";
+ s+="html,body,#root{background:var(--lab-bg)!important}body,button,input{font-family:"+font+"!important}body{color:var(--lab-text)!important}";
+ s+=".app-shell,.architecture-page{background:var(--lab-bg)!important;color:var(--lab-text)!important}";
+ s+=".atlas-topbar,.burner-topbar,.radiant-topbar,.heat-topbar,.architecture-topbar,[class*='topbar']{background:rgba(4,5,7,.88)!important;border-color:var(--lab-line)!important;backdrop-filter:blur("+v.blur+") saturate(1.1)!important}";
+ s+=".atlas-contextbar,.burner-contextbar,.architecture-contextbar,[class*='contextbar']{background:rgba(6,8,10,.92)!important;border-color:var(--lab-line)!important}";
+ s+=".component-navigator,.inspector-panel,.burner-left,.burner-tech,.simulator-console,[class*='panel'],[class*='sheet'],[class*='sidebar']{background:var(--lab-panel)!important;border-color:var(--lab-line)!important}";
+ s+=".hero-viewer,.burner-viewer,.simulator-viewer,[class*='viewer']{background:"+v.viewer+"!important}";
+ s+=".primary-nav button{font-size:11px!important;font-weight:500!important;color:var(--lab-muted)!important}.primary-nav button.active{color:var(--lab-text)!important}.primary-nav button.active::after{height:2px!important;background:var(--lab-accent)!important;box-shadow:0 0 20px rgba(255,122,24,.38)!important}";
+ s+=".global-search{border-color:var(--lab-strong)!important;background:rgba(255,255,255,.025)!important;border-radius:12px!important}.brand-lockup strong{font-size:19px!important;font-weight:600!important;letter-spacing:-.01em!important}.brand-lockup span{font-size:9px!important;color:var(--lab-muted)!important;letter-spacing:.24em!important}";
+ s+="h1,h2,h3{font-family:"+font+"!important;letter-spacing:-.025em!important}p,li,small{line-height:1.55!important}.navigator-head h2,.inspector-head h2{font-size:22px!important}.inspector-head p,.inspector-section p,.special-study-card p,.list-section ul{font-size:11px!important;color:#aeb6bd!important}.navigator-head p{font-size:10px!important;color:var(--lab-muted)!important}";
+ s+=".component-btn,.study-buttons button,.inspector-actions button,.back-atlas,.simulator-presets button,[class*='tab'] button,[class*='dock'] button{border-color:var(--lab-line)!important;border-radius:calc(var(--lab-radius)*.55)!important;background:rgba(255,255,255,.018)!important;transition:transform var(--lab-dur) cubic-bezier(.2,.8,.2,1),border-color var(--lab-dur),background var(--lab-dur),color var(--lab-dur)!important}";
+ s+=".component-btn:hover,.study-buttons button:hover,.inspector-actions button:hover,.back-atlas:hover,.simulator-presets button:hover,[class*='tab'] button:hover,[class*='dock'] button:hover{transform:translateY(-1px)!important;border-color:var(--lab-strong)!important;background:rgba(255,255,255,.035)!important}";
+ s+=".component-btn.active,.inspector-actions button.active,.view-pills button.active,.simulator-presets button.active,[class*='tab'] button.active{border-color:rgba(255,122,24,.48)!important;background:rgba(255,122,24,.09)!important;box-shadow:inset 0 0 0 1px rgba(255,122,24,.08)!important}.component-btn.active{box-shadow:inset 2px 0 var(--lab-accent)!important}";
+ s+=".component-dot,.viewer-kicker i{background:var(--lab-accent)!important;box-shadow:0 0 14px rgba(255,122,24,.52)!important}";
+ s+=".viewer-kicker,.context-state,.burner-view-state,.hero-burner-badge,.burner-flow-legend,.simulator-state-badge,.simulator-flow-legend,.control-dock,.view-pills,.simulator-camera-dock{border-color:var(--lab-line)!important;border-radius:calc(var(--lab-radius)*.62)!important;background:rgba(5,7,9,.72)!important;backdrop-filter:blur("+v.blur+") saturate(1.08)!important;box-shadow:inset 0 1px rgba(255,255,255,.035)!important}";
+ s+=".inspector-section,.related-section,.burner-tech-section,[class*='section']{border-color:var(--lab-line)!important}.inspector-section>span,.related-section>span,.special-study-card>span,.burner-tech-section>span{color:#ff9a52!important;font-size:9px!important;letter-spacing:.12em!important}";
+ s+=".special-study-card,.radiant-warning,.simulator-boundary-note,[class*='warning']{border-color:rgba(255,122,24,.20)!important;background:rgba(255,122,24,.035)!important;border-radius:var(--lab-radius)!important}.simulator-output-grid>div,[class*='card']{border-color:var(--lab-line)!important;border-radius:var(--lab-radius)!important}input[type='range']{accent-color:var(--lab-accent)!important}";
+ if(state.theme==='cinematic')s+=".atlas-workspace{grid-template-columns:220px minmax(0,1fr) 310px!important}.component-navigator,.inspector-panel,.burner-left,.burner-tech{background:rgba(7,8,10,.82)!important}.component-btn,.study-buttons button,.inspector-actions button{border-color:transparent!important}.inspector-head h2,.burner-title-block h1,.simulator-console-head h1{font-weight:500!important}";
+ if(state.theme==='industrial')s+=".atlas-topbar,.atlas-contextbar,.component-navigator,.inspector-panel,.control-dock,.view-pills,.viewer-kicker,.context-state,[class*='panel'],[class*='card'],button,input{border-radius:2px!important;backdrop-filter:none!important}.component-btn.active{background:transparent!important}.primary-nav button.active::after{box-shadow:none!important}.brand-lockup strong,h1,h2,h3{font-weight:500!important}";
+ s+="@media(prefers-reduced-motion:no-preference){.hero-viewer canvas,.burner-viewer canvas,[class*='viewer'] canvas{transition:filter var(--lab-dur),opacity var(--lab-dur)!important}.inspector-panel,.component-navigator,.burner-left,.burner-tech,.simulator-console{transition:background var(--lab-dur),border-color var(--lab-dur)!important}}";
+ return s;
+}
+function apply(){var doc=frame.contentDocument;if(!doc)return;var st=doc.getElementById('refero-style-lab');if(!st){st=doc.createElement('style');st.id='refero-style-lab';doc.head.appendChild(st)}st.textContent=makeCss();corner.textContent=(state.theme+' · '+state.font+' · '+state.motion).toUpperCase()}
+function bind(group,key,attr){document.querySelectorAll('[data-group="'+group+'"] button').forEach(function(btn){btn.addEventListener('click',function(){state[key]=btn.dataset[attr];document.querySelectorAll('[data-group="'+group+'"] button').forEach(function(b){b.classList.remove('active')});btn.classList.add('active');if(key==='device'){device.className='device'+(state.device==='desktop'?'':' '+state.device)}else apply()})})}
+bind('theme','theme','theme');bind('font','font','font');bind('motion','motion','motion');bind('device','device','device');frame.addEventListener('load',function(){setTimeout(apply,180)});
+</script>
+</body>
+</html>
