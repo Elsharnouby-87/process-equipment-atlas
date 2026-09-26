@@ -12,6 +12,7 @@ const requiredFiles = [
   'src/TroubleshootingPage.tsx',
   'src/PurgeAirPage.tsx',
   'src/purgeAirStudy.css',
+  'src/readability.css',
   'src/heater3d/viewConfig.ts',
   'src/physicsCalibration.ts',
   'src/combustionTrainingLogic.ts',
@@ -34,6 +35,10 @@ function requireText(file, text, label) {
   if (!fs.readFileSync(file, 'utf8').includes(text)) failures.push(`${label}: missing in ${file}`);
 }
 
+requireText('src/main.tsx', "import './readability.css';", 'Global readability stylesheet import');
+requireText('src/readability.css', '.trouble-diagnostic-card p', 'Troubleshooting readability overrides');
+requireText('src/readability.css', '.simulator-console-head p', 'Simulator readability overrides');
+requireText('src/readability.css', '.operation-system-strip small', 'Operation readability overrides');
 requireText('src/App.tsx', "useState('')", 'Free Explore default selection');
 requireText('src/App.tsx', 'Draft Instruments', 'Draft instruments registry');
 requireText('src/App.tsx', 'Stack Analyzers', 'Stack analyzers registry');
@@ -89,7 +94,7 @@ if (failures.length) {
 
 console.log('[qa:structure] PASS');
 console.log(` - ${requiredFiles.length} required modules present`);
-console.log(' - free-explore, draft instrumentation, burner exploded, purge-air learning module, T-04/T-05 troubleshooting and fuel-path guards present');
+console.log(' - free-explore, draft instrumentation, burner exploded, purge-air learning module, T-04/T-05 troubleshooting, global readability pass and fuel-path guards present');
 console.log(' - burner fuel path remains readable across Atlas and dedicated study modes');
 console.log(' - mobile simulator keeps Draft, radiant O2 and CO visible with tuning controls collapsed');
 console.log(' - simulator V2 exposes heat input, actual air, excess air, radiant/stack O2, CO, draft and representative stack temperature');
