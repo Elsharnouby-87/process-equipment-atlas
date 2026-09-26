@@ -11,6 +11,8 @@ const requireText = (path, text, label) => {
 [
   'src/ComponentsPage.tsx',
   'src/SimulatorPage.tsx',
+  'src/PurgeAirPage.tsx',
+  'src/purgeAirStudy.css',
   'src/navigationArchitecture.css',
   'src/GlobalNavigation.tsx',
   'src/App.tsx',
@@ -21,11 +23,15 @@ requireText('src/GlobalNavigation.tsx', "'simulator'", 'SIMULATOR navigation tar
 requireText('src/GlobalNavigation.tsx', "label: 'SIMULATOR'", 'SIMULATOR desktop/mobile navigation item');
 requireText('src/App.tsx', "activeModule === 'componentsHub'", 'Components landing route');
 requireText('src/App.tsx', "activeModule === 'simulator'", 'Simulator route');
+requireText('src/App.tsx', "activeModule === 'purgeAir'", 'Purge Air System route');
 requireText('src/App.tsx', "setActiveModule('componentsHub')", 'Components navigation no longer depends on selected Atlas component');
 requireText('src/ComponentsPage.tsx', "id: 'burner'", 'Burner component module card');
 requireText('src/ComponentsPage.tsx', "id: 'radiant'", 'Radiant component module card');
 requireText('src/ComponentsPage.tsx', "id: 'heatRecovery'", 'Shield and convection module card');
 requireText('src/ComponentsPage.tsx', "id: 'draftStack'", 'Draft and stack module card');
+requireText('src/ComponentsPage.tsx', "id: 'purgeAir'", 'Purge Air System module card');
+requireText('src/PurgeAirPage.tsx', 'Full Purge Flow', 'Purge full-flow study navigation');
+requireText('src/PurgeAirPage.tsx', 'BMS / Permissive', 'Purge BMS/permissive study navigation');
 requireText('src/SimulatorPage.tsx', 'getCombustionTrainingMetrics', 'Simulator reuses existing V2 physics kernel');
 requireText('src/SimulatorPage.tsx', 'metrics.heatInputPctRef', 'Simulator heat-input output');
 requireText('src/SimulatorPage.tsx', 'metrics.actualAirPctStoich', 'Simulator actual-air output');
@@ -54,7 +60,7 @@ if (fs.existsSync('src/GlobalNavigation.tsx')) {
 if (failures.length) throw new Error(`[qa:navigation] ${failures.join(' | ')}`);
 
 console.log('[qa:navigation] PASS');
-console.log(' - COMPONENTS opens a dedicated four-module landing page');
+console.log(' - COMPONENTS opens a dedicated five-module landing page including Purge Air System');
 console.log(' - SIMULATOR is an independent global destination');
 console.log(' - Burner page is visually component-focused; cross-system controls are separated');
 console.log(' - Simulator reuses the existing V2 physics kernel with no duplicate physics implementation');
