@@ -1,0 +1,250 @@
+/*
+ * Global readability pass — 2026-09-26
+ * Keep hierarchy and 3D HUD density intact while lifting instructional/body copy
+ * out of the 6–9 px range. Headline sizes and large numeric readouts remain unchanged.
+ */
+
+/* Shared context and panel copy */
+.atlas-contextbar span,
+.burner-contextbar span,
+.radiant-contextbar span,
+.architecture-contextbar span,
+.trouble-contextbar span { font-size: 9px !important; }
+
+.atlas-contextbar p,
+.burner-contextbar p,
+.radiant-contextbar p,
+.architecture-contextbar p { font-size: 10px !important; line-height: 1.45 !important; }
+
+.navigator-head > span,
+.navigator-label,
+.inspector-head > span,
+.inspector-section > span,
+.related-section > span,
+.special-study-card > span,
+.burner-title-block > span,
+.burner-parts > span,
+.burner-tech-head > span,
+.burner-tech-section > span,
+.burner-path > span,
+.radiant-title-block > span,
+.radiant-parts > span,
+.radiant-tech-head > span,
+.radiant-tech-section > span,
+.radiant-path > span { font-size: 9px !important; }
+
+.navigator-head p,
+.navigator-note p,
+.location-line,
+.empty-search { font-size: 10px !important; line-height: 1.55 !important; }
+
+.component-btn small,
+.burner-study-tabs button small,
+.radiant-study-tabs button small,
+.operation-zone-list small,
+.operation-pilot-options button small,
+.abnormal-scenario-list small { font-size: 9px !important; }
+
+.component-btn,
+.study-buttons button,
+.inspector-actions button,
+.related-section button,
+.open-burner-page,
+.open-radiant-page,
+.open-heat-page,
+.open-draft-page,
+.open-purge-page,
+.control-dock button,
+.back-atlas { font-size: 9.5px !important; }
+
+/* Component-study learning copy */
+.burner-title-block p,
+.burner-tech-head p,
+.burner-tech-section p,
+.burner-warning p,
+.radiant-title-block p,
+.radiant-tech-head p,
+.radiant-tech-section p,
+.radiant-warning p { font-size: 10.5px !important; line-height: 1.62 !important; }
+
+.burner-tech-section ul,
+.radiant-tech-section ul { font-size: 10.5px !important; line-height: 1.62 !important; }
+
+.burner-part strong,
+.radiant-part strong { font-size: 10px !important; }
+
+.burner-part p,
+.radiant-part p,
+.heat-construction-note p,
+.draft-principle-note p,
+.types-training-note p,
+.operation-principle-note p { font-size: 9.5px !important; line-height: 1.58 !important; }
+
+.burner-center-tabs button,
+.radiant-center-tabs button,
+.heat-center-tabs button,
+.types-center-types button { font-size: 9.5px !important; }
+
+.radiant-scenario-chips button,
+.semantic-explode > div b,
+.burner-path > div span,
+.radiant-path > div span,
+.heat-section-badges span,
+.types-comparison-head span,
+.types-comparison-table b,
+.types-comparison-table span { font-size: 8.5px !important; line-height: 1.4 !important; }
+
+.heat-tube-compare article b { font-size: 9.5px !important; }
+.heat-tube-compare article p { font-size: 9px !important; line-height: 1.55 !important; }
+
+/* Components hub */
+.components-hub-intro > span,
+.component-module-card > span,
+.components-hub-note b { font-size: 9px !important; }
+
+.component-module-card p { font-size: 11px !important; line-height: 1.65 !important; }
+.component-module-path { font-size: 9.5px !important; line-height: 1.5 !important; }
+.component-module-action { font-size: 10.5px !important; }
+.components-hub-note span { font-size: 10px !important; line-height: 1.55 !important; }
+
+/* Simulator — preserve big numeric readouts, enlarge labels/explanations */
+.simulator-state-badge span,
+.simulator-flow-legend span { font-size: 8px !important; }
+
+.simulator-state-badge b { font-size: 10.5px !important; }
+.simulator-camera-dock button { font-size: 9px !important; }
+
+.simulator-console-head > span,
+.simulator-presets > span,
+.simulator-output-heading > span { font-size: 9px !important; }
+
+.simulator-console-head p { font-size: 10.5px !important; line-height: 1.62 !important; }
+
+.sim-range-control b { font-size: 10.5px !important; }
+.sim-range-control small { font-size: 8.5px !important; line-height: 1.2 !important; }
+
+.simulator-presets button { font-size: 9.5px !important; min-height: 36px; }
+.simulator-output-heading b { font-size: 8px !important; }
+.simulator-output-grid small { font-size: 8.5px !important; }
+.simulator-output-grid em { font-size: 8.5px !important; line-height: 1.45 !important; }
+
+.simulator-boundary-note b { font-size: 9px !important; }
+.simulator-boundary-note p { font-size: 9.5px !important; line-height: 1.58 !important; }
+
+/* Troubleshooting — the densest reading surface */
+.trouble-scenario-list strong { font-size: 10px !important; }
+.trouble-scenario-list small { font-size: 8.5px !important; line-height: 1.35 !important; }
+.trouble-scenario-list button > b { font-size: 9.5px !important; }
+
+.trouble-guide-card b { font-size: 9px !important; }
+.trouble-guide-card p { font-size: 9.5px !important; line-height: 1.58 !important; }
+.trouble-guide-card button { font-size: 9px !important; }
+
+.trouble-phase-rail button > i { font-size: 8.5px !important; }
+.trouble-phase-rail button b { font-size: 9px !important; }
+.trouble-phase-rail button small { font-size: 7.5px !important; }
+
+.trouble-stage-card > span { font-size: 7.5px !important; }
+.trouble-stage-card > b { font-size: 10.5px !important; }
+.trouble-stage-card > p { font-size: 9.5px !important; line-height: 1.5 !important; }
+
+.trouble-evidence-rail > span { font-size: 7.5px !important; }
+.trouble-evidence-rail button b { font-size: 8.5px !important; }
+
+.trouble-progress span { font-size: 7.5px !important; }
+
+.trouble-diagnostic-tabs button { font-size: 8.5px !important; min-height: 34px; }
+.trouble-diagnostic-card > span { font-size: 8.5px !important; }
+.trouble-diagnostic-card h3 { font-size: 15px !important; }
+.trouble-diagnostic-card p { font-size: 10.5px !important; line-height: 1.62 !important; }
+.trouble-diagnostic-card ul { font-size: 10.5px !important; line-height: 1.62 !important; }
+.trouble-diagnostic-card li { margin: 5px 0 !important; }
+
+.trouble-source-note p { font-size: 9.5px !important; line-height: 1.58 !important; }
+.trouble-learning-chain > span { font-size: 8.5px !important; }
+.trouble-learning-chain b { font-size: 8px !important; line-height: 1.25 !important; padding: 5px 7px !important; }
+
+/* Operation — status chips stay compact but readable */
+.operation-system-strip::before { font-size: 7px !important; }
+.operation-system-strip small { font-size: 7px !important; }
+.operation-system-strip b { font-size: 9px !important; }
+.operation-simulator-cta { font-size: 9px !important; }
+.operation-simulator-cta small { font-size: 7px !important; }
+
+.operation-principle-note b,
+.operation-readiness-panel > span,
+.operation-abnormal-launch b,
+.abnormal-panel-head > span { font-size: 9px !important; }
+
+.operation-principle-note p,
+.operation-review-count,
+.operation-zone-detail small,
+.abnormal-current-view > p,
+.abnormal-summary,
+.abnormal-guardrail { font-size: 9.5px !important; line-height: 1.55 !important; }
+
+.operation-zone-list b,
+.operation-pilot-options button b,
+.abnormal-scenario-list b,
+.abnormal-current-view > b { font-size: 10px !important; }
+
+.operation-step-controls button,
+.abnormal-phase-strip button,
+.abnormal-phase-controls button { font-size: 8.5px !important; }
+
+/* Purge Air System */
+.purge-source-note b { font-size: 9px !important; }
+.purge-source-note p { font-size: 9.5px !important; line-height: 1.58 !important; }
+.purge-live-status small { font-size: 7.5px !important; }
+.purge-live-status b { font-size: 9px !important; }
+.purge-bms-badge { font-size: 8.5px !important; }
+.purge-permissive-grid small { font-size: 8px !important; }
+.purge-permissive-grid b { font-size: 9.5px !important; }
+.purge-permissive-grid em { font-size: 8.5px !important; line-height: 1.45 !important; }
+.purge-permissive-panel > p { font-size: 9.5px !important; line-height: 1.58 !important; }
+.purge-flow-chain b { font-size: 8.5px !important; }
+
+/* Mobile sheets: instructional text should not shrink back below the desktop baseline */
+.sheet-eyebrow,
+.sheet-subhead { font-size: 9.5px !important; }
+
+.sheet-view-grid small,
+.operation-mobile-study-head > small,
+.operation-mobile-topic-list button small { font-size: 9.5px !important; }
+
+.operation-mobile-topic-preview span,
+.operation-mobile-state-note span { font-size: 9px !important; }
+
+.operation-mobile-topic-preview p { font-size: 10.5px !important; line-height: 1.55 !important; }
+
+@media (max-width: 700px) {
+  .trouble-mobile-sheet .trouble-diagnostic-card p,
+  .trouble-mobile-sheet .trouble-diagnostic-card ul { font-size: 11px !important; line-height: 1.62 !important; }
+
+  .trouble-mobile-scenario-list strong { font-size: 10.5px !important; }
+  .trouble-mobile-scenario-list small { font-size: 9px !important; }
+
+  .simulator-console-head p,
+  .component-module-card p,
+  .burner-title-block p,
+  .burner-tech-head p,
+  .burner-tech-section p,
+  .radiant-title-block p,
+  .radiant-tech-head p,
+  .radiant-tech-section p,
+  .radiant-warning p { font-size: 11px !important; }
+
+  .sim-range-control b { font-size: 11px !important; }
+  .simulator-presets button { font-size: 10px !important; }
+  .simulator-output-grid small,
+  .simulator-output-grid em { font-size: 9px !important; }
+}
+
+@media (max-width: 520px) {
+  .operation-system-strip small { font-size: 6.5px !important; }
+  .operation-system-strip b { font-size: 8.5px !important; }
+  .operation-simulator-cta { font-size: 8.5px !important; }
+
+  .simulator-flow-legend span { font-size: 7.5px !important; }
+  .architecture-topbar .brand-lockup span { font-size: 8px !important; }
+}
