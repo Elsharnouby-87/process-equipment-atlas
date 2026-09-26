@@ -198,8 +198,8 @@
           if (purgeFlow) child.visible = operationState === 'purgeActive' || operationState === 'purgeComplete';
           else if (processFlow) child.visible = ['processReady', 'purgeReady', 'purgeActive', 'purgeComplete'].includes(operationState);
           else child.visible = false;
-        } else if (purgeFlow) child.visible = selected === 'Purge Air Blower' && !burnerStudyMode && !radiantStudyMode && !heatRecoveryStudyMode && !draftStudyMode;
-        else if (burnerFlow) child.visible = Boolean(burnerStudyMode) && burnerStudyMode !== 'exploded' && (burnerStudyMode !== 'pilot' || burnerFlow === 'fuel');
+        } else if (burnerFlow) child.visible = Boolean(burnerStudyMode) && burnerStudyMode !== 'exploded' && (burnerStudyMode !== 'pilot' || burnerFlow === 'fuel');
+        else if (purgeFlow) child.visible = selected === 'Purge Air Blower' && !burnerStudyMode && !radiantStudyMode && !heatRecoveryStudyMode && !draftStudyMode;
         else if (radiantFlow) child.visible = radiantStudyMode === 'flow';
         else if (flueFlow) child.visible = selected !== 'Purge Air Blower' && (draftStudyMode ? ['overview', 'breeching', 'damper', 'path', 'stack'].includes(draftStudyMode) : !burnerStudyMode && !radiantStudyMode && !heatRecoveryStudyMode);
         else if (processFlow) child.visible = selected !== 'Purge Air Blower' && !draftStudyMode && !burnerStudyMode && !radiantStudyMode && !heatRecoveryStudyMode;
