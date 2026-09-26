@@ -8,7 +8,7 @@ import type { CameraAction, CameraCommand, TroubleshootingPhase, Troubleshooting
 type Props = { onBack: () => void; onNavigate: (target: NavigationTarget) => void };
 type DiagnosticTab = 'observe' | 'causes' | 'inspect' | 'why';
 type MobileSheet = 'scenarios' | 'diagnose' | 'layers' | null;
-type EvidenceKind = 'primary' | 'secondary' | 'thermal' | 'context' | 'damper' | 'backfire';
+type EvidenceKind = 'primary' | 'secondary' | 'thermal' | 'context' | 'damper' | 'backfire' | 'deposit' | 'restriction' | 'deltaP' | 'stackTemp' | 'firing' | 'bypass' | 'excessAir' | 'tubeSide';
 type PhaseSpec = { id: TroubleshootingPhase; title: string; short: string; cue: string };
 type DiagnosticCopy = Record<DiagnosticTab, { title: string; intro: string; items: string[] }>;
 type ScenarioCopy = {
@@ -91,9 +91,51 @@ const scenarioCopy: Record<TroubleshootingScenario, ScenarioCopy> = {
     },
     learningChain: ['Negative tendency', 'Damper / evacuation concern', 'Positive pressure', 'Leakage + burner-specific concern'],
   },
+  convectionFouling: {
+    code: 'T-04',
+    category: 'CONVECTION / FLUE-GAS PATH',
+    title: 'Convection Fouling',
+    subtitle: 'Deposit Build-Up · Restriction · ΔP / Stack-T Context',
+    intro: 'Start with a clean convection bank, then build a representative deposit pattern and watch how fouling can reduce open gas-path area, increase resistance and reduce heat-recovery effectiveness.',
+    tour: 'Move through clean condition → deposit formation → restricted gas path → combined draft-loss / stack-temperature consequence. The visual progression is qualitative and does not assign a deposit type or cleaning method.',
+    source: 'John Zink Combustion Handbook · Burner/Heater Operations §16.2.1 draft measurement / convection pressure loss and §16.2.7 flue-gas temperatures; Troubleshooting §17.11 high stack temperature',
+    phases: [
+      { id: 'normal', title: 'Clean Convection', short: 'Baseline', cue: 'The finned convection bank is shown with open gas passages and the normal qualitative upward flue-gas route.' },
+      { id: 'deviation', title: 'Deposit Formation', short: 'Early Fouling', cue: 'Representative external deposits begin to appear on convection surfaces. The deposit geometry is illustrative and does not identify soot, ash, salts or another material.' },
+      { id: 'contact', title: 'Restricted Gas Path', short: 'Flow Resistance', cue: 'The deposit pattern becomes denser and the visual gas path narrows, representing increased resistance through the convection bank rather than a measured blockage percentage.' },
+      { id: 'consequence', title: 'ΔP + Stack-T Consequence', short: 'System Effect', cue: 'The model links a fouled / restricted bank to higher convection-section pressure loss and a possible higher stack-temperature trend when heat recovery deteriorates. Neither cue is a plant setpoint.' },
+    ],
+    diagnostics: {
+      observe: { title: 'What Changes Visually', intro: 'Read fouling as a developing restriction and heat-transfer problem, not simply as a dirty surface.', items: ['External deposit cue developing around the finned convection rows', 'Progressive loss of clear gas-path area between rows', 'Greater draft loss across the convection bank can accompany excessive fouling', 'Stack-temperature trend may rise as convection heat transfer deteriorates', 'A clean-looking accessible area does not prove the full bank is clean'] },
+      causes: { title: 'Possible Fouling Context', intro: 'The scenario does not diagnose deposit chemistry. Use service, fuel, combustion and inspection evidence to determine the actual mechanism.', items: ['Foreign deposits on convection surfaces or between fins', 'Poor liquid-fuel atomization can carry larger droplets into the convection section and create deposits', 'Afterburning can damage extended surfaces and reduce convection heat-transfer capability', 'Fuel / ash / process-specific contamination mechanisms require plant-specific investigation', 'Mechanical fin damage can also reduce effective heat-transfer surface without being a deposit problem'] },
+      inspect: { title: 'Evidence to Compare', intro: 'Use several independent observations because draft loss and stack temperature each have other possible causes.', items: ['Compare draft at the firebox roof / arch with the convection outlet or below-damper reference where instrumentation exists', 'Trend stack temperature and bridgewall / convection inlet temperature against comparable duty', 'Inspect accessible convection surfaces, fins, gaps and soot / deposit pattern using approved methods', 'Check for uneven gas-path restriction, damaged fins or foreign material between extended surfaces', 'Compare process-side duty and temperature response before concluding that fouling is the only cause'] },
+      why: { title: 'Why It Matters', intro: 'Convection fouling affects both the pressure path and heat-recovery path of the heater.', items: ['Higher gas-side resistance can consume more of the available draft', 'Reduced convection heat transfer can send more sensible heat to the stack', 'Higher stack temperature corresponds to reduced overall heater efficiency', 'Severe restriction can contribute to broader draft / pressure concerns', 'Actual cleaning and operating response must follow approved plant / OEM procedures'] },
+    },
+    learningChain: ['Clean bank', 'Deposit formation', 'Gas-path restriction', 'ΔP ↑ + heat recovery ↓ / stack-T concern'],
+  },
+  highStackTemperature: {
+    code: 'T-05',
+    category: 'STACK TEMPERATURE / HEAT RECOVERY',
+    title: 'High Stack Temperature',
+    subtitle: 'Symptom First · Multi-Branch Diagnosis',
+    intro: 'Treat a rising stack temperature as a symptom of reduced heater efficiency, then compare several plausible branches instead of selecting one root cause automatically.',
+    tour: 'Start from a normal stack-temperature concept, reveal a rising trend, correlate it with heat-recovery evidence, then open the diagnostic branch map: firing / duty, convection fouling, flue-gas bypass, excess air / air leakage and process / tube-side heat absorption.',
+    source: 'John Zink Combustion Handbook · Burner/Heater Operations §16.2.7 and Troubleshooting §17.11. Source-direct branches include high excess air, afterburning / combustibles, convection fouling and flue-gas bypass; firing-duty and tube/process-side checks are broader engineering diagnostic context.',
+    phases: [
+      { id: 'normal', title: 'Normal Stack-T Concept', short: 'Baseline', cue: 'Stack temperature is treated relative to the heater design, operating duty and comparable historical condition — not as one universal temperature target.' },
+      { id: 'deviation', title: 'Rising Stack Temperature', short: 'Symptom', cue: 'A qualitative stack-temperature indicator rises. The correct first interpretation is reduced heat-recovery efficiency / increased stack sensible heat, not an automatic root-cause conclusion.' },
+      { id: 'contact', title: 'Correlate the Evidence', short: 'Trend Context', cue: 'Compare stack temperature with bridgewall / convection inlet temperature, O₂ / combustion condition, draft / ΔP, firing duty and process-side heat pickup before choosing a diagnostic branch.' },
+      { id: 'consequence', title: 'Open Diagnostic Branches', short: 'No Single Cause', cue: 'Five investigation branches are shown together: firing / duty, dirty or damaged convection, flue-gas bypass / maldistribution, excess air / leakage, and process / tube-side heat-absorption concern. They are hypotheses to test, not diagnoses.' },
+    ],
+    diagnostics: {
+      observe: { title: 'Recognize the Symptom', intro: 'Stack temperature is useful as a trend and efficiency indicator when compared at meaningful operating conditions.', items: ['Stack gas temperature above the expected value for the relevant duty / design basis', 'Sustained upward trend is more informative than one isolated reading', 'Higher stack temperature means more sensible heat leaves with the flue gas and overall efficiency falls', 'Long-term abnormally high stack temperature can increase thermal exposure of stack / convection equipment', 'Instrument condition and comparable operating basis should be checked before diagnosis'] },
+      causes: { title: 'Diagnostic Branches', intro: 'Do not rank these branches from the temperature alone. Use correlated evidence to eliminate or support each one.', items: ['Firing / duty branch — verify current firing and duty against the expected operating basis rather than assuming over-firing from stack temperature alone', 'Dirty / damaged convection — fouling, deposits or damaged extended surface can lower heat recovery', 'Flue-gas bypass / maldistribution — hot gas can follow lower-resistance paths with less contact with effective heat-transfer surface', 'Excess air / air leakage — high excess air increases flue-gas mass and stack sensible loss; leakage location matters', 'Process / tube-side heat absorption — investigate whether process flow, internal fouling or service condition is limiting expected heat pickup; this is broader engineering context, not a direct §17.11 single-cause statement', 'Afterburning / combustibles entering the convection section is an additional source-supported branch when combustion is incomplete in the radiant section'] },
+      inspect: { title: 'What to Correlate', intro: 'Build a heat-balance and gas-path picture before assigning root cause.', items: ['Trend stack temperature at comparable throughput, firing and ambient conditions', 'Compare bridgewall / convection-inlet temperature with stack temperature to understand where heat recovery is being lost', 'Review O₂, CO / combustibles and draft together; stack O₂ may also be influenced by tramp air', 'Check convection ΔP / draft loss and physical fouling / fin condition where measurements and access exist', 'Inspect for header-box / tube-end bypass paths or uneven gas distribution where applicable', 'Review process-side flow, inlet / outlet temperatures and any evidence of internal tube fouling or reduced heat pickup'] },
+      why: { title: 'Why It Matters', intro: 'High stack temperature is an efficiency symptom that can also point to equipment or combustion problems depending on the correlated evidence.', items: ['Higher stack sensible heat means lower thermal efficiency and higher fuel requirement for the same useful duty', 'Convection afterburning or damaged extended surface can create equipment-integrity concerns', 'Persistent high-temperature exposure can affect the convection roof / stack area', 'Treating the symptom as one automatic cause can send troubleshooting in the wrong direction', 'Approved site procedures and design limits govern any operating response'] },
+    },
+    learningChain: ['Normal reference', 'Stack-T rises', 'Correlate heat / O₂ / draft / duty', 'Test multiple diagnostic branches'],
+  },
 };
-
-const futureScenarios = ['Convection Fouling', 'High Stack Temperature'];
 
 export default function TroubleshootingPage({ onBack, onNavigate }: Props) {
   const [scenario, setScenario] = useState<TroubleshootingScenario>('flameImpingement');
