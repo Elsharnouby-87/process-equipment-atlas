@@ -3,7 +3,7 @@ export type ContextMode = 'full' | 'focus' | 'isolate';
 export type BurnerStudy = 'external' | 'internal' | 'exploded' | 'pilot';
 export type RadiantStudy = 'full' | 'pass' | 'supports' | 'clearance' | 'flow' | 'inspection';
 export type RadiantScenario = 'normal' | 'impingement' | 'hotspot' | 'coking';
-export type TroubleshootingScenario = 'flameImpingement' | 'tubeHotArea' | 'draftPressure';
+export type TroubleshootingScenario = 'flameImpingement' | 'tubeHotArea' | 'draftPressure' | 'convectionFouling' | 'highStackTemperature';
 export type TroubleshootingPhase = 'normal' | 'deviation' | 'contact' | 'consequence';
 export type HeatStudy = 'overview' | 'shield' | 'convection' | 'flue' | 'process' | 'fouling';
 export type HeatScenario = 'clean' | 'fouled' | 'plugged';
@@ -53,7 +53,11 @@ export type CameraAction =
   | 'purgeBms'
   | 'troubleDraft'
   | 'troubleDraftDamper'
-  | 'troubleBackfire';
+  | 'troubleBackfire'
+  | 'troubleConvection'
+  | 'troubleConvectionDp'
+  | 'troubleStackTemperature'
+  | 'troubleStackBranches';
 
 export type CameraCommand = {
   id: number;
