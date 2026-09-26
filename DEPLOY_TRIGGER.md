@@ -27,3 +27,5 @@ Production update: **Troubleshooting content cleanup** — removes Learning Chai
 Production update: **Troubleshooting declutter pass** — removes the repeated Training Boundary card from T-01 through T-05 to keep the diagnostic panels concise and reduce non-essential visual noise.
 
 Production update: **Atlas context declutter** — removes the redundant `Training visualization · Schematic geometry · Not a certified plant design` line from the main Atlas context bar.
+
+Production update: **Free Explore declutter** — removes the entire right-side Free Explore inspector, hides its mobile Details action, and expands the 3D workspace until a real component is selected.
