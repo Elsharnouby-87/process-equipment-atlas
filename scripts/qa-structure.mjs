@@ -74,6 +74,7 @@ forbidText('src/TroubleshootingPage.tsx', 'trouble-source-note', 'Troubleshootin
 forbidText('src/TroubleshootingPage.tsx', 'trouble-learning-chain', 'Troubleshooting learning-chain card removed');
 forbidText('src/TroubleshootingPage.tsx', 'Training boundary.', 'Troubleshooting training-boundary card removed');
 forbidText('src/TroubleshootingPage.tsx', 'trouble-guardrail', 'Troubleshooting guardrail card removed');
+forbidText('src/App.tsx', 'Training visualization · Schematic geometry · Not a certified plant design', 'Atlas context disclaimer removed');
 requireText('src/TroubleshootingPage.tsx', "code: 'T-04'", 'T-04 Convection Fouling scenario');
 requireText('src/TroubleshootingPage.tsx', "code: 'T-05'", 'T-05 High Stack Temperature scenario');
 requireText('src/TroubleshootingPage.tsx', 'Deposit Formation', 'T-04 deposit progression');
