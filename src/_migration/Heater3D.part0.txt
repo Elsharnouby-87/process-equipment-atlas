@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import type { BurnerStudy, CameraCommand, ContextMode, DraftPressureScenario, DraftStudy, HeatScenario, HeatStudy, OperationState, RadiantScenario, RadiantStudy, TroubleshootingPhase, TroubleshootingScenario, ViewMode } from './modelTypes';
 import { cameraPresets, relatedComponents, type CameraPreset } from './heater3d/config';
-import { addBoltCircle, addGrating, addHandrail, addIBeam, addIndustrialBackground, addLadder, addStair, addValveWheel, box, cylinder, cylinderBetween, disposeSceneResources, frustum, makeFlameMaterial, makeLabel, makeSurfaceTexture, tag, tubePath } from './heater3d/sceneHelpers';
+import { addBoltCircle, addGrating, addHandrail, addIBeam, addLadder, addStair, addValveWheel, box, cylinder, cylinderBetween, disposeSceneResources, frustum, makeFlameMaterial, makeLabel, makeSurfaceTexture, tag, tubePath } from './heater3d/sceneHelpers';
 import { explodeOffsets, getAtlasLighting, getAtlasModeCameraPreset, operationContextMap, operationLabelMap, semanticExplodeOffsets } from './heater3d/viewConfig';
 
 type Props = {
@@ -170,7 +170,6 @@ export default function Heater3D({ mode, selected, labels, flow, explode, contex
     const boltMat = new THREE.MeshPhysicalMaterial({ color: '#9aa1a4', metalness: 0.92, roughness: 0.25 });
     const ceramic = new THREE.MeshPhysicalMaterial({ color: '#d7d8d2', metalness: 0.04, roughness: 0.58, clearcoat: 0.12, clearcoatRoughness: 0.72 });
     const gratingMat = new THREE.MeshPhysicalMaterial({ color: '#30393e', metalness: 0.82, roughness: 0.41 });
-    const backgroundMat = new THREE.MeshStandardMaterial({ color: '#18232a', metalness: 0.62, roughness: 0.58 });
     const ghostFocus = new THREE.MeshPhysicalMaterial({ color: '#456273', metalness: 0.22, roughness: 0.74, transparent: true, opacity: 0.11, depthWrite: false });
     const ghostRelated = new THREE.MeshPhysicalMaterial({ color: '#5a7b8c', metalness: 0.26, roughness: 0.7, transparent: true, opacity: 0.24, depthWrite: false });
     const ghostIsolate = new THREE.MeshPhysicalMaterial({ color: '#36505f', metalness: 0.18, roughness: 0.78, transparent: true, opacity: 0.035, depthWrite: false });
@@ -240,7 +239,6 @@ export default function Heater3D({ mode, selected, labels, flow, explode, contex
     (grid.material as THREE.Material).opacity = 0.32;
     (grid.material as THREE.Material).transparent = true;
     scene.add(grid);
-    addIndustrialBackground(scene, backgroundMat);
 
     const components: ComponentMap = new Map();
     const addComponent = (name: string, group: THREE.Group) => {
