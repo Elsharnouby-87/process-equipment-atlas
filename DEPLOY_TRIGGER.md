@@ -17,3 +17,5 @@ Deployment retry: purge fan integration QA-anchor compatibility fix applied.
 Deployment retry: TypeScript cleanup for purge fan integration.
 
 Production update: **Purge Air System detailed learning module** — adds Overview, Blower, Isolation Damper, Airflow Proof, External Riser, Two Entries, Full Purge Flow and BMS/Permissive studies, plus explicit O-04 FAN RUNNING / DAMPER PROVED / AIRFLOW PROVED visual-state cues.
+
+Production update: **Troubleshooting T-04 / T-05 expansion** — activates Convection Fouling (clean → deposits → restricted gas path → ΔP / stack-T consequence) and High Stack Temperature (baseline → rising trend → correlated evidence → multi-branch diagnosis) with new 3D overlays, camera focuses and source-grounded diagnostic content.
