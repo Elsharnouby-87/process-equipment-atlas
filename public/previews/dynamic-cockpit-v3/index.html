@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Fired Heater Atlas — Dynamic Cockpit V3</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;background:#020609;color:#fff;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overflow:hidden}
+.shell{position:relative;width:100vw;height:100vh;background:#020609}
+iframe{width:100%;height:100%;border:0;background:#06111b;display:block}
+.labbar{position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:50;display:flex;align-items:center;gap:5px;padding:5px;border:1px solid rgba(255,255,255,.11);border-radius:999px;background:rgba(3,7,10,.78);backdrop-filter:blur(22px) saturate(1.15);box-shadow:0 18px 60px rgba(0,0,0,.42)}
+.labbar button{border:0;border-radius:999px;background:transparent;color:#7f8d99;padding:8px 12px;font-size:10px;font-weight:650;letter-spacing:.02em;cursor:pointer;transition:.2s ease}
+.labbar button:hover{color:#fff;background:rgba(255,255,255,.05)}
+.labbar button.active{color:#fff;background:rgba(255,122,24,.14);box-shadow:inset 0 0 0 1px rgba(255,122,24,.42)}
+.flag{position:absolute;right:12px;bottom:10px;z-index:40;padding:7px 9px;border:1px solid rgba(255,255,255,.1);border-radius:7px;background:rgba(2,5,8,.66);backdrop-filter:blur(14px);color:#73818c;font:650 8px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.09em;pointer-events:none}
+@media(max-width:700px){.labbar{top:7px;max-width:calc(100vw - 14px)}.labbar button{padding:7px 9px;font-size:9px}.flag{display:none}}
+</style>
+</head>
+<body>
+<div class="shell">
+<iframe id="atlas" src="../../" title="Fired Heater Atlas Dynamic Cockpit"></iframe>
+<div class="labbar">
+<button class="active" data-mode="cockpit">Dynamic Cockpit</button>
+<button data-mode="stage">Cinematic Stage</button>
+<button data-mode="original">Original</button>
+</div>
+<div class="flag" id="flag">MOTION LAB V3 · DYNAMIC COCKPIT</div>
+</div>
+<script>
+var frame=document.getElementById('atlas');
+var flag=document.getElementById('flag');
+var mode='cockpit';
+
+function baseCss(){
+return `
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+:root{--motion:cubic-bezier(.22,.78,.22,1);--orange:#ff7a18;--cyan:#62c9f3}
+html,body,#root{background:#02070b!important}
+body,button,input{font-family:Inter,system-ui,sans-serif!important}
+.app-shell{background:#02070b!important;overflow:hidden!important}
+.atlas-topbar{position:absolute!important;left:14px!important;right:14px!important;top:14px!important;height:58px!important;z-index:40!important;border:1px solid rgba(120,195,232,.17)!important;border-radius:14px!important;background:rgba(3,12,18,.76)!important;backdrop-filter:blur(20px) saturate(1.14)!important;box-shadow:0 16px 50px rgba(0,0,0,.26)!important;transition:transform .45s var(--motion),opacity .35s var(--motion)!important}
+.atlas-contextbar{position:absolute!important;left:50%!important;top:81px!important;transform:translateX(-50%)!important;z-index:35!important;width:auto!important;max-width:min(920px,72vw)!important;height:38px!important;padding:0 14px!important;border:1px solid rgba(120,195,232,.12)!important;border-radius:999px!important;background:rgba(3,12,18,.68)!important;backdrop-filter:blur(18px)!important;box-shadow:0 10px 36px rgba(0,0,0,.22)!important;transition:transform .45s var(--motion),opacity .35s var(--motion)!important}
+.atlas-contextbar>div{gap:9px!important}.atlas-contextbar p{display:none!important}
+.atlas-workspace{position:relative!important;height:100vh!important;display:block!important;background:#02070b!important}
+.hero-viewer{position:absolute!important;inset:0!important;background:radial-gradient(circle at 50% 46%,rgba(31,112,155,.16),transparent 40%),linear-gradient(180deg,#06131d 0%,#02070b 100%)!important}
+.component-navigator,.inspector-panel{position:absolute!important;top:132px!important;bottom:18px!important;z-index:32!important;width:300px!important;border:1px solid rgba(120,195,232,.15)!important;border-radius:16px!important;background:rgba(3,13,20,.82)!important;backdrop-filter:blur(20px) saturate(1.12)!important;box-shadow:0 20px 70px rgba(0,0,0,.34)!important;transition:transform .48s var(--motion),opacity .36s var(--motion),box-shadow .3s ease!important}
+.component-navigator{left:16px!important;padding:16px 13px!important;transform:translateX(-250px)!important}
+.inspector-panel{right:16px!important;width:342px!important;padding:18px!important;transform:translateX(292px)!important}
+body.lab-left-open .component-navigator{transform:translateX(0)!important}
+body.lab-right-open .inspector-panel{transform:translateX(0)!important}
+body:not(.lab-left-open) .component-navigator{opacity:.64!important}
+body:not(.lab-right-open) .inspector-panel{opacity:.64!important}
+.control-dock{position:absolute!important;left:50%!important;bottom:18px!important;transform:translateX(-50%)!important;z-index:36!important;padding:6px!important;border:1px solid rgba(120,195,232,.19)!important;border-radius:999px!important;background:rgba(3,13,20,.8)!important;backdrop-filter:blur(20px)!important;box-shadow:0 18px 52px rgba(0,0,0,.35)!important}
+.control-dock button{border-radius:999px!important;padding:9px 10px!important;font-size:9px!important}
+.view-pills{top:128px!important;z-index:36!important;border-radius:999px!important;background:rgba(3,13,20,.78)!important;backdrop-filter:blur(20px)!important;box-shadow:0 12px 40px rgba(0,0,0,.26)!important}
+.view-pills button{border-radius:999px!important}
+.viewer-kicker{left:50%!important;top:auto!important;bottom:74px!important;transform:translateX(-50%)!important;z-index:35!important;border-radius:999px!important;background:rgba(3,13,20,.65)!important;backdrop-filter:blur(16px)!important}
+.context-state{left:50%!important;top:auto!important;bottom:108px!important;transform:translateX(-50%)!important;z-index:35!important;border-radius:10px!important;background:rgba(3,13,20,.67)!important;backdrop-filter:blur(16px)!important}
+.section-key{top:132px!important;right:58px!important;z-index:35!important}
+.component-btn{transition:transform .22s var(--motion),background .22s ease,border-color .22s ease!important}
+.component-btn:hover{transform:translateX(3px)!important}
+.component-btn.active{background:linear-gradient(90deg,rgba(255,122,24,.16),rgba(255,122,24,.025))!important;box-shadow:inset 3px 0 #ff7a18!important}
+.primary-nav button{font-weight:500!important;letter-spacing:.03em!important}
+.brand-lockup strong{font-weight:600!important;letter-spacing:-.01em!important}
+.navigator-head h2,.inspector-head h2{letter-spacing:-.02em!important}
+.lab-edge{position:fixed!important;z-index:80!important;border:1px solid rgba(120,195,232,.16)!important;background:rgba(3,13,20,.78)!important;backdrop-filter:blur(18px)!important;color:#95b9ca!important;cursor:pointer!important;box-shadow:0 12px 38px rgba(0,0,0,.28)!important;transition:transform .25s var(--motion),background .2s ease,color .2s ease!important}
+.lab-edge:hover{background:rgba(8,24,34,.94)!important;color:#fff!important}
+.lab-edge-left{left:9px!important;top:50%!important;transform:translateY(-50%)!important;width:34px!important;height:112px!important;border-radius:10px!important;writing-mode:vertical-rl!important;font:700 9px/1 'IBM Plex Mono',monospace!important;letter-spacing:.13em!important}
+.lab-edge-right{right:9px!important;top:50%!important;transform:translateY(-50%) rotate(180deg)!important;width:34px!important;height:96px!important;border-radius:10px!important;writing-mode:vertical-rl!important;font:700 9px/1 'IBM Plex Mono',monospace!important;letter-spacing:.13em!important}
+.lab-focus{position:fixed!important;right:18px!important;bottom:18px!important;z-index:81!important;border:1px solid rgba(255,122,24,.24)!important;border-radius:999px!important;background:rgba(3,13,20,.8)!important;color:#ffc08e!important;padding:9px 12px!important;font-size:9px!important;font-weight:700!important;letter-spacing:.05em!important;backdrop-filter:blur(18px)!important;cursor:pointer!important}
+body.lab-focus-mode .atlas-topbar{transform:translateY(-86px)!important;opacity:0!important}
+body.lab-focus-mode .atlas-contextbar{transform:translate(-50%,-90px)!important;opacity:0!important}
+body.lab-focus-mode .component-navigator{transform:translateX(-340px)!important;opacity:0!important}
+body.lab-focus-mode .inspector-panel{transform:translateX(390px)!important;opacity:0!important}
+body.lab-focus-mode .section-key{opacity:0!important;pointer-events:none!important}
+body.lab-focus-mode .view-pills{top:18px!important}
+body.lab-focus-mode .viewer-kicker{bottom:20px!important}
+body.lab-focus-mode .context-state{bottom:55px!important}
+body.lab-focus-mode .control-dock{bottom:18px!important}
+body.lab-focus-mode .lab-edge{opacity:.15!important}
+@media(max-width:980px){
+ .atlas-topbar{left:8px!important;right:8px!important;top:8px!important}
+ .atlas-contextbar{display:none!important}
+ .component-navigator,.inspector-panel{top:74px!important;bottom:12px!important;width:min(86vw,330px)!important}
+ .component-navigator{left:8px!important;transform:translateX(calc(-100% + 42px))!important}
+ .inspector-panel{right:8px!important;transform:translateX(calc(100% - 42px))!important}
+ .view-pills{top:74px!important}
+ .section-key{display:none!important}
+ .lab-edge-left{left:4px!important}.lab-edge-right{right:4px!important}
+}
+`;
+}
+
+function stageCss(){
+return baseCss()+`
+.atlas-topbar{top:18px!important;left:50%!important;right:auto!important;transform:translateX(-50%)!important;width:min(980px,calc(100vw - 36px))!important;grid-template-columns:220px minmax(220px,420px) 1fr!important;background:rgba(0,0,0,.48)!important;border-color:rgba(255,255,255,.1)!important}
+.atlas-contextbar{top:auto!important;bottom:76px!important;background:rgba(0,0,0,.42)!important;border-color:rgba(255,255,255,.08)!important}
+.component-navigator,.inspector-panel{top:50%!important;bottom:auto!important;max-height:72vh!important;transform:translateY(-50%) translateX(-260px)!important;background:rgba(0,0,0,.50)!important;border-color:rgba(255,255,255,.08)!important}
+.inspector-panel{transform:translateY(-50%) translateX(302px)!important}
+body.lab-left-open .component-navigator{transform:translateY(-50%) translateX(0)!important}
+body.lab-right-open .inspector-panel{transform:translateY(-50%) translateX(0)!important}
+.hero-viewer{background:radial-gradient(circle at 50% 48%,rgba(49,67,79,.14),transparent 35%),#000!important}
+.view-pills{top:88px!important;background:rgba(0,0,0,.42)!important;border-color:rgba(255,255,255,.09)!important}
+.control-dock{background:rgba(0,0,0,.48)!important;border-color:rgba(255,255,255,.1)!important}
+.viewer-kicker,.context-state{background:rgba(0,0,0,.42)!important;border-color:rgba(255,255,255,.08)!important}
+body.lab-focus-mode .atlas-topbar{transform:translate(-50%,-100px)!important}
+`;
+}
+
+function cleanup(doc){
+ ['lab-left-handle','lab-right-handle','lab-focus-button','dynamic-cockpit-style'].forEach(function(id){
+  var el=doc.getElementById(id);if(el)el.remove();
+ });
+ doc.body.classList.remove('lab-left-open','lab-right-open','lab-focus-mode');
+}
+
+function install(modeName){
+ var doc=frame.contentDocument;if(!doc)return;
+ cleanup(doc);
+ if(modeName==='original')return;
+ var style=doc.createElement('style');style.id='dynamic-cockpit-style';style.textContent=modeName==='stage'?stageCss():baseCss();doc.head.appendChild(style);
+ var left=doc.createElement('button');left.id='lab-left-handle';left.className='lab-edge lab-edge-left';left.textContent='COMPONENTS';
+ var right=doc.createElement('button');right.id='lab-right-handle';right.className='lab-edge lab-edge-right';right.textContent='DETAILS';
+ var focus=doc.createElement('button');focus.id='lab-focus-button';focus.className='lab-focus';focus.textContent='IMMERSIVE VIEW';
+ doc.body.appendChild(left);doc.body.appendChild(right);doc.body.appendChild(focus);
+ left.onclick=function(){doc.body.classList.toggle('lab-left-open')};
+ right.onclick=function(){doc.body.classList.toggle('lab-right-open')};
+ focus.onclick=function(){
+  doc.body.classList.toggle('lab-focus-mode');
+  focus.textContent=doc.body.classList.contains('lab-focus-mode')?'EXIT IMMERSIVE':'IMMERSIVE VIEW';
+ };
+ doc.body.classList.add('lab-left-open');
+ var buttons=doc.querySelectorAll('.component-btn');
+ buttons.forEach(function(btn){btn.addEventListener('click',function(){doc.body.classList.add('lab-right-open')})});
+}
+
+document.querySelectorAll('[data-mode]').forEach(function(btn){
+ btn.addEventListener('click',function(){
+  mode=btn.dataset.mode;
+  document.querySelectorAll('[data-mode]').forEach(function(b){b.classList.remove('active')});
+  btn.classList.add('active');
+  flag.textContent='MOTION LAB V3 · '+(mode==='cockpit'?'DYNAMIC COCKPIT':mode==='stage'?'CINEMATIC STAGE':'ORIGINAL');
+  install(mode);
+ });
+});
+frame.addEventListener('load',function(){setTimeout(function(){install(mode)},220)});
+</script>
+</body>
+</html>
