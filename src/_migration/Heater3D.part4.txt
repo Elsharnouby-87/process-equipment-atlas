@@ -203,7 +203,7 @@
         } else if (burnerFlow) child.visible = Boolean(burnerStudyMode) && burnerStudyMode !== 'exploded' && (burnerStudyMode !== 'pilot' || burnerFlow === 'fuel');
         else if (purgeFlow) child.visible = selected === 'Purge Air Blower' && !burnerStudyMode && !radiantStudyMode && !heatRecoveryStudyMode && !draftStudyMode;
         else if (radiantFlow) child.visible = radiantStudyMode === 'flow';
-        else if (flueFlow) child.visible = selected !== 'Purge Air Blower' && (draftStudyMode ? ['overview', 'breeching', 'damper', 'path', 'stack'].includes(draftStudyMode) : !burnerStudyMode && !radiantStudyMode && !heatRecoveryStudyMode);
+        else if (flueFlow) child.visible = selected !== 'Purge Air Blower' && (draftStudyMode ? ['overview', 'breeching', 'damper', 'path', 'stack'].includes(draftStudyMode) : heatRecoveryStudyMode ? (heatRecoveryStudyMode === 'flue' || (troubleshootingScenario === 'convectionFouling' && heatRecoveryStudyMode === 'fouling')) : !burnerStudyMode && !radiantStudyMode);
         else if (processFlow) child.visible = selected !== 'Purge Air Blower' && !draftStudyMode && !burnerStudyMode && !radiantStudyMode && !heatRecoveryStudyMode;
         else child.visible = !burnerStudyMode && !radiantStudyMode && !heatRecoveryStudyMode && !draftStudyMode;
       });
