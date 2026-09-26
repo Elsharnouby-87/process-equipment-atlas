@@ -37,8 +37,15 @@ app = replaceOnce(
 app = replaceOnce(
   app,
   "  const detail = details[selected] ?? details['Radiant Tubes'];",
-  "  const detail: Detail = selected ? details[selected] : {\n    group: 'FREE EXPLORE',\n    location: 'Whole fired heater · unrestricted spatial orientation mode.',\n    summary: 'No component is selected. Explore the complete heater first, then click any tagged component when you want to enter a focused study.',\n    function: 'Orbit, pan and zoom around the heater without forcing the camera to stay centered on one component.',\n    why: 'Spatial freedom makes it easier to understand where every component sits before switching into Focus or Isolate study modes.',\n    observe: ['Whole-heater proportions', 'Relative component locations', 'Underfurnace access', 'Upper heater, breeching and stack relationship'],\n    issues: [],\n    inspection: [],\n    related: [],\n  };",
-  'free-explore detail state'
+  "  const detail: Detail = selected ? details[selected] : {\n    group: '',\n    location: '',\n    summary: '',\n    function: '',\n    why: '',\n    observe: [],\n    issues: [],\n    inspection: [],\n    related: [],\n  };",
+  'empty free-explore detail state'
+);
+
+app = replaceOnce(
+  app,
+  '<main className="app-shell">',
+  '<main className={\`app-shell \${!selected ? \'free-explore-active\' : \'\'}\`}>',
+  'free-explore shell state'
 );
 
 app = replaceOnce(
@@ -158,6 +165,6 @@ fs.writeFileSync(heaterPath, heater);
 const cssPath = 'src/index.css';
 let css = fs.readFileSync(cssPath, 'utf8');
 if (!css.includes('/* free explore camera UX v11 */')) {
-  css += `\n\n/* free explore camera UX v11 */\n.control-dock button:disabled{opacity:.32;cursor:not-allowed;filter:saturate(.45)}\n.context-state.free-explore{border-color:rgba(86,201,255,.34);box-shadow:0 10px 28px rgba(0,0,0,.18),inset 0 0 22px rgba(75,201,255,.035)}\n.context-state.free-explore span{color:#6dd9f7}\n.inspector-panel.free-explore .list-section,.inspector-panel.free-explore .related-section{display:none}\n.inspector-panel.free-explore .inspector-head span{color:#6dd9f7}\n.three-host canvas{touch-action:none;overscroll-behavior:contain}\n`;
+  css += `\n\n/* free explore camera UX v11 */\n.control-dock button:disabled{opacity:.32;cursor:not-allowed;filter:saturate(.45)}\n.context-state.free-explore{border-color:rgba(86,201,255,.34);box-shadow:0 10px 28px rgba(0,0,0,.18),inset 0 0 22px rgba(75,201,255,.035)}\n.context-state.free-explore span{color:#6dd9f7}\n.app-shell.free-explore-active .inspector-panel{display:none!important}\n.app-shell.free-explore-active .mobile-panel-actions button:last-child{display:none!important}\n@media(min-width:1181px){.app-shell.free-explore-active .atlas-workspace{grid-template-columns:246px minmax(0,1fr)}}\n@media(min-width:981px) and (max-width:1180px){.app-shell.free-explore-active .atlas-workspace{grid-template-columns:220px minmax(0,1fr)}}\n.three-host canvas{touch-action:none;overscroll-behavior:contain}\n`;
 }
 fs.writeFileSync(cssPath, css);
