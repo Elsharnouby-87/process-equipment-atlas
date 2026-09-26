@@ -2,10 +2,10 @@
 
 Preview source branch: `checkpoint-pre-components-motion-prototype-2026-09-14`
 
-Preview addition: **Refero Style Lab V2**
+Preview addition: **Dynamic Cockpit Motion Lab V3**
 
-This trigger republishes the unchanged production Atlas plus the isolated V2 style sandbox at:
+This republishes the unchanged production Atlas plus the isolated radical layout/motion sandbox at:
 
-`/process-equipment-atlas/previews/refero-style-lab-v2/`
+`/process-equipment-atlas/previews/dynamic-cockpit-v3/`
 
-The production application itself is unchanged.
+Production application source and behavior remain unchanged.
