@@ -18,10 +18,8 @@ type ScenarioCopy = {
   subtitle: string;
   intro: string;
   tour: string;
-  source: string;
   phases: PhaseSpec[];
   diagnostics: DiagnosticCopy;
-  learningChain: string[];
 };
 
 const scenarioCopy: Record<TroubleshootingScenario, ScenarioCopy> = {
@@ -32,7 +30,6 @@ const scenarioCopy: Record<TroubleshootingScenario, ScenarioCopy> = {
     subtitle: 'Recognition & Diagnostic Context',
     intro: 'Move from a normal baseline to direct flame / tube contact and connect the visible evidence to diagnostic context.',
     tour: 'Play the four phases automatically, then stop anywhere to rotate, zoom and inspect the flame-to-tube relationship.',
-    source: 'John Zink Combustion Handbook · Troubleshooting §17.3',
     phases: [
       { id: 'normal', title: 'Normal Clearance', short: 'Baseline', cue: 'Flame remains inside the intended firing corridor with visible clearance to the radiant tube wall.' },
       { id: 'deviation', title: 'Flame Deviation', short: 'Early Cue', cue: 'One representative burner flame begins leaning toward the nearby radiant tube surface.' },
@@ -45,7 +42,6 @@ const scenarioCopy: Record<TroubleshootingScenario, ScenarioCopy> = {
       inspect: { title: 'What to Inspect', intro: 'Use observation and approved inspection methods to understand the condition before any plant-specific response is considered.', items: ['Compare the flame envelope with the nearest tube surface and adjacent burner patterns', 'Inspect tube color pattern, local hot areas, distortion and visible surface condition', 'Review burner-tip / firing-port condition and alignment within the burner throat', 'Look at burner tile / diffuser condition and signs of uneven combustion-air distribution', 'Review draft indications and, where appropriate, use an IR survey to investigate a suspected local hot tube-skin area'] },
       why: { title: 'Why It Matters', intro: 'The learning chain is local flame contact → local heat input → tube-temperature rise → possible process-side and mechanical consequences.', items: ['Localized overheating can create a tube hot spot', 'In coking service, local overheating can accelerate coke formation', 'Coke can insulate the tube wall from process-fluid cooling and reduce heat transfer', 'Persistent overheating can increase damage risk and shorten tube life'] },
     },
-    learningChain: ['Flame deviation', 'Tube contact', 'Local heat input', 'Damage concern'],
   },
   tubeHotArea: {
     code: 'T-02',
@@ -54,7 +50,6 @@ const scenarioCopy: Record<TroubleshootingScenario, ScenarioCopy> = {
     subtitle: 'Thermal Pattern Recognition',
     intro: 'Learn to recognize a localized tube hot area, compare it with adjacent tube surfaces, and separate the visible symptom from its possible causes.',
     tour: 'Follow the tube from a normal appearance into a scan-and-compare view, then reveal a localized hot area and the diagnostic branches behind it.',
-    source: 'John Zink Combustion Handbook · Burner/Heater Operations §16.4.4.3',
     phases: [
       { id: 'normal', title: 'Normal Tube Pattern', short: 'Baseline', cue: 'The representative radiant tube has no localized hot-area cue; use the surrounding tube pattern as the visual baseline.' },
       { id: 'deviation', title: 'Thermal Scan', short: 'Compare Pattern', cue: 'A moving scan cue tracks the target tube while a neighboring tube is marked as a reference. No root cause is assigned.' },
@@ -67,7 +62,6 @@ const scenarioCopy: Record<TroubleshootingScenario, ScenarioCopy> = {
       inspect: { title: 'Compare & Inspect', intro: 'Build the diagnosis from several observations and approved measurements rather than from tube color alone.', items: ['Compare the hot area with adjacent tube surfaces and the rest of the same tube', 'Check the nearby flame pattern and whether heat input appears locally concentrated', 'Inspect for tube displacement, bowing and support / guide condition', 'Review approved tube-skin / IR measurements where provided and applicable', 'Review process-side evidence that may support internal fouling or coking concerns'] },
       why: { title: 'Why It Matters', intro: 'A localized hot area can indicate loss of normal tube cooling or concentrated heat input, so persistence matters even when the root cause is not yet known.', items: ['Local metal temperature may rise substantially relative to the surrounding tube', 'Internal fouling can reduce heat transfer and reduce the cooling effect of the process fluid at the wall', 'Continued overheating can contribute to distortion and eventual tube failure', 'Plant metallurgy, design limits and approved procedures — not this visualization — determine actual acceptance and response'] },
     },
-    learningChain: ['Tube pattern', 'Local contrast', 'Compare context', 'Investigate cause'],
   },
   draftPressure: {
     code: 'T-03',
@@ -76,7 +70,6 @@ const scenarioCopy: Record<TroubleshootingScenario, ScenarioCopy> = {
     subtitle: 'Pressure Direction & Hot-Gas Containment',
     intro: 'Read the heater as a pressure system: start with the normal inward tendency, then follow what changes when draft becomes insufficient and the arch region approaches a positive-pressure concern.',
     tour: 'Follow pressure direction, then zoom into the internal stack damper as its blade moves to a more restrictive representative position. Continue to the arch pressure reversal, hot-gas leakage, and a burner-specific premix flashback / backfire awareness cue.',
-    source: 'John Zink Combustion Handbook · Burner/Heater Operations §16.4.1 and Troubleshooting §17.4 Flashback',
     phases: [
       { id: 'normal', title: 'Negative-Pressure Concept', short: 'Contained', cue: 'Representative openings show an inward pressure tendency while flue gas remains contained and moves toward the upper gas path. The internal stack damper is visible as part of the connected draft system.' },
       { id: 'deviation', title: 'Damper / Draft Restriction', short: 'Early Concern', cue: 'The internal stack-damper blade rotates toward a more restrictive representative position while upper flue-gas evacuation weakens. This is a qualitative mechanism illustration, not a prescribed damper setting.' },
@@ -89,7 +82,6 @@ const scenarioCopy: Record<TroubleshootingScenario, ScenarioCopy> = {
       inspect: { title: 'What to Inspect', intro: 'Build the picture from approved indications and physical observations without turning this training view into an operating instruction.', items: ['Review the plant draft indication at its defined reference location', 'Inspect the actual stack-damper blade / shaft / linkage / actuator arrangement and its indication using approved methods', 'Look for evidence of hot gas moving outward at doors, openings or casing interfaces', 'Compare flame shape / stability and burner-air behavior with the normal pattern', 'If the installed burner is a natural-draft premix design, include burner throat / mixer / venturi evidence when investigating flashback or backfiring concerns', 'Consider convection / flue-gas-path condition when investigating abnormal draft performance'] },
       why: { title: 'Why It Matters', intro: 'Draft affects combustion-air delivery and hot-gas containment. Burner flashback is shown separately because its mechanism is burner-specific rather than a generic result of positive pressure.', items: ['Too-little draft can restrict burner air and contribute to flame instability or flame-envelope problems', 'Positive pressure can push hot gases out through heater openings', 'Escaping hot gas can damage casing and weaken refractory anchors and can create a personnel hazard', 'A premix-burner flashback can propagate the flame into the mixer / venturi when flame speed exceeds mixture velocity', 'Actual response remains governed by plant / OEM / BMS / SIS procedures and the installed burner design'] },
     },
-    learningChain: ['Negative tendency', 'Damper / evacuation concern', 'Positive pressure', 'Leakage + burner-specific concern'],
   },
   convectionFouling: {
     code: 'T-04',
@@ -98,7 +90,6 @@ const scenarioCopy: Record<TroubleshootingScenario, ScenarioCopy> = {
     subtitle: 'Deposit Build-Up · Restriction · ΔP / Stack-T Context',
     intro: 'Start with a clean convection bank, then build a representative deposit pattern and watch how fouling can reduce open gas-path area, increase resistance and reduce heat-recovery effectiveness.',
     tour: 'Move through clean condition → deposit formation → restricted gas path → combined draft-loss / stack-temperature consequence. The visual progression is qualitative and does not assign a deposit type or cleaning method.',
-    source: 'John Zink Combustion Handbook · Burner/Heater Operations §16.2.1 draft measurement / convection pressure loss and §16.2.7 flue-gas temperatures; Troubleshooting §17.11 high stack temperature',
     phases: [
       { id: 'normal', title: 'Clean Convection', short: 'Baseline', cue: 'The finned convection bank is shown with open gas passages and the normal qualitative upward flue-gas route.' },
       { id: 'deviation', title: 'Deposit Formation', short: 'Early Fouling', cue: 'Representative external deposits begin to appear on convection surfaces. The deposit geometry is illustrative and does not identify soot, ash, salts or another material.' },
@@ -111,7 +102,6 @@ const scenarioCopy: Record<TroubleshootingScenario, ScenarioCopy> = {
       inspect: { title: 'Evidence to Compare', intro: 'Use several independent observations because draft loss and stack temperature each have other possible causes.', items: ['Compare draft at the firebox roof / arch with the convection outlet or below-damper reference where instrumentation exists', 'Trend stack temperature and bridgewall / convection inlet temperature against comparable duty', 'Inspect accessible convection surfaces, fins, gaps and soot / deposit pattern using approved methods', 'Check for uneven gas-path restriction, damaged fins or foreign material between extended surfaces', 'Compare process-side duty and temperature response before concluding that fouling is the only cause'] },
       why: { title: 'Why It Matters', intro: 'Convection fouling affects both the pressure path and heat-recovery path of the heater.', items: ['Higher gas-side resistance can consume more of the available draft', 'Reduced convection heat transfer can send more sensible heat to the stack', 'Higher stack temperature corresponds to reduced overall heater efficiency', 'Severe restriction can contribute to broader draft / pressure concerns', 'Actual cleaning and operating response must follow approved plant / OEM procedures'] },
     },
-    learningChain: ['Clean bank', 'Deposit formation', 'Gas-path restriction', 'ΔP ↑ + heat recovery ↓ / stack-T concern'],
   },
   highStackTemperature: {
     code: 'T-05',
@@ -120,7 +110,6 @@ const scenarioCopy: Record<TroubleshootingScenario, ScenarioCopy> = {
     subtitle: 'Symptom First · Multi-Branch Diagnosis',
     intro: 'Treat a rising stack temperature as a symptom of reduced heater efficiency, then compare several plausible branches instead of selecting one root cause automatically.',
     tour: 'Start from a normal stack-temperature concept, reveal a rising trend, correlate it with heat-recovery evidence, then open the diagnostic branch map: firing / duty, convection fouling, flue-gas bypass, excess air / air leakage and process / tube-side heat absorption.',
-    source: 'John Zink Combustion Handbook · Burner/Heater Operations §16.2.7 and Troubleshooting §17.11. Source-direct branches include high excess air, afterburning / combustibles, convection fouling and flue-gas bypass; firing-duty and tube/process-side checks are broader engineering diagnostic context.',
     phases: [
       { id: 'normal', title: 'Normal Stack-T Concept', short: 'Baseline', cue: 'Stack temperature is treated relative to the heater design, operating duty and comparable historical condition — not as one universal temperature target.' },
       { id: 'deviation', title: 'Rising Stack Temperature', short: 'Symptom', cue: 'A qualitative stack-temperature indicator rises. The correct first interpretation is reduced heat-recovery efficiency / increased stack sensible heat, not an automatic root-cause conclusion.' },
@@ -133,7 +122,6 @@ const scenarioCopy: Record<TroubleshootingScenario, ScenarioCopy> = {
       inspect: { title: 'What to Correlate', intro: 'Build a heat-balance and gas-path picture before assigning root cause.', items: ['Trend stack temperature at comparable throughput, firing and ambient conditions', 'Compare bridgewall / convection-inlet temperature with stack temperature to understand where heat recovery is being lost', 'Review O₂, CO / combustibles and draft together; stack O₂ may also be influenced by tramp air', 'Check convection ΔP / draft loss and physical fouling / fin condition where measurements and access exist', 'Inspect for header-box / tube-end bypass paths or uneven gas distribution where applicable', 'Review process-side flow, inlet / outlet temperatures and any evidence of internal tube fouling or reduced heat pickup'] },
       why: { title: 'Why It Matters', intro: 'High stack temperature is an efficiency symptom that can also point to equipment or combustion problems depending on the correlated evidence.', items: ['Higher stack sensible heat means lower thermal efficiency and higher fuel requirement for the same useful duty', 'Convection afterburning or damaged extended surface can create equipment-integrity concerns', 'Persistent high-temperature exposure can affect the convection roof / stack area', 'Treating the symptom as one automatic cause can send troubleshooting in the wrong direction', 'Approved site procedures and design limits govern any operating response'] },
     },
-    learningChain: ['Normal reference', 'Stack-T rises', 'Correlate heat / O₂ / draft / duty', 'Test multiple diagnostic branches'],
   },
 };
 
@@ -448,9 +436,7 @@ export default function TroubleshootingPage({ onBack, onNavigate }: Props) {
         <aside className="radiant-tech trouble-tech">
           <div className="radiant-tech-head trouble-tech-head"><span>{currentScenario.code} · {currentScenario.title.toUpperCase()}</span><h2>{currentPhase.title}</h2><p>{currentPhase.cue}</p></div>
           {renderDiagnostic()}
-          <section className="trouble-source-note"><Info size={16} /><p><b>Technical basis</b><br />{currentScenario.source}. Content is synthesized for visual training rather than reproduced as an operating procedure.</p></section>
           <section className="radiant-warning trouble-guardrail"><ShieldAlert size={17} /><p><b>Training boundary.</b> This lab teaches recognition and diagnostic context. It does not prescribe burner, fuel, air, damper, shutdown or maintenance actions. Approved site / OEM / BMS / SIS procedures and plant-specific engineering limits govern response.</p></section>
-          <section className="trouble-learning-chain"><span>LEARNING CHAIN</span><div>{currentScenario.learningChain.map((item, index) => <span key={item}><b>{item}</b>{index < currentScenario.learningChain.length - 1 && <i>→</i>}</span>)}</div></section>
         </aside>
       </section>
     </main>
