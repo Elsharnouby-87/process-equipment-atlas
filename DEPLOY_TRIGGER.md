@@ -35,3 +35,5 @@ Production update: **Heater Types visual refinement** — upgrades Box, Cabin an
 Production update: **Heater Types lighting boost** — lifts scene exposure, brightens shell/tube materials, adds a soft front fill light, strengthens key/rim lighting, and raises ground/grid visibility while preserving the dark Atlas theme.
 
 Production update: **Heater Types envelope continuity** — closes the Box heater exterior roof, replaces the Cabin floating roof plates with a continuous pitched roof, connects both heaters through coherent plenum/breeching transitions to the stack, and keeps cutaway openings limited to study views.
+
+Production update: **Open stack tops** — changes Box, Cabin and Vertical Cylindrical heater stacks to open-ended shells with visible dark inner throats and top rim detail, removing the unrealistic closed top cap.
