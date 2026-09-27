@@ -307,6 +307,27 @@
           p.position.set(u < 0.75 ? 5.02 : -5.02, 7.0 + (u - 0.5) * 34.5, 2.55 - (u - 0.5) * 7.6);
         }
       }
+      // Keep purge callouts readable without letting them cover the equipment at close zoom.
+      if (labelRef.current) {
+        const purgeFocus = selectedRef.current === 'Purge Air Blower' && contextModeRef.current !== 'full';
+        const purgeDistance = camera.position.distanceTo(new THREE.Vector3(-10.75, 1.45, 0.28));
+        const purgeLod = purgeFocus ? THREE.MathUtils.clamp(purgeDistance / 12.5, 0.42, 0.92) : 1;
+        labelRef.current.children.forEach(child => {
+          if (child instanceof THREE.Sprite && child.userData.purgeLabel) {
+            const baseScale = child.userData.baseScale as THREE.Vector3 | undefined;
+            if (baseScale) {
+              const detailFactor = child.userData.kind === 'detail' ? 0.86 : 1;
+              child.scale.copy(baseScale).multiplyScalar(purgeLod * detailFactor);
+            }
+            const material = child.material as THREE.SpriteMaterial;
+            material.opacity = purgeFocus ? THREE.MathUtils.lerp(0.76, 0.96, purgeLod) : 1;
+          } else if (child instanceof THREE.Line && child.userData.isAtlasLabelLeader && child.userData.componentName === 'Purge Air Blower') {
+            const material = child.material as THREE.LineBasicMaterial;
+            const baseOpacity = child.userData.kind === 'major' ? 0.62 : 0.46;
+            material.opacity = purgeFocus ? baseOpacity * THREE.MathUtils.lerp(0.55, 0.88, purgeLod) : baseOpacity;
+          }
+        });
+      }
       renderer.render(scene, camera);
     };
     animate();
@@ -397,7 +418,7 @@
     } else if (cameraCommand.action === 'purgeOverview') {
       transition({ yaw: -0.96, pitch: -0.02, radius: 29.5, target: [-5.8, 6.2, 0] }, 900);
     } else if (cameraCommand.action === 'purgeBlower') {
-      transition({ yaw: -1.02, pitch: 0.075, radius: 7.8, target: [-10.95, 1.35, 0.30] }, 850);
+      transition({ yaw: -0.58, pitch: 0.07, radius: 8.6, target: [-10.88, 1.30, 0.36] }, 850);
     } else if (cameraCommand.action === 'purgeDamper') {
       transition({ yaw: -1.08, pitch: -0.04, radius: 7.7, target: [-9.72, 1.45, 0] }, 850);
     } else if (cameraCommand.action === 'purgeProof') {
