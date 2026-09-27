@@ -102,6 +102,11 @@ requireText('src/HeaterTypes3D.tsx', 'const roofRise = 1.25', 'Cabin roof geomet
 requireText('src/HeaterTypes3D.tsx', 'Short plenum / convection box intersects the ridge', 'Cabin roof-to-plenum continuity');
 requireText('src/HeaterTypes3D.tsx', 'const stackCurb = cylinder(1.48', 'Box heater stack curb');
 requireText('src/HeaterTypes3D.tsx', 'const stackCurb = cylinder(1.36', 'Cabin heater stack curb');
+requireText('src/HeaterTypes3D.tsx', 'function openStack', 'Open stack helper');
+requireText('src/HeaterTypes3D.tsx', 'CylinderGeometry(radius, radius, height, segments, 1, true)', 'Open-ended stack geometry');
+requireText('src/HeaterTypes3D.tsx', 'openStack(1.28, 4.5', 'Box heater open stack');
+requireText('src/HeaterTypes3D.tsx', 'openStack(1.18, 4.0', 'Cabin heater open stack');
+requireText('src/HeaterTypes3D.tsx', 'openStack(1.15, 4.2', 'Cylindrical heater open stack');
 requireText('src/BurnerPage.tsx', 'PHYSICS-BASED COMBUSTION + DRAFT SIMULATOR V2', 'Simulator V2 heading');
 requireText('src/BurnerPage.tsx', 'metrics.radiantOxygenPct', 'Radiant O2 readout');
 requireText('src/BurnerPage.tsx', 'metrics.stackOxygenPct', 'Stack O2 readout');
