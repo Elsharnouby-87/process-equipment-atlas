@@ -39,3 +39,5 @@ Production update: **Heater Types envelope continuity** — closes the Box heate
 Production update: **Open stack tops** — changes Box, Cabin and Vertical Cylindrical heater stacks to open-ended shells with visible dark inner throats and top rim detail, removing the unrealistic closed top cap.
 
 Production update: **Box radiant full-flow routing** — animates process fluid through all four representative two-pass radiant tube circuits, following each vertical tube pair and top return bend instead of showing only one loop.
+
+Production update: **Heater Types declutter** — removes the redundant Training Model card, Visual Comparison Questions card, and duplicated mobile training guardrail so the right panel ends on useful comparison/study content only.
