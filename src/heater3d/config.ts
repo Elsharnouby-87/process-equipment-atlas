@@ -7,7 +7,7 @@ export type CameraPreset = {
 
 export const cameraPresets: Record<string, CameraPreset> = {
   Burners: { yaw: -0.72, pitch: -0.02, radius: 18, target: [0, 6.4, 0] },
-  'Purge Air Blower': { yaw: -1.02, pitch: 0.055, radius: 12.5, target: [-10.75, 1.45, 0.28] },
+  'Purge Air Blower': { yaw: -0.62, pitch: 0.06, radius: 11.8, target: [-10.75, 1.42, 0.34] },
   'Radiant Tubes': { yaw: -0.76, pitch: 0.03, radius: 22, target: [0, 11.8, 0] },
   'Shield Tubes': { yaw: -0.84, pitch: 0.08, radius: 18, target: [0, 18.7, 0] },
   'Convection Bank': { yaw: -0.82, pitch: 0.08, radius: 21, target: [0, 22.2, 0] },
