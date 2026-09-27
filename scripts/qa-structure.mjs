@@ -93,6 +93,9 @@ requireText('src/HeaterTypes3D.tsx', 'function addLadder', 'Heater types ladder 
 requireText('src/HeaterTypes3D.tsx', 'addCylindricalPlatform', 'Cylindrical heater platform cue');
 requireText('src/HeaterTypes3D.tsx', 'const turns = 5.25', 'Cylindrical helical-coil refinement');
 requireText('src/HeaterTypes3D.tsx', 'addRectBands', 'Rectangular heater structural-band refinement');
+requireText('src/HeaterTypes3D.tsx', 'toneMappingExposure = 1.58', 'Heater types lighting exposure boost');
+requireText('src/HeaterTypes3D.tsx', "const fill = new THREE.DirectionalLight('#bfe8ff', 3.2)", 'Heater types front fill light');
+requireText('src/HeaterTypes3D.tsx', "scene.background = new THREE.Color('#0b1d2a')", 'Heater types brighter scene background');
 requireText('src/BurnerPage.tsx', 'PHYSICS-BASED COMBUSTION + DRAFT SIMULATOR V2', 'Simulator V2 heading');
 requireText('src/BurnerPage.tsx', 'metrics.radiantOxygenPct', 'Radiant O2 readout');
 requireText('src/BurnerPage.tsx', 'metrics.stackOxygenPct', 'Stack O2 readout');
