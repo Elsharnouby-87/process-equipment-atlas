@@ -65,9 +65,11 @@
       const label = makeLabel(spec.displayText ?? spec.text);
       const isPurge = spec.component === 'Purge Air Blower';
       const scale: [number, number, number] = spec.kind === 'major'
-        ? (isPurge ? [2.75, 0.62, 1] : [3.55, 0.8, 1])
-        : (isPurge ? [2.35, 0.52, 1] : [2.7, 0.61, 1]);
+        ? (isPurge ? [1.90, 0.42, 1] : [3.55, 0.8, 1])
+        : (isPurge ? [1.65, 0.36, 1] : [2.7, 0.61, 1]);
       label.scale.set(...scale);
+      label.userData.baseScale = new THREE.Vector3(...scale);
+      label.userData.purgeLabel = isPurge;
       label.position.set(...spec.pos);
       label.userData.componentName = spec.component;
       label.userData.labelText = spec.text;
