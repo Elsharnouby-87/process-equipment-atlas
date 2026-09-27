@@ -569,54 +569,57 @@ export default function HeaterTypes3D({ heaterType, view, compare, cameraCommand
     if (!host) return;
     const mobile = window.matchMedia('(max-width: 700px)').matches || host.clientWidth <= 700;
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color('#07141f');
-    scene.fog = new THREE.FogExp2('#07141f', 0.016);
+    scene.background = new THREE.Color('#0b1d2a');
+    scene.fog = new THREE.FogExp2('#0b1d2a', 0.012);
     const camera = new THREE.PerspectiveCamera(35, host.clientWidth / Math.max(host.clientHeight, 1), 0.1, 160);
     const renderer = new THREE.WebGLRenderer({ antialias: !mobile, powerPreference: 'high-performance' });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, mobile ? 1.1 : 1.65));
     renderer.setSize(host.clientWidth, host.clientHeight);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.25;
+    renderer.toneMappingExposure = 1.58;
     renderer.shadowMap.enabled = !mobile;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     host.appendChild(renderer.domElement);
 
     const materials: Materials = {
-      shell: new THREE.MeshPhysicalMaterial({ color: '#5b6971', metalness: 0.74, roughness: 0.40, clearcoat: 0.08 }),
-      shellDark: new THREE.MeshPhysicalMaterial({ color: '#232e35', metalness: 0.82, roughness: 0.36 }),
-      steel: new THREE.MeshPhysicalMaterial({ color: '#536168', metalness: 0.84, roughness: 0.32 }),
-      tube: new THREE.MeshPhysicalMaterial({ color: '#485157', metalness: 0.92, roughness: 0.23, emissive: '#160b06', emissiveIntensity: 0.13 }),
+      shell: new THREE.MeshPhysicalMaterial({ color: '#74838b', metalness: 0.7, roughness: 0.38, clearcoat: 0.09 }),
+      shellDark: new THREE.MeshPhysicalMaterial({ color: '#35434b', metalness: 0.78, roughness: 0.36 }),
+      steel: new THREE.MeshPhysicalMaterial({ color: '#68777e', metalness: 0.82, roughness: 0.31 }),
+      tube: new THREE.MeshPhysicalMaterial({ color: '#59636a', metalness: 0.9, roughness: 0.23, emissive: '#1a0d07', emissiveIntensity: 0.16 }),
       tubeFocus: new THREE.MeshPhysicalMaterial({ color: '#69777d', metalness: 0.9, roughness: 0.2, emissive: '#133447', emissiveIntensity: 0.5 }),
       refractory: new THREE.MeshStandardMaterial({ color: '#a68d6d', roughness: 0.95, emissive: '#281008', emissiveIntensity: 0.08 }),
       burner: new THREE.MeshPhysicalMaterial({ color: '#8d4d24', metalness: 0.82, roughness: 0.34 }),
       flame: new THREE.MeshBasicMaterial({ color: '#ff7a18', transparent: true, opacity: 0.56, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, depthWrite: false }),
-      fin: new THREE.MeshPhysicalMaterial({ color: '#5a6469', metalness: 0.9, roughness: 0.3 }),
+      fin: new THREE.MeshPhysicalMaterial({ color: '#6e797e', metalness: 0.88, roughness: 0.3 }),
       ghost: new THREE.MeshPhysicalMaterial({ color: '#547080', metalness: 0.2, roughness: 0.75, transparent: true, opacity: 0.12, depthWrite: false }),
       process: new THREE.MeshBasicMaterial({ color: '#25c9ff', transparent: true, opacity: 0.95 }),
       flue: new THREE.MeshBasicMaterial({ color: '#ff7a18', transparent: true, opacity: 0.88 }),
-      rail: new THREE.MeshPhysicalMaterial({ color: '#d79217', metalness: 0.55, roughness: 0.42 }),
+      rail: new THREE.MeshPhysicalMaterial({ color: '#e3a42b', metalness: 0.5, roughness: 0.4 }),
     };
 
-    scene.add(new THREE.HemisphereLight('#c4e8fa', '#25140e', 1.4));
-    const key = new THREE.DirectionalLight('#e7f4ff', 5.4);
+    scene.add(new THREE.HemisphereLight('#d9f2ff', '#3b2016', 2.15));
+    const key = new THREE.DirectionalLight('#f2fbff', 7.3);
     key.position.set(-12, 26, 18);
     key.castShadow = true;
     key.shadow.mapSize.set(1024, 1024);
     scene.add(key);
-    const rim = new THREE.DirectionalLight('#5acbff', 2.8);
+    const rim = new THREE.DirectionalLight('#74d7ff', 4.2);
     rim.position.set(18, 18, -15);
     scene.add(rim);
-    const warm = new THREE.PointLight('#ff7a18', 28, 30, 1.8);
+    const fill = new THREE.DirectionalLight('#bfe8ff', 3.2);
+    fill.position.set(3, 13, 24);
+    scene.add(fill);
+    const warm = new THREE.PointLight('#ff8a2e', 36, 34, 1.7);
     warm.position.set(0, 8, 3);
     scene.add(warm);
 
-    const ground = meshBox([58, 0.25, 34], [0, -0.35, 0], new THREE.MeshStandardMaterial({ color: '#10191e', roughness: 0.82, metalness: 0.16 }));
+    const ground = meshBox([58, 0.25, 34], [0, -0.35, 0], new THREE.MeshStandardMaterial({ color: '#18262e', roughness: 0.8, metalness: 0.14 }));
     scene.add(ground);
-    const grid = new THREE.GridHelper(56, 56, '#274352', '#142934');
+    const grid = new THREE.GridHelper(56, 56, '#35596a', '#1c3744');
     grid.position.y = -0.2;
     (grid.material as THREE.Material).transparent = true;
-    (grid.material as THREE.Material).opacity = 0.28;
+    (grid.material as THREE.Material).opacity = 0.38;
     scene.add(grid);
 
     const models = new Map<HeaterType, ModelVisual>();
