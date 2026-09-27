@@ -45,3 +45,5 @@ Production update: **Heater Types declutter** — removes the redundant Training
 Production update: **Smart Atlas label declutter** — compacts component labels, shortens purge callouts, adds subtle leader lines to purge equipment, and limits Focus mode labels to the selected component and its own detail callouts so equipment stays visible.
 
 Production update: **Purge blower visual + camera refinement** — rebuilds the purge blower as a clearer industrial package with skid rails, flanged casing, tapered bellmouth, inlet guard/spokes, side-mounted finned motor and drive guard, and retunes Atlas/Purge-study cameras to center the blower package instead of the heater body.
+
+Production update: **Purge blower realism + label LOD refinement** — adds a more industrial blower package (desaturated materials, flanged/bellmouth inlet, concentric guard, swept impeller blades, motor end bells/fan cover, flexible connector, damper flanges/lever and instrument-style airflow proof) and makes purge labels shrink/fade subtly at close zoom while retuning Atlas and study cameras to a three-quarter view.
