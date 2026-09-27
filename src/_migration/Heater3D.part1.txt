@@ -76,7 +76,30 @@
     }
 
     // Axial-style low-pressure blower casing with flanged ends and a tapered inlet bellmouth.
-    purgeSystem.add(cylinderBetween(new THREE.Vector3(-11.58, 1.35, 0), new THREE.Vector3(-10.96, 1.35, 0), 0.64, purgeBlowerMat, 36));
+    // The casing is intentionally open-ended so the impeller remains visible through the inlet guard.
+    const blowerCasing = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.64, 0.64, 0.62, 36, 1, true),
+      purgeBlowerMat
+    );
+    blowerCasing.rotation.z = Math.PI / 2;
+    blowerCasing.position.set(-11.27, 1.35, 0);
+    blowerCasing.castShadow = true;
+    blowerCasing.receiveShadow = true;
+    purgeSystem.add(blowerCasing);
+
+    const blowerInnerMat = new THREE.MeshStandardMaterial({
+      color: '#11181c',
+      roughness: 0.88,
+      metalness: 0.08,
+      side: THREE.BackSide,
+    });
+    const blowerInnerThroat = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.555, 0.555, 0.66, 36, 1, true),
+      blowerInnerMat
+    );
+    blowerInnerThroat.rotation.z = Math.PI / 2;
+    blowerInnerThroat.position.set(-11.27, 1.35, 0);
+    purgeSystem.add(blowerInnerThroat);
     for (const flangeX of [-11.60, -10.94]) {
       const flange = new THREE.Mesh(new THREE.TorusGeometry(0.66, 0.055, 8, 36), steel);
       flange.rotation.y = Math.PI / 2;
@@ -92,7 +115,7 @@
     inletLip.position.set(-12.12, 1.35, 0);
     purgeSystem.add(inletLip);
 
-    // Inlet guard: rim and six radial spokes keep the fan face visually readable.
+    // Inlet guard: concentric rings, eight radial spokes and flange bolts keep the fan face readable without hiding the impeller.
     const guardCenter = new THREE.Vector3(-12.13, 1.35, 0);
     const guardRing = new THREE.Mesh(new THREE.TorusGeometry(0.69, 0.035, 7, 36), darkSteel);
     guardRing.rotation.y = Math.PI / 2;
@@ -144,10 +167,33 @@
     purgeSystem.add(box([0.58, 0.14, 0.24], [-10.90, 0.38, 0.94], darkSteel));
     purgeSystem.add(box([0.58, 0.14, 0.24], [-10.48, 0.38, 0.94], darkSteel));
 
-    // Fan shaft and compact belt/coupling guard.
+    // Fan shaft and slim rounded belt / coupling guard.
     purgeSystem.add(cylinderBetween(new THREE.Vector3(-10.98, 1.35, 0), new THREE.Vector3(-10.74, 1.35, 0), 0.055, boltMat, 12));
-    const purgeDriveGuard = box([0.40, 0.72, 1.06], [-10.80, 1.03, 0.48], darkSteel);
-    purgeDriveGuard.rotation.x = -0.10;
+    const driveShape = new THREE.Shape();
+    const driveW = 0.34;
+    const driveH = 0.58;
+    const driveR = 0.09;
+    driveShape.moveTo(-driveW / 2 + driveR, -driveH / 2);
+    driveShape.lineTo(driveW / 2 - driveR, -driveH / 2);
+    driveShape.quadraticCurveTo(driveW / 2, -driveH / 2, driveW / 2, -driveH / 2 + driveR);
+    driveShape.lineTo(driveW / 2, driveH / 2 - driveR);
+    driveShape.quadraticCurveTo(driveW / 2, driveH / 2, driveW / 2 - driveR, driveH / 2);
+    driveShape.lineTo(-driveW / 2 + driveR, driveH / 2);
+    driveShape.quadraticCurveTo(-driveW / 2, driveH / 2, -driveW / 2, driveH / 2 - driveR);
+    driveShape.lineTo(-driveW / 2, -driveH / 2 + driveR);
+    driveShape.quadraticCurveTo(-driveW / 2, -driveH / 2, -driveW / 2 + driveR, -driveH / 2);
+    const purgeDriveGuard = new THREE.Mesh(
+      new THREE.ExtrudeGeometry(driveShape, {
+        depth: 0.58,
+        bevelEnabled: true,
+        bevelThickness: 0.025,
+        bevelSize: 0.025,
+        bevelSegments: 2,
+      }),
+      darkSteel
+    );
+    purgeDriveGuard.position.set(-10.81, 1.02, 0.19);
+    purgeDriveGuard.castShadow = true;
     purgeSystem.add(purgeDriveGuard);
 
     // Visible impeller reference behind the inlet guard. It rotates only during Purge Active.
@@ -235,11 +281,17 @@
       purgeSystem.add(innerCollar);
     }
 
-    // Local starter / status box shown as a representative operator interface only.
-    purgeSystem.add(box([0.52, 0.68, 0.30], [-10.95, 2.42, 0.82], panelDarkMat));
-    const purgeStatusLamp = new THREE.Mesh(new THREE.SphereGeometry(0.07, 10, 8), new THREE.MeshBasicMaterial({ color: '#65ef9e' }));
-    purgeStatusLamp.position.set(-10.95, 2.55, 0.98);
+    // Compact local starter / status box on a simple pedestal; intentionally secondary to the blower package.
+    purgeSystem.add(box([0.08, 0.78, 0.08], [-9.96, 0.80, 1.10], darkSteel));
+    purgeSystem.add(box([0.34, 0.08, 0.28], [-9.96, 0.39, 1.10], darkSteel));
+    const purgeStarter = box([0.34, 0.44, 0.22], [-9.96, 1.42, 1.10], panelDarkMat);
+    purgeSystem.add(purgeStarter);
+    const purgeStatusLamp = new THREE.Mesh(new THREE.SphereGeometry(0.045, 10, 8), new THREE.MeshBasicMaterial({ color: '#65ef9e' }));
+    purgeStatusLamp.position.set(-9.96, 1.51, 1.225);
     purgeSystem.add(purgeStatusLamp);
+    const purgeStopButton = new THREE.Mesh(new THREE.SphereGeometry(0.034, 10, 8), new THREE.MeshBasicMaterial({ color: '#d45b45' }));
+    purgeStopButton.position.set(-9.96, 1.36, 1.225);
+    purgeSystem.add(purgeStopButton);
 
     purgeSystem.userData.purgeRotor = purgeRotor;
     addComponent('Purge Air Blower', purgeSystem);
