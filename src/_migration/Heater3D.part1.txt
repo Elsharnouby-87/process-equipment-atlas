@@ -57,11 +57,12 @@
     // Training geometry: blower -> main duct -> butterfly isolation damper ->
     // airflow proof -> external riser -> short side manifold -> two lower-radiant entries.
     const purgeSystem = new THREE.Group();
-    const purgeBlowerMat = new THREE.MeshPhysicalMaterial({ color: '#4d6672', metalness: 0.74, roughness: 0.38, clearcoat: 0.08, clearcoatRoughness: 0.7 });
-    const purgeDuctMat = new THREE.MeshPhysicalMaterial({ color: '#2d8ea9', metalness: 0.58, roughness: 0.34, clearcoat: 0.1, clearcoatRoughness: 0.66 });
-    const purgeMotorMat = new THREE.MeshPhysicalMaterial({ color: '#26353d', metalness: 0.78, roughness: 0.4 });
-    const purgeInstrumentMat = new THREE.MeshPhysicalMaterial({ color: '#5dbd8a', metalness: 0.32, roughness: 0.42, clearcoat: 0.08 });
-    const purgeSafetyMat = new THREE.MeshPhysicalMaterial({ color: '#d58a2a', metalness: 0.52, roughness: 0.36 });
+    const purgeBlowerMat = new THREE.MeshPhysicalMaterial({ color: '#53656d', metalness: 0.62, roughness: 0.48, clearcoat: 0.045, clearcoatRoughness: 0.82 });
+    const purgeDuctMat = new THREE.MeshPhysicalMaterial({ color: '#3f7180', metalness: 0.46, roughness: 0.48, clearcoat: 0.045, clearcoatRoughness: 0.8 });
+    const purgeMotorMat = new THREE.MeshPhysicalMaterial({ color: '#273238', metalness: 0.68, roughness: 0.46 });
+    const purgeInstrumentMat = new THREE.MeshPhysicalMaterial({ color: '#4d5c63', metalness: 0.42, roughness: 0.5, clearcoat: 0.04 });
+    const purgeSafetyMat = new THREE.MeshPhysicalMaterial({ color: '#c98222', metalness: 0.46, roughness: 0.42 });
+    const purgeRubberMat = new THREE.MeshStandardMaterial({ color: '#151a1d', roughness: 0.9, metalness: 0.04 });
 
     const purgeRiserX = -6.72;
     const purgeHeaderY = 5.15;
@@ -97,15 +98,25 @@
     guardRing.rotation.y = Math.PI / 2;
     guardRing.position.copy(guardCenter);
     purgeSystem.add(guardRing);
-    for (let i = 0; i < 6; i += 1) {
-      const a = i / 6 * Math.PI * 2;
+    for (let i = 0; i < 8; i += 1) {
+      const a = i / 8 * Math.PI * 2;
       purgeSystem.add(cylinderBetween(
         guardCenter,
         new THREE.Vector3(guardCenter.x, guardCenter.y + Math.cos(a) * 0.64, guardCenter.z + Math.sin(a) * 0.64),
-        0.018,
+        0.016,
         darkSteel,
         8
       ));
+    }
+    const guardInnerRing = new THREE.Mesh(new THREE.TorusGeometry(0.36, 0.018, 7, 32), darkSteel);
+    guardInnerRing.rotation.y = Math.PI / 2;
+    guardInnerRing.position.copy(guardCenter);
+    purgeSystem.add(guardInnerRing);
+    for (let i = 0; i < 8; i += 1) {
+      const a = i / 8 * Math.PI * 2;
+      const bolt = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 6), boltMat);
+      bolt.position.set(-12.15, 1.35 + Math.cos(a) * 0.72, Math.sin(a) * 0.72);
+      purgeSystem.add(bolt);
     }
 
     // Fan support saddles.
@@ -116,15 +127,22 @@
 
     // Side-mounted motor / drive keeps the discharge axis clear and reads as a real package.
     purgeSystem.add(cylinderBetween(new THREE.Vector3(-11.20, 0.72, 0.94), new THREE.Vector3(-10.18, 0.72, 0.94), 0.30, purgeMotorMat, 28));
+    purgeSystem.add(cylinderBetween(new THREE.Vector3(-11.30, 0.72, 0.94), new THREE.Vector3(-11.14, 0.72, 0.94), 0.335, purgeMotorMat, 28));
+    purgeSystem.add(cylinderBetween(new THREE.Vector3(-10.24, 0.72, 0.94), new THREE.Vector3(-10.08, 0.72, 0.94), 0.335, purgeMotorMat, 28));
     for (const finX of [-11.05, -10.88, -10.71, -10.54, -10.37]) {
-      const fin = new THREE.Mesh(new THREE.TorusGeometry(0.305, 0.025, 7, 28), steel);
+      const fin = new THREE.Mesh(new THREE.TorusGeometry(0.315, 0.022, 7, 28), steel);
       fin.rotation.y = Math.PI / 2;
       fin.position.set(finX, 0.72, 0.94);
       purgeSystem.add(fin);
     }
-    purgeSystem.add(box([0.42, 0.24, 0.36], [-10.64, 1.08, 0.94], purgeInstrumentMat));
-    purgeSystem.add(box([0.62, 0.14, 0.24], [-10.90, 0.38, 0.94], darkSteel));
-    purgeSystem.add(box([0.62, 0.14, 0.24], [-10.48, 0.38, 0.94], darkSteel));
+    const motorFanCover = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, 0.12, 28, 1, true), darkSteel);
+    motorFanCover.rotation.z = Math.PI / 2;
+    motorFanCover.position.set(-10.03, 0.72, 0.94);
+    purgeSystem.add(motorFanCover);
+    const motorTerminal = box([0.34, 0.20, 0.30], [-10.66, 1.06, 0.94], purgeInstrumentMat);
+    purgeSystem.add(motorTerminal);
+    purgeSystem.add(box([0.58, 0.14, 0.24], [-10.90, 0.38, 0.94], darkSteel));
+    purgeSystem.add(box([0.58, 0.14, 0.24], [-10.48, 0.38, 0.94], darkSteel));
 
     // Fan shaft and compact belt/coupling guard.
     purgeSystem.add(cylinderBetween(new THREE.Vector3(-10.98, 1.35, 0), new THREE.Vector3(-10.74, 1.35, 0), 0.055, boltMat, 12));
@@ -135,34 +153,70 @@
     // Visible impeller reference behind the inlet guard. It rotates only during Purge Active.
     const purgeRotor = new THREE.Group();
     purgeRotor.position.set(-11.60, 1.35, 0);
-    const purgeRotorHub = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 0.11, 22), purgeSafetyMat);
+    const purgeRotorHub = new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.17, 0.16, 24), purgeSafetyMat);
     purgeRotorHub.rotation.z = Math.PI / 2;
     purgeRotor.add(purgeRotorHub);
+    const spinner = new THREE.Mesh(new THREE.ConeGeometry(0.18, 0.26, 24), purgeSafetyMat);
+    spinner.rotation.z = -Math.PI / 2;
+    spinner.position.x = -0.18;
+    purgeRotor.add(spinner);
+    const bladeShape = new THREE.Shape();
+    bladeShape.moveTo(0.13, 0.02);
+    bladeShape.lineTo(0.56, 0.11);
+    bladeShape.quadraticCurveTo(0.49, 0.26, 0.28, 0.30);
+    bladeShape.lineTo(0.12, 0.16);
+    bladeShape.closePath();
+    const bladeGeometry = new THREE.ShapeGeometry(bladeShape, 10);
+    bladeGeometry.rotateY(Math.PI / 2);
     for (let i = 0; i < 8; i += 1) {
-      const a = i / 8 * Math.PI * 2;
-      const blade = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.50, 0.11), purgeSafetyMat);
-      blade.position.set(0, Math.cos(a) * 0.29, Math.sin(a) * 0.29);
-      blade.rotation.x = a + 0.18;
+      const blade = new THREE.Mesh(bladeGeometry.clone(), purgeSafetyMat);
+      blade.rotation.x = i / 8 * Math.PI * 2 + 0.12;
       purgeRotor.add(blade);
     }
     purgeSystem.add(purgeRotor);
+    const blowerNameplate = box([0.28, 0.16, 0.018], [-11.18, 1.62, 0.63], boltMat);
+    blowerNameplate.rotation.x = -0.08;
+    purgeSystem.add(blowerNameplate);
 
     // Main discharge duct. The blower axis is +X toward the heater.
-    purgeSystem.add(cylinderBetween(new THREE.Vector3(-10.88, 1.35, 0), new THREE.Vector3(-9.82, 1.35, 0), 0.28, purgeDuctMat, 22));
+    // A short flexible connector and flange rings make the package read as installed equipment.
+    purgeSystem.add(cylinderBetween(new THREE.Vector3(-10.92, 1.35, 0), new THREE.Vector3(-10.70, 1.35, 0), 0.305, purgeRubberMat, 24));
+    for (const flexX of [-10.88, -10.83, -10.78, -10.73]) {
+      const flexRing = new THREE.Mesh(new THREE.TorusGeometry(0.31, 0.018, 7, 28), darkSteel);
+      flexRing.rotation.y = Math.PI / 2;
+      flexRing.position.set(flexX, 1.35, 0);
+      purgeSystem.add(flexRing);
+    }
+    purgeSystem.add(cylinderBetween(new THREE.Vector3(-10.70, 1.35, 0), new THREE.Vector3(-9.82, 1.35, 0), 0.28, purgeDuctMat, 24));
 
     // BDV-301 representative butterfly isolation damper with compact actuator / position proof.
+    for (const flangeX of [-9.87, -9.57]) {
+      const flange = new THREE.Mesh(new THREE.TorusGeometry(0.305, 0.035, 8, 28), steel);
+      flange.rotation.y = Math.PI / 2;
+      flange.position.set(flangeX, 1.35, 0);
+      purgeSystem.add(flange);
+    }
     const purgeDamperDisc = new THREE.Mesh(new THREE.CylinderGeometry(0.245, 0.245, 0.055, 28), purgeSafetyMat);
     purgeDamperDisc.rotation.z = Math.PI / 2;
     purgeDamperDisc.position.set(-9.72, 1.35, 0);
     purgeSystem.add(purgeDamperDisc);
-    purgeSystem.add(cylinderBetween(new THREE.Vector3(-9.72, 1.02, 0), new THREE.Vector3(-9.72, 1.68, 0), 0.034, boltMat, 10));
-    purgeSystem.add(box([0.34, 0.34, 0.30], [-9.72, 1.86, 0.18], purgeInstrumentMat));
+    purgeSystem.add(cylinderBetween(new THREE.Vector3(-9.72, 1.02, 0), new THREE.Vector3(-9.72, 1.70, 0), 0.032, boltMat, 10));
+    purgeSystem.add(cylinderBetween(new THREE.Vector3(-9.72, 1.66, 0.02), new THREE.Vector3(-9.48, 1.78, 0.16), 0.026, steel, 10));
+    purgeSystem.add(box([0.30, 0.30, 0.26], [-9.43, 1.86, 0.18], purgeInstrumentMat));
 
-    purgeSystem.add(cylinderBetween(new THREE.Vector3(-9.62, 1.35, 0), new THREE.Vector3(purgeRiserX, 1.35, 0), 0.28, purgeDuctMat, 22));
+    purgeSystem.add(cylinderBetween(new THREE.Vector3(-9.57, 1.35, 0), new THREE.Vector3(purgeRiserX, 1.35, 0), 0.28, purgeDuctMat, 24));
 
     // Representative purge flow / pressure proof device on the main duct.
-    purgeSystem.add(cylinderBetween(new THREE.Vector3(-8.92, 1.56, 0), new THREE.Vector3(-8.92, 1.98, 0), 0.035, boltMat, 10));
-    purgeSystem.add(box([0.38, 0.42, 0.30], [-8.92, 2.18, 0], purgeInstrumentMat));
+    purgeSystem.add(cylinderBetween(new THREE.Vector3(-8.92, 1.56, 0), new THREE.Vector3(-8.92, 1.94, 0), 0.030, boltMat, 10));
+    const proofBody = cylinder(0.15, 0.22, [-8.92, 2.08, 0], purgeInstrumentMat, 20);
+    purgeSystem.add(proofBody);
+    const proofFace = new THREE.Mesh(new THREE.CircleGeometry(0.105, 20), new THREE.MeshBasicMaterial({ color: '#d8eef4' }));
+    proofFace.rotation.x = -Math.PI / 2;
+    proofFace.position.set(-8.92, 2.20, 0);
+    purgeSystem.add(proofFace);
+    const proofLamp = new THREE.Mesh(new THREE.SphereGeometry(0.04, 10, 8), new THREE.MeshBasicMaterial({ color: '#65ef9e' }));
+    proofLamp.position.set(-8.80, 2.08, 0.02);
+    purgeSystem.add(proofLamp);
 
     // External riser and very short side manifold at the burner-floor / lower-radiant zone.
     purgeSystem.add(cylinderBetween(new THREE.Vector3(purgeRiserX, 1.35, 0), new THREE.Vector3(purgeRiserX, purgeHeaderY, 0), 0.24, purgeDuctMat, 22));
