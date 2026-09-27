@@ -96,6 +96,12 @@ requireText('src/HeaterTypes3D.tsx', 'addRectBands', 'Rectangular heater structu
 requireText('src/HeaterTypes3D.tsx', 'toneMappingExposure = 1.58', 'Heater types lighting exposure boost');
 requireText('src/HeaterTypes3D.tsx', "const fill = new THREE.DirectionalLight('#bfe8ff', 3.2)", 'Heater types front fill light');
 requireText('src/HeaterTypes3D.tsx', "scene.background = new THREE.Color('#0b1d2a')", 'Heater types brighter scene background');
+requireText('src/HeaterTypes3D.tsx', 'Closed convection roof / breeching transition', 'Box heater closed upper envelope');
+requireText('src/HeaterTypes3D.tsx', 'Continuous cabin roof', 'Cabin heater continuous sloped roof');
+requireText('src/HeaterTypes3D.tsx', 'const roofRise = 1.25', 'Cabin roof geometry');
+requireText('src/HeaterTypes3D.tsx', 'Short plenum / convection box intersects the ridge', 'Cabin roof-to-plenum continuity');
+requireText('src/HeaterTypes3D.tsx', 'const stackCurb = cylinder(1.48', 'Box heater stack curb');
+requireText('src/HeaterTypes3D.tsx', 'const stackCurb = cylinder(1.36', 'Cabin heater stack curb');
 requireText('src/BurnerPage.tsx', 'PHYSICS-BASED COMBUSTION + DRAFT SIMULATOR V2', 'Simulator V2 heading');
 requireText('src/BurnerPage.tsx', 'metrics.radiantOxygenPct', 'Radiant O2 readout');
 requireText('src/BurnerPage.tsx', 'metrics.stackOxygenPct', 'Stack O2 readout');
