@@ -307,24 +307,43 @@
           p.position.set(u < 0.75 ? 5.02 : -5.02, 7.0 + (u - 0.5) * 34.5, 2.55 - (u - 0.5) * 7.6);
         }
       }
-      // Keep purge callouts readable without letting them cover the equipment at close zoom.
+      // Purge callout LOD: reduce information as the camera closes in so labels never become the subject.
       if (labelRef.current) {
         const purgeFocus = selectedRef.current === 'Purge Air Blower' && contextModeRef.current !== 'full';
         const purgeDistance = camera.position.distanceTo(new THREE.Vector3(-10.75, 1.45, 0.28));
-        const purgeLod = purgeFocus ? THREE.MathUtils.clamp(purgeDistance / 12.5, 0.42, 0.92) : 1;
+        const purgeTier = purgeDistance < 7.5 ? 'close' : purgeDistance < 12.5 ? 'medium' : 'far';
+        const mediumLabels = new Set(['PURGE FAN / BLOWER', 'PURGE DAMPER', 'AIRFLOW PROOF']);
         labelRef.current.children.forEach(child => {
+          const labelText = child.userData.labelText as string | undefined;
           if (child instanceof THREE.Sprite && child.userData.purgeLabel) {
             const baseScale = child.userData.baseScale as THREE.Vector3 | undefined;
+            if (purgeFocus) {
+              child.visible = purgeTier === 'close'
+                ? labelText === 'PURGE FAN / BLOWER'
+                : purgeTier === 'medium'
+                  ? Boolean(labelText && mediumLabels.has(labelText))
+                  : true;
+            }
             if (baseScale) {
+              const tierScale = !purgeFocus ? 1 : purgeTier === 'close' ? 0.62 : purgeTier === 'medium' ? 0.78 : 0.94;
               const detailFactor = child.userData.kind === 'detail' ? 0.86 : 1;
-              child.scale.copy(baseScale).multiplyScalar(purgeLod * detailFactor);
+              child.scale.copy(baseScale).multiplyScalar(tierScale * detailFactor);
             }
             const material = child.material as THREE.SpriteMaterial;
-            material.opacity = purgeFocus ? THREE.MathUtils.lerp(0.76, 0.96, purgeLod) : 1;
+            material.opacity = !purgeFocus ? 1 : purgeTier === 'close' ? 0.90 : purgeTier === 'medium' ? 0.94 : 0.98;
           } else if (child instanceof THREE.Line && child.userData.isAtlasLabelLeader && child.userData.componentName === 'Purge Air Blower') {
             const material = child.material as THREE.LineBasicMaterial;
             const baseOpacity = child.userData.kind === 'major' ? 0.62 : 0.46;
-            material.opacity = purgeFocus ? baseOpacity * THREE.MathUtils.lerp(0.55, 0.88, purgeLod) : baseOpacity;
+            if (purgeFocus) {
+              // At extreme close-up all leaders disappear; at medium range keep only the remote
+              // damper / proof leaders so no line is drawn across the blower face.
+              child.visible = purgeTier === 'close'
+                ? false
+                : purgeTier === 'medium'
+                  ? labelText === 'PURGE DAMPER' || labelText === 'AIRFLOW PROOF'
+                  : true;
+            }
+            material.opacity = !purgeFocus ? baseOpacity : purgeTier === 'medium' ? baseOpacity * 0.72 : baseOpacity * 0.88;
           }
         });
       }
