@@ -107,6 +107,9 @@ requireText('src/HeaterTypes3D.tsx', 'CylinderGeometry(radius, radius, height, s
 requireText('src/HeaterTypes3D.tsx', 'openStack(1.28, 4.5', 'Box heater open stack');
 requireText('src/HeaterTypes3D.tsx', 'openStack(1.18, 4.0', 'Cabin heater open stack');
 requireText('src/HeaterTypes3D.tsx', 'openStack(1.15, 4.2', 'Cylindrical heater open stack');
+requireText('src/HeaterTypes3D.tsx', 'const boxProcessCurves = [', 'Box heater multi-circuit radiant flow');
+requireText('src/HeaterTypes3D.tsx', 'particle.userData.processCurve = curve', 'Per-particle radiant circuit assignment');
+requireText('src/HeaterTypes3D.tsx', 'const particleCurve = (p.userData.processCurve', 'Multi-curve process animation');
 requireText('src/BurnerPage.tsx', 'PHYSICS-BASED COMBUSTION + DRAFT SIMULATOR V2', 'Simulator V2 heading');
 requireText('src/BurnerPage.tsx', 'metrics.radiantOxygenPct', 'Radiant O2 readout');
 requireText('src/BurnerPage.tsx', 'metrics.stackOxygenPct', 'Stack O2 readout');
