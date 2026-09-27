@@ -43,3 +43,5 @@ Production update: **Box radiant full-flow routing** — animates process fluid 
 Production update: **Heater Types declutter** — removes the redundant Training Model card, Visual Comparison Questions card, and duplicated mobile training guardrail so the right panel ends on useful comparison/study content only.
 
 Production update: **Smart Atlas label declutter** — compacts component labels, shortens purge callouts, adds subtle leader lines to purge equipment, and limits Focus mode labels to the selected component and its own detail callouts so equipment stays visible.
+
+Production update: **Purge blower visual + camera refinement** — rebuilds the purge blower as a clearer industrial package with skid rails, flanged casing, tapered bellmouth, inlet guard/spokes, side-mounted finned motor and drive guard, and retunes Atlas/Purge-study cameras to center the blower package instead of the heater body.
