@@ -538,8 +538,6 @@ button { -webkit-tap-highlight-color: transparent; }
 .types-flow-legend { top: 136px; }
 .types-compare-badge { position: absolute; right: 13px; top: 136px; padding: 6px 8px; border: 1px solid rgba(255,142,58,.28); border-radius: 7px; background: rgba(3,17,28,.84); color: #ff9a55; font-size: 7px; font-weight: 750; letter-spacing: .08em; pointer-events: none; }
 .types-current-study h3 { margin: 4px 0 6px; color: #e1edf2; font-size: 13px; }
-.types-warning { border-color: rgba(255,142,58,.2); background: rgba(255,122,24,.04); }
-.types-path i { color: #ff9851; }
 .types-comparison-head { margin-top: 10px; display: grid; grid-template-columns: repeat(3,1fr); gap: 5px; }
 .types-comparison-head span { padding: 6px 4px; border-radius: 6px; text-align: center; color: #73cdef; background: rgba(40,139,183,.08); font-size: 7px; font-weight: 800; letter-spacing: .08em; }
 .types-comparison-table { margin-top: 14px; display: grid; gap: 6px; }
