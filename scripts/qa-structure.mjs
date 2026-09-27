@@ -69,14 +69,19 @@ requireText('src/Heater3D.tsx', 'isAtlasLabelLeader', 'Atlas label leader-line s
 requireText('src/Heater3D.tsx', "else if (contextMode === 'focus') child.visible = name === selected || detailFor === selected", 'Focus label declutter');
 requireText('src/Heater3D.tsx', "cameraCommand.action === 'purgeOverview'", 'Purge overview camera');
 requireText('src/Heater3D.tsx', 'Blower skid: twin steel rails', 'Refined purge blower skid');
-requireText('src/Heater3D.tsx', 'Inlet guard: rim and six radial spokes', 'Refined purge blower inlet guard');
+requireText('src/Heater3D.tsx', 'Inlet guard: concentric rings, eight radial spokes', 'Refined purge blower inlet guard');
 requireText('src/Heater3D.tsx', 'Side-mounted motor / drive keeps the discharge axis clear', 'Refined purge blower motor layout');
 requireText('src/Heater3D.tsx', 'purgeDriveGuard', 'Purge blower drive guard');
+requireText('src/Heater3D.tsx', 'blowerInnerThroat', 'Open-ended hollow purge blower casing');
+requireText('src/Heater3D.tsx', 'new THREE.ExtrudeGeometry(driveShape', 'Slim rounded purge drive guard');
+requireText('src/Heater3D.tsx', 'Compact local starter / status box on a simple pedestal', 'Pedestal-mounted purge starter');
+requireText('src/Heater3D.tsx', "labelText === 'PURGE FAN / BLOWER'", 'Close zoom blower-only label state');
+requireText('src/Heater3D.tsx', "labelText === 'PURGE DAMPER' || labelText === 'AIRFLOW PROOF'", 'Medium zoom purge leader state');
 requireText('src/Heater3D.tsx', 'purgeRubberMat', 'Purge blower flexible connector');
 requireText('src/Heater3D.tsx', 'const bladeShape = new THREE.Shape()', 'Swept purge impeller blades');
 requireText('src/Heater3D.tsx', 'guardInnerRing', 'Purge inlet guard concentric ring');
 requireText('src/Heater3D.tsx', 'proofFace', 'Purge airflow-proof instrument face');
-requireText('src/Heater3D.tsx', 'const purgeLod = purgeFocus', 'Close-zoom purge label LOD');
+requireText('src/Heater3D.tsx', "const purgeTier = purgeDistance < 7.5 ? 'close'", 'Three-tier purge label LOD');
 requireText('src/Heater3D.tsx', "yaw: -0.58, pitch: 0.07, radius: 8.6", 'Purge study three-quarter camera');
 requireText('src/heater3d/config.ts', "yaw: -0.62, pitch: 0.06, radius: 11.8, target: [-10.75, 1.42, 0.34]", 'Purge blower Atlas focus camera');
 requireText('src/Heater3D.tsx', "cameraCommand.action === 'purgeFlow'", 'Purge full-flow camera');
@@ -151,7 +156,7 @@ if (failures.length) {
 
 console.log('[qa:structure] PASS');
 console.log(` - ${requiredFiles.length} required modules present`);
-console.log(' - free-explore, draft instrumentation, burner exploded, refined purge blower/camera, purge-air learning module, T-04/T-05 troubleshooting, refined heater-family geometry, global readability pass and fuel-path guards present');
+console.log(' - free-explore, draft instrumentation, burner exploded, open purge blower casing, smart purge label LOD, purge-air learning module, T-04/T-05 troubleshooting, refined heater-family geometry, global readability pass and fuel-path guards present');
 console.log(' - burner fuel path remains readable across Atlas and dedicated study modes');
 console.log(' - mobile simulator keeps Draft, radiant O2 and CO visible with tuning controls collapsed');
 console.log(' - simulator V2 exposes heat input, actual air, excess air, radiant/stack O2, CO, draft and representative stack temperature');
