@@ -68,6 +68,11 @@ requireText('src/Heater3D.tsx', "displayText: 'PURGE ENTRIES'", 'Compact purge e
 requireText('src/Heater3D.tsx', 'isAtlasLabelLeader', 'Atlas label leader-line support');
 requireText('src/Heater3D.tsx', "else if (contextMode === 'focus') child.visible = name === selected || detailFor === selected", 'Focus label declutter');
 requireText('src/Heater3D.tsx', "cameraCommand.action === 'purgeOverview'", 'Purge overview camera');
+requireText('src/Heater3D.tsx', 'Blower skid: twin steel rails', 'Refined purge blower skid');
+requireText('src/Heater3D.tsx', 'Inlet guard: rim and six radial spokes', 'Refined purge blower inlet guard');
+requireText('src/Heater3D.tsx', 'Side-mounted motor / drive keeps the discharge axis clear', 'Refined purge blower motor layout');
+requireText('src/Heater3D.tsx', 'purgeDriveGuard', 'Purge blower drive guard');
+requireText('src/heater3d/config.ts', "radius: 12.5, target: [-10.75, 1.45, 0.28]", 'Purge blower Atlas focus camera');
 requireText('src/Heater3D.tsx', "cameraCommand.action === 'purgeFlow'", 'Purge full-flow camera');
 requireText('src/PurgeAirPage.tsx', "id: 'blower'", 'Purge blower study');
 requireText('src/PurgeAirPage.tsx', "id: 'damper'", 'Purge damper study');
@@ -140,7 +145,7 @@ if (failures.length) {
 
 console.log('[qa:structure] PASS');
 console.log(` - ${requiredFiles.length} required modules present`);
-console.log(' - free-explore, draft instrumentation, burner exploded, purge-air learning module, T-04/T-05 troubleshooting, refined heater-family geometry, global readability pass and fuel-path guards present');
+console.log(' - free-explore, draft instrumentation, burner exploded, refined purge blower/camera, purge-air learning module, T-04/T-05 troubleshooting, refined heater-family geometry, global readability pass and fuel-path guards present');
 console.log(' - burner fuel path remains readable across Atlas and dedicated study modes');
 console.log(' - mobile simulator keeps Draft, radiant O2 and CO visible with tuning controls collapsed');
 console.log(' - simulator V2 exposes heat input, actual air, excess air, radiant/stack O2, CO, draft and representative stack temperature');
