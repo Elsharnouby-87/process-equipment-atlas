@@ -37,3 +37,5 @@ Production update: **Heater Types lighting boost** — lifts scene exposure, bri
 Production update: **Heater Types envelope continuity** — closes the Box heater exterior roof, replaces the Cabin floating roof plates with a continuous pitched roof, connects both heaters through coherent plenum/breeching transitions to the stack, and keeps cutaway openings limited to study views.
 
 Production update: **Open stack tops** — changes Box, Cabin and Vertical Cylindrical heater stacks to open-ended shells with visible dark inner throats and top rim detail, removing the unrealistic closed top cap.
+
+Production update: **Box radiant full-flow routing** — animates process fluid through all four representative two-pass radiant tube circuits, following each vertical tube pair and top return bend instead of showing only one loop.
