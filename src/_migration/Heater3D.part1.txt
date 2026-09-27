@@ -62,6 +62,14 @@
     const purgeMotorMat = new THREE.MeshPhysicalMaterial({ color: '#273238', metalness: 0.68, roughness: 0.46 });
     const purgeInstrumentMat = new THREE.MeshPhysicalMaterial({ color: '#4d5c63', metalness: 0.42, roughness: 0.5, clearcoat: 0.04 });
     const purgeSafetyMat = new THREE.MeshPhysicalMaterial({ color: '#c98222', metalness: 0.46, roughness: 0.42 });
+    const purgeImpellerMat = new THREE.MeshPhysicalMaterial({
+      color: '#c68a2a',
+      metalness: 0.50,
+      roughness: 0.38,
+      clearcoat: 0.03,
+      emissive: '#2a1705',
+      emissiveIntensity: 0.08,
+    });
     const purgeRubberMat = new THREE.MeshStandardMaterial({ color: '#151a1d', roughness: 0.9, metalness: 0.04 });
 
     const purgeRiserX = -6.72;
@@ -115,29 +123,29 @@
     inletLip.position.set(-12.12, 1.35, 0);
     purgeSystem.add(inletLip);
 
-    // Inlet guard: concentric rings, eight radial spokes and flange bolts keep the fan face readable without hiding the impeller.
+    // Inlet guard: lighter six-spoke cage so the fan face stays protected without visually hiding the impeller.
     const guardCenter = new THREE.Vector3(-12.13, 1.35, 0);
-    const guardRing = new THREE.Mesh(new THREE.TorusGeometry(0.69, 0.035, 7, 36), darkSteel);
+    const guardRing = new THREE.Mesh(new THREE.TorusGeometry(0.69, 0.024, 7, 36), darkSteel);
     guardRing.rotation.y = Math.PI / 2;
     guardRing.position.copy(guardCenter);
     purgeSystem.add(guardRing);
-    for (let i = 0; i < 8; i += 1) {
-      const a = i / 8 * Math.PI * 2;
+    for (let i = 0; i < 6; i += 1) {
+      const a = i / 6 * Math.PI * 2;
       purgeSystem.add(cylinderBetween(
         guardCenter,
         new THREE.Vector3(guardCenter.x, guardCenter.y + Math.cos(a) * 0.64, guardCenter.z + Math.sin(a) * 0.64),
-        0.016,
+        0.011,
         darkSteel,
         8
       ));
     }
-    const guardInnerRing = new THREE.Mesh(new THREE.TorusGeometry(0.36, 0.018, 7, 32), darkSteel);
+    const guardInnerRing = new THREE.Mesh(new THREE.TorusGeometry(0.36, 0.012, 7, 32), darkSteel);
     guardInnerRing.rotation.y = Math.PI / 2;
     guardInnerRing.position.copy(guardCenter);
     purgeSystem.add(guardInnerRing);
-    for (let i = 0; i < 8; i += 1) {
-      const a = i / 8 * Math.PI * 2;
-      const bolt = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 6), boltMat);
+    for (let i = 0; i < 6; i += 1) {
+      const a = i / 6 * Math.PI * 2;
+      const bolt = new THREE.Mesh(new THREE.SphereGeometry(0.026, 8, 6), boltMat);
       bolt.position.set(-12.15, 1.35 + Math.cos(a) * 0.72, Math.sin(a) * 0.72);
       purgeSystem.add(bolt);
     }
@@ -196,27 +204,28 @@
     purgeDriveGuard.castShadow = true;
     purgeSystem.add(purgeDriveGuard);
 
-    // Visible impeller reference behind the inlet guard. It rotates only during Purge Active.
+    // Visible impeller reference behind the inlet guard. The rotor sits close to the inlet plane
+    // so the blades remain legible from a front-biased camera instead of disappearing deep in the casing.
     const purgeRotor = new THREE.Group();
-    purgeRotor.position.set(-11.60, 1.35, 0);
-    const purgeRotorHub = new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.17, 0.16, 24), purgeSafetyMat);
+    purgeRotor.position.set(-11.96, 1.35, 0);
+    const purgeRotorHub = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.12, 24), purgeImpellerMat);
     purgeRotorHub.rotation.z = Math.PI / 2;
     purgeRotor.add(purgeRotorHub);
-    const spinner = new THREE.Mesh(new THREE.ConeGeometry(0.18, 0.26, 24), purgeSafetyMat);
+    const spinner = new THREE.Mesh(new THREE.ConeGeometry(0.14, 0.20, 24), purgeImpellerMat);
     spinner.rotation.z = -Math.PI / 2;
-    spinner.position.x = -0.18;
+    spinner.position.x = -0.12;
     purgeRotor.add(spinner);
     const bladeShape = new THREE.Shape();
-    bladeShape.moveTo(0.13, 0.02);
-    bladeShape.lineTo(0.56, 0.11);
-    bladeShape.quadraticCurveTo(0.49, 0.26, 0.28, 0.30);
-    bladeShape.lineTo(0.12, 0.16);
+    bladeShape.moveTo(0.10, 0.015);
+    bladeShape.lineTo(0.59, 0.10);
+    bladeShape.quadraticCurveTo(0.53, 0.27, 0.29, 0.32);
+    bladeShape.lineTo(0.10, 0.14);
     bladeShape.closePath();
-    const bladeGeometry = new THREE.ShapeGeometry(bladeShape, 10);
+    const bladeGeometry = new THREE.ShapeGeometry(bladeShape, 12);
     bladeGeometry.rotateY(Math.PI / 2);
     for (let i = 0; i < 8; i += 1) {
-      const blade = new THREE.Mesh(bladeGeometry.clone(), purgeSafetyMat);
-      blade.rotation.x = i / 8 * Math.PI * 2 + 0.12;
+      const blade = new THREE.Mesh(bladeGeometry.clone(), purgeImpellerMat);
+      blade.rotation.x = i / 8 * Math.PI * 2 + 0.25;
       purgeRotor.add(blade);
     }
     purgeSystem.add(purgeRotor);
