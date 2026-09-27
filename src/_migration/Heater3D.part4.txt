@@ -180,7 +180,7 @@
         if (baseY !== undefined) child.position.y = baseY + (explode && name ? (explodeOffsets[name]?.y ?? 0) : 0);
         if (operationLabels) child.visible = Boolean(labelText && operationLabels.has(labelText));
         else if (contextMode === 'full') child.visible = kind === 'major';
-        else if (contextMode === 'focus') child.visible = name === selected || related.has(name ?? '') || detailFor === selected;
+        else if (contextMode === 'focus') child.visible = name === selected || detailFor === selected;
         else child.visible = name === selected || detailFor === selected;
         if ((burnerStudyMode === 'pilot' || burnerStudyMode === 'exploded') && name === 'Burners') child.visible = false;
         if (radiantStudyMode && name === 'Radiant Tubes' && kind === 'major') child.visible = false;
