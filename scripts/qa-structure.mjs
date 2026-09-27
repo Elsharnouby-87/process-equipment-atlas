@@ -72,7 +72,13 @@ requireText('src/Heater3D.tsx', 'Blower skid: twin steel rails', 'Refined purge 
 requireText('src/Heater3D.tsx', 'Inlet guard: rim and six radial spokes', 'Refined purge blower inlet guard');
 requireText('src/Heater3D.tsx', 'Side-mounted motor / drive keeps the discharge axis clear', 'Refined purge blower motor layout');
 requireText('src/Heater3D.tsx', 'purgeDriveGuard', 'Purge blower drive guard');
-requireText('src/heater3d/config.ts', "radius: 12.5, target: [-10.75, 1.45, 0.28]", 'Purge blower Atlas focus camera');
+requireText('src/Heater3D.tsx', 'purgeRubberMat', 'Purge blower flexible connector');
+requireText('src/Heater3D.tsx', 'const bladeShape = new THREE.Shape()', 'Swept purge impeller blades');
+requireText('src/Heater3D.tsx', 'guardInnerRing', 'Purge inlet guard concentric ring');
+requireText('src/Heater3D.tsx', 'proofFace', 'Purge airflow-proof instrument face');
+requireText('src/Heater3D.tsx', 'const purgeLod = purgeFocus', 'Close-zoom purge label LOD');
+requireText('src/Heater3D.tsx', "yaw: -0.58, pitch: 0.07, radius: 8.6", 'Purge study three-quarter camera');
+requireText('src/heater3d/config.ts', "yaw: -0.62, pitch: 0.06, radius: 11.8, target: [-10.75, 1.42, 0.34]", 'Purge blower Atlas focus camera');
 requireText('src/Heater3D.tsx', "cameraCommand.action === 'purgeFlow'", 'Purge full-flow camera');
 requireText('src/PurgeAirPage.tsx', "id: 'blower'", 'Purge blower study');
 requireText('src/PurgeAirPage.tsx', "id: 'damper'", 'Purge damper study');
