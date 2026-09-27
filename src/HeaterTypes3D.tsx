@@ -296,12 +296,23 @@ function buildBox(materials: Materials): ModelVisual {
     group.add(meshBox([10.8, 0.34, 6.8], [0, 4.78, 0], materials.shellDark));
     addRectShell(group, 10.6, 10.4, 6.6, 10.0, materials.shell, cutaway);
     addRectShell(group, 10.8, 4.2, 6.6, 17.3, materials.shell, cutaway);
-    group.add(rectangularFrustum(10.8, 6.6, 4.0, 3.4, 1.5, 20.15, materials.shellDark, cutaway));
-    group.add(meshBox([4.0, 0.42, 3.4], [0, 20.92, 0], materials.shellDark));
-    group.add(cylinder(1.28, 4.6, [0, 23.22, 0], materials.shell, 32));
+
+    // Closed convection roof / breeching transition. Exterior stays fully closed;
+    // cutaway removes only the front half of the roof so the internal bank remains readable.
+    if (cutaway) group.add(meshBox([10.8, 0.22, 3.25], [0, 19.42, -1.68], materials.shellDark));
+    else group.add(meshBox([10.8, 0.22, 6.6], [0, 19.42, 0], materials.shellDark));
+
+    group.add(rectangularFrustum(10.8, 6.6, 4.0, 3.4, 1.5, 20.18, materials.shellDark, cutaway));
+    if (cutaway) group.add(meshBox([4.0, 0.24, 1.7], [0, 20.94, -0.86], materials.shellDark));
+    else group.add(meshBox([4.0, 0.24, 3.4], [0, 20.94, 0], materials.shellDark));
+
+    const stackCurb = cylinder(1.48, 0.42, [0, 21.15, 0], materials.steel, 32);
+    group.add(stackCurb);
+    group.add(cylinder(1.28, 4.5, [0, 23.60, 0], materials.shell, 32));
+
     addRectBands(group, 10.6, 6.6, [7.1, 9.9, 12.7, 15.05], materials.steel, cutaway);
     addRectBands(group, 10.8, 6.6, [16.1, 18.25], materials.steel, cutaway);
-    addStackFlanges(group, 1.31, [20.98, 25.43], materials.steel);
+    addStackFlanges(group, 1.31, [21.38, 25.82], materials.steel);
     addPlatform(group, 14.75, 11.8, 1.25, 3.82, materials);
     addLadder(group, 5.55, 4.28, 4.65, 14.75, materials);
   };
@@ -342,9 +353,9 @@ function buildBox(materials: Materials): ModelVisual {
     new THREE.Vector3(0, 5.9, 0),
     new THREE.Vector3(0.35, 11.2, -0.2),
     new THREE.Vector3(-0.25, 16.1, 0.3),
-    new THREE.Vector3(0, 19.4, 0),
-    new THREE.Vector3(0, 21.3, 0),
-    new THREE.Vector3(0, 25.2, 0),
+    new THREE.Vector3(0, 19.25, 0),
+    new THREE.Vector3(0, 21.2, 0),
+    new THREE.Vector3(0, 25.7, 0),
   ], false, 'centripetal', 0.18);
   const processParticles = createParticles(flow, processCurve, materials.process, 18, 0.095);
   const flueParticles = createParticles(flow, flueCurve, materials.flue, 24, 0.105);
@@ -369,20 +380,43 @@ function buildCabin(materials: Materials): ModelVisual {
   const buildShell = (group: THREE.Group, cutaway: boolean) => {
     group.add(meshBox([13.8, 0.34, 7.5], [0, 3.88, 0], materials.shellDark));
     addRectShell(group, 13.6, 8.4, 7.35, 8.08, materials.shell, cutaway);
-    const leftRoof = meshBox([7.15, 0.30, 7.35], [-3.3, 12.48, 0], materials.shellDark);
-    leftRoof.rotation.z = -0.17;
+
+    // Continuous cabin roof: both slopes meet at one ridge and land directly on the radiant walls.
+    // In cutaway, only the rear half-depth remains so the interior can still be inspected.
+    const roofRise = 1.25;
+    const halfWidth = 6.8;
+    const roofLength = Math.hypot(halfWidth, roofRise);
+    const roofAngle = Math.atan2(roofRise, halfWidth);
+    const roofDepth = cutaway ? 3.65 : 7.35;
+    const roofZ = cutaway ? -1.85 : 0;
+    const roofY = 12.28 + roofRise / 2;
+    const leftRoof = meshBox([roofLength, 0.28, roofDepth], [-halfWidth / 2, roofY, roofZ], materials.shellDark);
+    leftRoof.rotation.z = roofAngle;
     group.add(leftRoof);
-    const rightRoof = meshBox([7.15, 0.30, 7.35], [3.3, 12.48, 0], materials.shellDark);
-    rightRoof.rotation.z = 0.17;
+    const rightRoof = meshBox([roofLength, 0.28, roofDepth], [halfWidth / 2, roofY, roofZ], materials.shellDark);
+    rightRoof.rotation.z = -roofAngle;
     group.add(rightRoof);
-    addRectShell(group, 9.6, 3.25, 6.25, 14.45, materials.shell, cutaway);
-    group.add(rectangularFrustum(9.6, 6.25, 3.8, 3.2, 1.35, 16.75, materials.shellDark, cutaway));
-    group.add(cylinder(1.18, 4.1, [0, 19.45, 0], materials.shell, 30));
+
+    // Short plenum / convection box intersects the ridge so it reads as one continuous envelope.
+    group.add(meshBox([9.55, 0.22, cutaway ? 3.05 : 6.15], [0, 13.34, cutaway ? -1.55 : 0], materials.shellDark));
+    addRectShell(group, 9.4, 2.9, 6.15, 14.75, materials.shell, cutaway);
+
+    if (cutaway) group.add(meshBox([9.4, 0.22, 3.0], [0, 16.22, -1.56], materials.shellDark));
+    else group.add(meshBox([9.4, 0.22, 6.15], [0, 16.22, 0], materials.shellDark));
+
+    group.add(rectangularFrustum(9.4, 6.15, 3.7, 3.0, 1.25, 16.85, materials.shellDark, cutaway));
+    if (cutaway) group.add(meshBox([3.7, 0.22, 1.5], [0, 17.48, -0.76], materials.shellDark));
+    else group.add(meshBox([3.7, 0.22, 3.0], [0, 17.48, 0], materials.shellDark));
+
+    const stackCurb = cylinder(1.36, 0.38, [0, 17.68, 0], materials.steel, 30);
+    group.add(stackCurb);
+    group.add(cylinder(1.18, 4.0, [0, 19.86, 0], materials.shell, 30));
+
     addRectBands(group, 13.6, 7.35, [5.7, 7.9, 10.1], materials.steel, cutaway);
-    addRectBands(group, 9.6, 6.25, [13.45, 15.45], materials.steel, cutaway);
-    addStackFlanges(group, 1.21, [17.42, 21.45], materials.steel);
-    addPlatform(group, 12.15, 14.5, 1.25, 4.2, materials);
-    addLadder(group, 6.85, 4.68, 3.8, 12.15, materials);
+    addRectBands(group, 9.4, 6.15, [13.85, 15.55], materials.steel, cutaway);
+    addStackFlanges(group, 1.21, [17.88, 21.85], materials.steel);
+    addPlatform(group, 11.95, 14.5, 1.25, 4.2, materials);
+    addLadder(group, 6.85, 4.68, 3.8, 11.95, materials);
   };
   buildShell(exteriorShell, false);
   buildShell(cutawayShell, true);
@@ -419,10 +453,10 @@ function buildCabin(materials: Materials): ModelVisual {
   const flueCurve = new THREE.CatmullRomCurve3([
     new THREE.Vector3(-1.6, 5.0, 0),
     new THREE.Vector3(0.8, 8.8, 0.45),
-    new THREE.Vector3(0, 12.3, -0.15),
-    new THREE.Vector3(0, 15.7, 0),
-    new THREE.Vector3(0, 17.5, 0),
-    new THREE.Vector3(0, 21.25, 0),
+    new THREE.Vector3(0, 12.55, -0.15),
+    new THREE.Vector3(0, 15.55, 0),
+    new THREE.Vector3(0, 17.45, 0),
+    new THREE.Vector3(0, 21.75, 0),
   ], false, 'centripetal', 0.18);
   const processParticles = createParticles(flow, processCurve, materials.process, 22, 0.095);
   const flueParticles = createParticles(flow, flueCurve, materials.flue, 24, 0.105);
