@@ -370,15 +370,24 @@ function buildBox(materials: Materials): ModelVisual {
   addFinnedBank(convection, 15.85, 9.2, [-2.3, -0.8, 0.8, 2.3], materials, 5);
   internals.add(radiant, burners, convection);
 
-  const processCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(4.55, 5.65, -2.25),
-    new THREE.Vector3(4.55, 9.8, -2.25),
-    new THREE.Vector3(4.55, 14.25, -2.25),
-    new THREE.Vector3(4.55, 14.6, -1.5),
-    new THREE.Vector3(4.55, 14.25, -0.75),
-    new THREE.Vector3(4.55, 9.8, -0.75),
-    new THREE.Vector3(4.55, 5.65, -0.75),
-  ], false, 'centripetal', 0.18);
+  // Four representative parallel two-pass radiant circuits.
+  // Each cyan stream follows an actual vertical-tube pair and its top return bend
+  // instead of showing flow in only one pair.
+  const boxProcessCurves = [
+    [-4.55, -2.25, -0.75],
+    [-4.55, 0.75, 2.25],
+    [4.55, -2.25, -0.75],
+    [4.55, 0.75, 2.25],
+  ].map(([x, zIn, zOut]) => new THREE.CatmullRomCurve3([
+    new THREE.Vector3(x, 5.65, zIn),
+    new THREE.Vector3(x, 9.8, zIn),
+    new THREE.Vector3(x, 14.25, zIn),
+    new THREE.Vector3(x, 14.62, (zIn + zOut) / 2),
+    new THREE.Vector3(x, 14.25, zOut),
+    new THREE.Vector3(x, 9.8, zOut),
+    new THREE.Vector3(x, 5.65, zOut),
+  ], false, 'centripetal', 0.12));
+  const processCurve = boxProcessCurves[0];
   const flueCurve = new THREE.CatmullRomCurve3([
     new THREE.Vector3(0, 5.9, 0),
     new THREE.Vector3(0.35, 11.2, -0.2),
@@ -387,7 +396,15 @@ function buildBox(materials: Materials): ModelVisual {
     new THREE.Vector3(0, 21.2, 0),
     new THREE.Vector3(0, 25.7, 0),
   ], false, 'centripetal', 0.18);
-  const processParticles = createParticles(flow, processCurve, materials.process, 18, 0.095);
+  const processParticles: THREE.Mesh[] = [];
+  boxProcessCurves.forEach((curve, circuitIndex) => {
+    const circuitParticles = createParticles(flow, curve, materials.process, 11, 0.09);
+    circuitParticles.forEach((particle, particleIndex) => {
+      particle.userData.processCurve = curve;
+      particle.userData.t = (particleIndex / circuitParticles.length + circuitIndex * 0.08) % 1;
+    });
+    processParticles.push(...circuitParticles);
+  });
   const flueParticles = createParticles(flow, flueCurve, materials.flue, 24, 0.105);
   const label = makeLabel(typeLabels.box);
   label.position.set(0, 27.0, 0);
@@ -825,7 +842,8 @@ export default function HeaterTypes3D({ heaterType, view, compare, cameraCommand
         });
         model.processParticles.forEach(p => {
           const u = (((p.userData.t as number | undefined) ?? 0) + t * 0.045) % 1;
-          p.position.copy(model.processCurve.getPoint(u));
+          const particleCurve = (p.userData.processCurve as THREE.Curve<THREE.Vector3> | undefined) ?? model.processCurve;
+          p.position.copy(particleCurve.getPoint(u));
         });
         model.flueParticles.forEach(p => {
           const u = (((p.userData.t as number | undefined) ?? 0) + t * 0.06) % 1;
