@@ -24,12 +24,21 @@
     scene.add(draftOverlay);
 
     const labelsGroup = new THREE.Group();
-    const specs: { text: string; component: string; pos: [number, number, number]; kind: 'major' | 'detail'; detailFor?: string }[] = [
+    type AtlasLabelSpec = {
+      text: string;
+      displayText?: string;
+      component: string;
+      pos: [number, number, number];
+      kind: 'major' | 'detail';
+      detailFor?: string;
+      anchor?: [number, number, number];
+    };
+    const specs: AtlasLabelSpec[] = [
       { text: 'BURNERS', component: 'Burners', pos: [0, 8.1, 5.4], kind: 'major' },
-      { text: 'PURGE FAN / BLOWER', component: 'Purge Air Blower', pos: [-11.0, 3.55, 1.3], kind: 'major' },
-      { text: 'PURGE DAMPER', component: 'Purge Air Blower', pos: [-9.45, 2.55, 1.0], kind: 'detail', detailFor: 'Purge Air Blower' },
-      { text: 'AIRFLOW PROOF', component: 'Purge Air Blower', pos: [-8.45, 3.0, 0.8], kind: 'detail', detailFor: 'Purge Air Blower' },
-      { text: 'TWO PURGE ENTRIES', component: 'Purge Air Blower', pos: [-7.0, 6.15, 0], kind: 'detail', detailFor: 'Purge Air Blower' },
+      { text: 'PURGE FAN / BLOWER', displayText: 'BLOWER', component: 'Purge Air Blower', pos: [-11.05, 2.65, 2.75], kind: 'major', anchor: [-11.2, 1.45, 0] },
+      { text: 'PURGE DAMPER', displayText: 'DAMPER', component: 'Purge Air Blower', pos: [-9.75, 3.55, 2.75], kind: 'detail', detailFor: 'Purge Air Blower', anchor: [-9.72, 1.45, 0] },
+      { text: 'AIRFLOW PROOF', component: 'Purge Air Blower', pos: [-8.25, 4.35, 2.75], kind: 'detail', detailFor: 'Purge Air Blower', anchor: [-8.92, 1.95, 0] },
+      { text: 'TWO PURGE ENTRIES', displayText: 'PURGE ENTRIES', component: 'Purge Air Blower', pos: [-6.45, 6.6, 2.75], kind: 'detail', detailFor: 'Purge Air Blower', anchor: [-6.72, 5.15, 0] },
       { text: 'RADIANT TUBES', component: 'Radiant Tubes', pos: [7.6, 12.7, 0.4], kind: 'major' },
       { text: 'SHIELD / SHOCK', component: 'Shield Tubes', pos: [7.7, 18.45, 0.4], kind: 'major' },
       { text: 'CONVECTION', component: 'Convection Bank', pos: [7.9, 22.4, 0.4], kind: 'major' },
@@ -53,14 +62,42 @@
       { text: 'ACTUATOR', component: 'Stack Damper', pos: [5.0, 31.35, 0], kind: 'detail', detailFor: 'Stack Damper' },
     ];
     for (const spec of specs) {
-      const label = makeLabel(spec.text);
+      const label = makeLabel(spec.displayText ?? spec.text);
+      const isPurge = spec.component === 'Purge Air Blower';
+      const scale: [number, number, number] = spec.kind === 'major'
+        ? (isPurge ? [2.75, 0.62, 1] : [3.55, 0.8, 1])
+        : (isPurge ? [2.35, 0.52, 1] : [2.7, 0.61, 1]);
+      label.scale.set(...scale);
       label.position.set(...spec.pos);
       label.userData.componentName = spec.component;
       label.userData.labelText = spec.text;
       label.userData.baseY = spec.pos[1];
       label.userData.kind = spec.kind;
       label.userData.detailFor = spec.detailFor;
+      label.userData.isAtlasLabel = true;
       labelsGroup.add(label);
+
+      if (spec.anchor) {
+        const lineGeometry = new THREE.BufferGeometry().setFromPoints([
+          new THREE.Vector3(...spec.anchor),
+          new THREE.Vector3(...spec.pos),
+        ]);
+        const line = new THREE.Line(
+          lineGeometry,
+          new THREE.LineBasicMaterial({
+            color: spec.kind === 'major' ? '#76d8ff' : '#4aa9c8',
+            transparent: true,
+            opacity: spec.kind === 'major' ? 0.62 : 0.46,
+            depthTest: false,
+          })
+        );
+        line.userData.componentName = spec.component;
+        line.userData.labelText = spec.text;
+        line.userData.kind = spec.kind;
+        line.userData.detailFor = spec.detailFor;
+        line.userData.isAtlasLabelLeader = true;
+        labelsGroup.add(line);
+      }
     }
     labelRef.current = labelsGroup;
     scene.add(labelsGroup);
