@@ -78,6 +78,36 @@ function cylinder(radius: number, height: number, position: [number, number, num
   return mesh;
 }
 
+function openStack(radius: number, height: number, position: [number, number, number], material: THREE.Material, rimMaterial: THREE.Material, segments = 32) {
+  const group = new THREE.Group();
+  group.position.set(...position);
+
+  const outer = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, height, segments, 1, true), material);
+  outer.castShadow = true;
+  outer.receiveShadow = true;
+  group.add(outer);
+
+  const innerMaterial = new THREE.MeshStandardMaterial({ color: '#081118', roughness: 0.96, side: THREE.BackSide });
+  const inner = new THREE.Mesh(new THREE.CylinderGeometry(radius * 0.88, radius * 0.88, height * 0.94, segments, 1, true), innerMaterial);
+  group.add(inner);
+
+  const rim = new THREE.Mesh(new THREE.TorusGeometry(radius, Math.max(0.045, radius * 0.045), 8, segments), rimMaterial);
+  rim.rotation.x = Math.PI / 2;
+  rim.position.y = height / 2;
+  group.add(rim);
+
+  // A recessed dark floor keeps the opening readable from steep camera angles without visually capping the stack.
+  const throat = new THREE.Mesh(
+    new THREE.CircleGeometry(radius * 0.82, segments),
+    new THREE.MeshBasicMaterial({ color: '#05090c', side: THREE.DoubleSide })
+  );
+  throat.rotation.x = -Math.PI / 2;
+  throat.position.y = -height * 0.34;
+  group.add(throat);
+
+  return group;
+}
+
 function cylinderBetween(a: THREE.Vector3, b: THREE.Vector3, radius: number, material: THREE.Material, segments = 10) {
   const direction = new THREE.Vector3().subVectors(b, a);
   const mesh = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, direction.length(), segments), material);
@@ -308,7 +338,7 @@ function buildBox(materials: Materials): ModelVisual {
 
     const stackCurb = cylinder(1.48, 0.42, [0, 21.15, 0], materials.steel, 32);
     group.add(stackCurb);
-    group.add(cylinder(1.28, 4.5, [0, 23.60, 0], materials.shell, 32));
+    group.add(openStack(1.28, 4.5, [0, 23.60, 0], materials.shell, materials.steel, 32));
 
     addRectBands(group, 10.6, 6.6, [7.1, 9.9, 12.7, 15.05], materials.steel, cutaway);
     addRectBands(group, 10.8, 6.6, [16.1, 18.25], materials.steel, cutaway);
@@ -410,7 +440,7 @@ function buildCabin(materials: Materials): ModelVisual {
 
     const stackCurb = cylinder(1.36, 0.38, [0, 17.68, 0], materials.steel, 30);
     group.add(stackCurb);
-    group.add(cylinder(1.18, 4.0, [0, 19.86, 0], materials.shell, 30));
+    group.add(openStack(1.18, 4.0, [0, 19.86, 0], materials.shell, materials.steel, 30));
 
     addRectBands(group, 13.6, 7.35, [5.7, 7.9, 10.1], materials.steel, cutaway);
     addRectBands(group, 9.4, 6.15, [13.85, 15.55], materials.steel, cutaway);
@@ -508,7 +538,7 @@ function buildCylindrical(materials: Materials): ModelVisual {
     transition.position.y = 20.25;
     transition.castShadow = true;
     shell.add(transition);
-    shell.add(cylinder(1.15, 4.2, [0, 22.95, 0], materials.shell, 32));
+    shell.add(openStack(1.15, 4.2, [0, 22.95, 0], materials.shell, materials.steel, 32));
     addStackFlanges(shell, 1.18, [20.88, 25.0], materials.steel);
 
     for (const y of [6.4, 9.1, 11.8, 14.5]) {
