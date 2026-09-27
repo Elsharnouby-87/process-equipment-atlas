@@ -31,3 +31,5 @@ Production update: **Atlas context declutter** — removes the redundant `Traini
 Production update: **Free Explore declutter** — removes the entire right-side Free Explore inspector, hides its mobile Details action, and expands the 3D workspace until a real component is selected.
 
 Production update: **Heater Types visual refinement** — upgrades Box, Cabin and Vertical Cylindrical models with cleaner proportions, shell panel thickness, stack/breeching transitions, structural bands, support framing, platforms/ladders, clearer burners and coil layouts, plus improved materials, shadows and camera framing.
+
+Production update: **Heater Types lighting boost** — lifts scene exposure, brightens shell/tube materials, adds a soft front fill light, strengthens key/rim lighting, and raises ground/grid visibility while preserving the dark Atlas theme.
