@@ -57,6 +57,22 @@ button { -webkit-tap-highlight-color: transparent; }
 .navigator-note svg { color: #ff8b34; flex: 0 0 auto; }
 .navigator-note p { margin: 0; font-size: 9px; line-height: 1.5; }
 .navigator-note b { color: #d7e6ed; }
+.atlas-creator-signature {
+  position: sticky;
+  bottom: -14px;
+  margin: 14px -12px -14px;
+  padding: 11px 12px 12px;
+  border-top: 1px solid rgba(76, 180, 237, .08);
+  background: linear-gradient(180deg, rgba(4, 18, 30, .62), rgba(4, 18, 30, .98) 38%);
+  color: #587b8c;
+  font-size: 8px;
+  font-weight: 560;
+  letter-spacing: .035em;
+  text-align: center;
+  white-space: nowrap;
+  z-index: 3;
+}
+.atlas-creator-signature:hover { color: #7799a8; }
 
 .hero-viewer { position: relative; overflow: hidden; min-width: 0; background: radial-gradient(circle at 50% 47%, rgba(28, 96, 131, .15), transparent 42%); }
 .three-host { position: absolute; inset: 0; cursor: grab; touch-action: none; }
@@ -327,6 +343,12 @@ button { -webkit-tap-highlight-color: transparent; }
   .component-navigator .mobile-close, .inspector-panel .mobile-close { display: grid; position: absolute; right: 8px; top: 8px; width: 28px; height: 28px; place-items: center; border: 1px solid rgba(77, 185, 244, .18); border-radius: 6px; background: #081c2a; color: #9dbdca; z-index: 2; }
   .navigator-head { padding-right: 34px; }
   .navigator-note { display: none; }
+  .atlas-creator-signature {
+    bottom: -12px;
+    margin: 14px -12px -12px;
+    padding-bottom: 10px;
+    font-size: 7.5px;
+  }
   .hero-viewer { min-height: calc(100vh - 106px); }
   .viewer-kicker { left: 8px; right: auto; top: 52px; }
   .context-state { left: 8px; top: 84px; }
