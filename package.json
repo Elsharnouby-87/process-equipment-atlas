@@ -5,7 +5,15 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "assemble": "node scripts/assemble-project.mjs",
+    "qa:structure": "node scripts/qa-structure.mjs",
+    "typecheck": "tsc --noEmit",
+    "qa:navigation": "node scripts/qa-navigation-architecture.mjs",
+    "qa:operation": "node scripts/qa-operation-state-v1.mjs",
+    "qa:physics": "node scripts/qa-physics-v2.mjs",
+    "qa": "npm run qa:structure && npm run typecheck && npm run qa:navigation && npm run qa:operation && npm run qa:physics",
     "build": "vite build",
+    "verify": "npm run assemble && npm run qa && npm run build",
     "preview": "vite preview"
   },
   "dependencies": {
