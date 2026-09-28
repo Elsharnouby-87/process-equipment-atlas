@@ -65,3 +65,5 @@ Retry note: removed the obsolete `free-explore-patch.mjs` anchor that still expe
 Production update: **Codebase cleanup checkpoint** — preserves the current site behavior while removing orphaned UI styles, organizing npm maintenance/QA commands, hardening Heater3D assembly validation, aligning the Pages workflow with named project scripts, and documenting the source-of-truth / checkpoint workflow. Baseline: `checkpoint/code-cleanup-baseline-2026-09-29`.
 
 Production update: **Atlas viewer badge cleanup** — removes the `FREE EXPLORE / WHOLE HEATER` status badge and the `RADIANT / SHIELD / CONVECTION` zone badges from the main 3D viewport, along with their obsolete styles and Free Explore patch anchor.
+
+Production update: **Simulator declutter** — removes the top `Representative causal model` disclaimer and the bottom `Representative physics-based training model` card from the Simulator, plus their unused copy export and styles.
