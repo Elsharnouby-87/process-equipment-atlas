@@ -3,7 +3,6 @@ import {
   Box,
   Eye,
   EyeOff,
-  Flame,
   Focus,
   Info,
   Layers3,
@@ -353,7 +352,6 @@ function App() {
           ) : (
             <div className="group-list">{componentGroups.map(group => <section className="component-group" key={group.label}><p className="navigator-label">{group.label}</p>{group.components.map(name => <button key={name} className={selected === name ? 'component-btn active' : 'component-btn'} onClick={() => chooseComponent(name)}><span className="component-dot" /><span><b>{name}</b><small>{details[name].group}</small></span></button>)}</section>)}</div>
           )}
-          <div className="navigator-note"><Flame size={17} /><p><b>Context-first learning.</b><br />Focus and Isolate keep a ghosted heater reference so components never appear to float without location context.</p></div>
           <div className="atlas-creator-signature" aria-label="Site creator">Created by Eng. Ahmed Elshrarnouby</div>
         </aside>
         <div className="hero-viewer">
