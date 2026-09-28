@@ -61,3 +61,5 @@ Production update: **Atlas/Components declutter** — removes the `Context-first
 Production update: **Atlas viewer declutter** — removes the `ATLAS 3D` interaction-hint strip (`Drag / Wheel / Shift-drag / Double tap`) from the viewer because the controls are already discoverable and the strip adds visual clutter.
 
 Retry note: removed the obsolete `free-explore-patch.mjs` anchor that still expected the deleted Atlas interaction hint, then retriggered Pages deployment.
+
+Production update: **Codebase cleanup checkpoint** — preserves the current site behavior while removing orphaned UI styles, organizing npm maintenance/QA commands, hardening Heater3D assembly validation, aligning the Pages workflow with named project scripts, and documenting the source-of-truth / checkpoint workflow. Baseline: `checkpoint/code-cleanup-baseline-2026-09-29`.
