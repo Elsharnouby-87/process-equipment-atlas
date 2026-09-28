@@ -42,22 +42,22 @@ jobs:
         run: npm ls react react-dom three
 
       - name: Assemble project source
-        run: node scripts/assemble-project.mjs
+        run: npm run assemble
 
       - name: Structural regression QA
-        run: node scripts/qa-structure.mjs
+        run: npm run qa:structure
 
       - name: TypeScript QA
-        run: npx tsc --noEmit
+        run: npm run typecheck
 
       - name: Navigation architecture QA
-        run: node scripts/qa-navigation-architecture.mjs
+        run: npm run qa:navigation
 
       - name: Operation state machine QA
-        run: node scripts/qa-operation-state-v1.mjs
+        run: npm run qa:operation
 
       - name: Physics V2 regression QA
-        run: node scripts/qa-physics-v2.mjs
+        run: npm run qa:physics
 
       - name: Production build QA
         run: npm run build
