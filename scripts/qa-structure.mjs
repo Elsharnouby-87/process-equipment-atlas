@@ -58,6 +58,10 @@ forbidText('src/App.tsx', 'Context-first learning.', 'Atlas context-learning not
 forbidText('src/App.tsx', 'ATLAS 3D', 'Atlas 3D interaction hint removed');
 forbidText('src/App.tsx', 'context-state', 'Atlas Free Explore / context status badge removed');
 forbidText('src/App.tsx', 'section-key', 'Atlas Radiant / Shield / Convection badges removed');
+forbidText('src/SimulatorPage.tsx', 'Representative causal model · Not a plant operating procedure', 'Simulator top boundary copy removed');
+forbidText('src/SimulatorPage.tsx', 'simulator-boundary-note', 'Simulator boundary card removed');
+forbidText('src/physicsCalibration.ts', 'physicsModelBoundary', 'Unused simulator boundary copy export removed');
+forbidText('src/navigationArchitecture.css', '.simulator-boundary-note', 'Simulator boundary card styles removed');
 forbidText('src/index.css', '.context-state', 'Atlas context badge styles removed');
 forbidText('src/index.css', '.section-key', 'Atlas section badge styles removed');
 forbidText('src/App.tsx', 'Double tap: fit component', 'Atlas interaction instruction strip removed');
