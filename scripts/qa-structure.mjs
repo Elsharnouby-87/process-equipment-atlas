@@ -53,6 +53,8 @@ forbidText('src/HeaterTypesPage.tsx', '<b>Training model.</b>', 'Heater Types tr
 forbidText('src/HeaterTypesPage.tsx', 'VISUAL COMPARISON QUESTIONS', 'Heater Types visual-comparison question card removed');
 forbidText('src/HeaterTypesPage.tsx', '<b>Training guardrail:</b>', 'Heater Types mobile training guardrail removed');
 forbidText('src/App.tsx', 'Context-first learning.', 'Atlas context-learning note removed');
+forbidText('src/App.tsx', 'ATLAS 3D', 'Atlas 3D interaction hint removed');
+forbidText('src/App.tsx', 'Double tap: fit component', 'Atlas interaction instruction strip removed');
 forbidText('src/ComponentsPage.tsx', 'Architecture rule', 'Components architecture rule removed');
 forbidText('src/ComponentsPage.tsx', 'Cross-system combustion / draft interaction', 'Components architecture explanatory copy removed');
 requireText('src/App.tsx', 'Draft Instruments', 'Draft instruments registry');
