@@ -53,3 +53,5 @@ Production update: **Open purge casing + smart label tiers** — makes the purge
 Production update: **Front-visible purge fan** — moves the impeller forward toward the inlet plane, reduces hub/spinner size, lightens the inlet guard to six thinner spokes and smaller bolts, adds a higher-contrast impeller material, and retunes Atlas/Purge-study cameras to a front-biased angle so the fan blades remain clearly visible from the inlet side.
 
 Production update: **Creator signature** — adds a subtle `Created by Eng. Ahmed Elshrarnouby` signature as a sticky footer at the bottom of the Atlas left sidebar, styled to stay visible without competing with navigation content.
+
+Production update: **Creator signature color** — switches `Created by Eng. Ahmed Elshrarnouby` to the Atlas orange accent with a lighter orange hover state.
