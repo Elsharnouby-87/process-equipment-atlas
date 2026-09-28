@@ -47,7 +47,3 @@ export const physicsCalibration: PhysicsCalibration = {
   referenceTrampAirFractionOfFlue: 0.015,
 };
 
-export const physicsModelBoundary = {
-  label: 'Representative physics-based training model',
-  note: 'Relative fuel flow, heat input, air flow, pressure loss, O2, CO and temperature responses are calibrated for causal teaching only. Site/OEM data, burner curves, fuel analysis and heater heat balance govern real operation.',
-} as const;
