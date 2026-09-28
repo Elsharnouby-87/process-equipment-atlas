@@ -91,10 +91,6 @@ export default function ComponentsPage({ onBack, onNavigate, onOpenModule }: Pro
           ))}
         </div>
 
-        <div className="components-hub-note">
-          <b>Architecture rule</b>
-          <span>Component pages stay focused on anatomy, function, inspection and local behaviour. Cross-system combustion / draft interaction lives in the separate Simulator tab.</span>
-        </div>
       </section>
     </main>
   );
