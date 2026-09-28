@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 
-const heaterParts = [
+const HEATER_PARTS = [
   'src/_migration/Heater3D.part0.txt',
   'src/_migration/Heater3D.part1.txt',
   'src/_migration/Heater3D.part2.txt',
@@ -8,7 +8,7 @@ const heaterParts = [
   'src/_migration/Heater3D.part4.txt',
 ];
 
-const patchStages = [
+const PATCH_STAGES = [
   './assemble-preview.mjs',
   './assemble-burner-sim.mjs',
   './free-explore-patch.mjs',
@@ -24,17 +24,25 @@ const patchStages = [
   './typescript-cleanup.mjs',
 ];
 
-for (const file of heaterParts) {
-  if (!fs.existsSync(file)) throw new Error(`Missing Heater3D source part: ${file}`);
+const OUTPUT_FILE = 'src/Heater3D.tsx';
+
+function assertFilesExist(paths, label) {
+  const missing = paths.filter(path => !fs.existsSync(path));
+  if (missing.length) {
+    throw new Error(`${label}: missing ${missing.join(', ')}`);
+  }
 }
 
-const assembled = heaterParts.map(file => fs.readFileSync(file, 'utf8')).join('');
-fs.writeFileSync('src/Heater3D.tsx', assembled);
-console.log(`[assemble] Heater3D base rebuilt from ${heaterParts.length} migration parts.`);
+assertFilesExist(HEATER_PARTS, 'Heater3D source');
+assertFilesExist(PATCH_STAGES.map(stage => `scripts/${stage.replace('./', '')}`), 'Assembly patch stage');
 
-for (const stage of patchStages) {
+const assembled = HEATER_PARTS.map(file => fs.readFileSync(file, 'utf8')).join('');
+fs.writeFileSync(OUTPUT_FILE, assembled);
+console.log(`[assemble] ${OUTPUT_FILE} rebuilt from ${HEATER_PARTS.length} migration parts.`);
+
+for (const stage of PATCH_STAGES) {
   console.log(`[assemble] ${stage}`);
   await import(stage);
 }
 
-console.log(`[assemble] Complete: ${patchStages.length} ordered refinement stages applied.`);
+console.log(`[assemble] Complete: ${PATCH_STAGES.length} ordered refinement stages applied.`);
