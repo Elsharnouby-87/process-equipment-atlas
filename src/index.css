@@ -64,7 +64,7 @@ button { -webkit-tap-highlight-color: transparent; }
   padding: 11px 12px 12px;
   border-top: 1px solid rgba(76, 180, 237, .08);
   background: linear-gradient(180deg, rgba(4, 18, 30, .62), rgba(4, 18, 30, .98) 38%);
-  color: #587b8c;
+  color: #ff8b34;
   font-size: 8px;
   font-weight: 560;
   letter-spacing: .035em;
@@ -72,7 +72,7 @@ button { -webkit-tap-highlight-color: transparent; }
   white-space: nowrap;
   z-index: 3;
 }
-.atlas-creator-signature:hover { color: #7799a8; }
+.atlas-creator-signature:hover { color: #ffad6b; }
 
 .hero-viewer { position: relative; overflow: hidden; min-width: 0; background: radial-gradient(circle at 50% 47%, rgba(28, 96, 131, .15), transparent 42%); }
 .three-host { position: absolute; inset: 0; cursor: grab; touch-action: none; }
