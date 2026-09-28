@@ -53,10 +53,6 @@ button { -webkit-tap-highlight-color: transparent; }
 .component-btn.active .component-dot { background: #ff7a18; box-shadow: 0 0 10px #ff7a18; }
 .search-results { padding-top: 12px; }
 .empty-search { margin: 9px 7px; padding: 12px; border: 1px dashed rgba(80, 179, 233, .2); border-radius: 8px; color: #7699a8; font-size: 9px; line-height: 1.45; }
-.navigator-note { margin-top: 14px; padding: 11px; border: 1px solid rgba(255, 122, 24, .18); border-radius: 9px; display: flex; gap: 9px; color: #789cac; background: rgba(255, 122, 24, .04); }
-.navigator-note svg { color: #ff8b34; flex: 0 0 auto; }
-.navigator-note p { margin: 0; font-size: 9px; line-height: 1.5; }
-.navigator-note b { color: #d7e6ed; }
 .atlas-creator-signature {
   position: sticky;
   bottom: -14px;
@@ -342,7 +338,6 @@ button { -webkit-tap-highlight-color: transparent; }
   .component-navigator.mobile-open { transform: translateX(0); }
   .component-navigator .mobile-close, .inspector-panel .mobile-close { display: grid; position: absolute; right: 8px; top: 8px; width: 28px; height: 28px; place-items: center; border: 1px solid rgba(77, 185, 244, .18); border-radius: 6px; background: #081c2a; color: #9dbdca; z-index: 2; }
   .navigator-head { padding-right: 34px; }
-  .navigator-note { display: none; }
   .atlas-creator-signature {
     bottom: -12px;
     margin: 14px -12px -12px;
