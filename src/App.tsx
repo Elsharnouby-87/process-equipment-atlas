@@ -356,7 +356,6 @@ function App() {
         </aside>
         <div className="hero-viewer">
           <Heater3D mode={mode} selected={selected} labels={labels} flow={flow} explode={explode} contextMode={contextMode} damperPosition={damperPosition} cameraCommand={cameraCommand} onSelect={chooseComponent} />
-          <div className="viewer-kicker"><i /> ATLAS 3D <span>Drag: rotate · Wheel / pinch: zoom · Shift-drag / two fingers: pan · Double tap: fit component</span></div>
           <div className={`context-state ${contextMode}`}><span>{contextMode === 'full' ? 'FULL HEATER' : contextMode === 'focus' ? 'FOCUS + CONTEXT' : 'CONTEXT ISOLATE'}</span><b>{selected}</b></div>
           <div className="view-pills" aria-label="3D view modes"><button className={mode === 'cutaway' && !explode ? 'active' : ''} onClick={() => { setMode('cutaway'); setExplode(false); }}><ScanLine size={15} />Cutaway</button><button className={mode === 'normal' && !explode ? 'active' : ''} onClick={() => { setMode('normal'); setExplode(false); }}><Eye size={15} />Normal</button><button className={mode === 'xray' && !explode ? 'active' : ''} onClick={() => { setMode('xray'); setExplode(false); }}><Layers3 size={15} />X-Ray</button><button className={explode ? 'active' : ''} onClick={() => { setMode('cutaway'); setExplode(value => !value); setContextMode('full'); }}><Box size={15} />Exploded</button></div>
           <div className="section-key"><span className="key-radiant">RADIANT</span><span className="key-shield">SHIELD</span><span className="key-convection">CONVECTION</span></div>
