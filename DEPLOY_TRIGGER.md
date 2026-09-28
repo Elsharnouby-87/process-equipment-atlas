@@ -55,3 +55,5 @@ Production update: **Front-visible purge fan** — moves the impeller forward to
 Production update: **Creator signature** — adds a subtle `Created by Eng. Ahmed Elshrarnouby` signature as a sticky footer at the bottom of the Atlas left sidebar, styled to stay visible without competing with navigation content.
 
 Production update: **Creator signature color** — switches `Created by Eng. Ahmed Elshrarnouby` to the Atlas orange accent with a lighter orange hover state.
+
+Production update: **Atlas/Components declutter** — removes the `Context-first learning` card from the Atlas sidebar and the `Architecture rule` note from the Components hub, keeping only the creator signature and actionable study content.
