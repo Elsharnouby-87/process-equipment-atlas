@@ -53,6 +53,8 @@ forbidText('src/HeaterTypesPage.tsx', '<b>Training model.</b>', 'Heater Types tr
 forbidText('src/HeaterTypesPage.tsx', 'VISUAL COMPARISON QUESTIONS', 'Heater Types visual-comparison question card removed');
 forbidText('src/HeaterTypesPage.tsx', '<b>Training guardrail:</b>', 'Heater Types mobile training guardrail removed');
 requireText('src/App.tsx', 'Draft Instruments', 'Draft instruments registry');
+requireText('src/App.tsx', 'Created by Eng. Ahmed Elshrarnouby', 'Atlas creator signature');
+requireText('src/index.css', '.atlas-creator-signature', 'Atlas creator signature styling');
 requireText('src/App.tsx', 'Stack Analyzers', 'Stack analyzers registry');
 requireText('src/App.tsx', 'burnerFuelPathLocked', 'Atlas burner fuel-path mode lock');
 requireText('src/Heater3D.tsx', 'semanticExplodeOffsets', 'Semantic burner explode support');
