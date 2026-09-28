@@ -5,7 +5,6 @@ import GlobalNavigation from './GlobalNavigation';
 import type { NavigationTarget } from './GlobalNavigation';
 import type { CameraAction, CameraCommand } from './modelTypes';
 import { combustionTrainingPresets, getCombustionTrainingMetrics } from './combustionTrainingLogic';
-import { physicsModelBoundary } from './physicsCalibration';
 
 type Props = { onBack: () => void; onNavigate: (target: NavigationTarget) => void };
 
@@ -65,7 +64,6 @@ export default function SimulatorPage({ onBack, onNavigate }: Props) {
 
       <section className="architecture-contextbar">
         <div><span>PHYSICS-BASED TRAINING SIMULATOR</span><strong>Fuel · Combustion Air · Stack Damper · Natural Draft</strong></div>
-        <p>Representative causal model · Not a plant operating procedure, burner guarantee, CFD model or design calculation</p>
       </section>
 
       <section className="simulator-workspace">
@@ -138,10 +136,6 @@ export default function SimulatorPage({ onBack, onNavigate }: Props) {
             <div><small>STACK TEMP*</small><strong>{metrics.stackTemperatureC}</strong><em>°C · representative</em></div>
           </div>
 
-          <div className="simulator-boundary-note">
-            <b>{physicsModelBoundary.label}</b>
-            <p>{physicsModelBoundary.note}</p>
-          </div>
         </aside>
       </section>
     </main>
