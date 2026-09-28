@@ -8,8 +8,8 @@ This document records the current source-of-truth structure so future patches do
 
 1. `App.tsx` — main Atlas shell, component navigation and cross-module routing.
 2. `Heater3D.tsx` — shared fired-heater Three.js scene and interaction runtime.
-3. Component study pages — Burner, Radiant, Shield/Convection and Draft/Stack.
-4. Training pages — Heater Types, Operation and Troubleshooting.
+3. Component study pages — Burner, Radiant, Shield/Convection, Draft/Stack and Purge Air.
+4. Training / system pages — Simulator, Heater Types, Operation and Troubleshooting.
 5. `heater3d/` helpers — camera presets, scene helpers, semantic explode offsets and view configuration.
 
 ## Heater3D assembly
@@ -23,6 +23,8 @@ Use `scripts/assemble-project.mjs` as the only assembly entrypoint. It:
 3. Produces the final CI/runtime source used by TypeScript and Vite.
 
 The patch order is significant. Do not manually reorder stages without a dedicated regression pass.
+
+For a complete local/CI-equivalent validation, run `npm run verify`. Named subcommands are available for assembly, structural QA, type checking, navigation QA, operation QA and physics QA.
 
 ## Critical invariants
 
@@ -42,3 +44,8 @@ The following behavior should be treated as regression-sensitive:
 Prefer small, testable extraction over large rewrites. `OperationPage.tsx` and `Heater3D.tsx` are large and should only be split in a dedicated refactor checkpoint after the current behavior is protected by regression checks.
 
 Do not combine a structural refactor with new simulator physics in the same patch. Stabilize first, then add behavior.
+
+
+## Maintenance
+
+See `docs/CODE_MAINTENANCE.md` for the current source-of-truth rules, checkpoint workflow and cleanup policy.
