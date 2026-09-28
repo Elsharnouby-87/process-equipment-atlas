@@ -59,3 +59,5 @@ Production update: **Creator signature color** — switches `Created by Eng. Ahm
 Production update: **Atlas/Components declutter** — removes the `Context-first learning` card from the Atlas sidebar and the `Architecture rule` note from the Components hub, keeping only the creator signature and actionable study content.
 
 Production update: **Atlas viewer declutter** — removes the `ATLAS 3D` interaction-hint strip (`Drag / Wheel / Shift-drag / Double tap`) from the viewer because the controls are already discoverable and the strip adds visual clutter.
+
+Retry note: removed the obsolete `free-explore-patch.mjs` anchor that still expected the deleted Atlas interaction hint, then retriggered Pages deployment.
