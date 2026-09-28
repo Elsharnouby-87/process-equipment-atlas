@@ -17,6 +17,8 @@ const requiredFiles = [
   'src/physicsCalibration.ts',
   'src/combustionTrainingLogic.ts',
   'src/simulatorV2.css',
+  'docs/CODE_MAINTENANCE.md',
+  'docs/checkpoints/24-codebase-cleanup-2026-09-29.md',
   'scripts/burner-fuel-path-mode-consistency.mjs',
   'scripts/simulator-live-readout.mjs',
   'scripts/physics-simulator-v2-ui.mjs',
@@ -57,6 +59,11 @@ forbidText('src/App.tsx', 'ATLAS 3D', 'Atlas 3D interaction hint removed');
 forbidText('src/App.tsx', 'Double tap: fit component', 'Atlas interaction instruction strip removed');
 forbidText('src/ComponentsPage.tsx', 'Architecture rule', 'Components architecture rule removed');
 forbidText('src/ComponentsPage.tsx', 'Cross-system combustion / draft interaction', 'Components architecture explanatory copy removed');
+forbidText('src/navigationArchitecture.css', '.components-hub-note', 'Obsolete Components hub note styles removed');
+forbidText('src/index.css', '.viewer-kicker', 'Obsolete Atlas interaction hint styles removed');
+forbidText('src/index.css', '.navigator-note', 'Obsolete Atlas context-note styles removed');
+requireText('package.json', '"verify": "npm run assemble && npm run qa && npm run build"', 'Unified project verification command');
+requireText('scripts/assemble-project.mjs', 'assertFilesExist(PATCH_STAGES', 'Assembly patch-stage validation');
 requireText('src/App.tsx', 'Draft Instruments', 'Draft instruments registry');
 requireText('src/App.tsx', 'Created by Eng. Ahmed Elshrarnouby', 'Atlas creator signature');
 requireText('src/index.css', '.atlas-creator-signature', 'Atlas creator signature styling');
