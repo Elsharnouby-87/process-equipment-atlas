@@ -97,13 +97,6 @@ app = replaceOnce(
   'free explore status badge'
 );
 
-app = replaceOnce(
-  app,
-  'Drag: rotate · Wheel / pinch: zoom · Shift-drag / two fingers: pan · Double tap: fit component',
-  'Drag: free orbit · Wheel / pinch: zoom · Shift-drag / two fingers: pan · Tap empty space: free explore · Double tap component: focus',
-  'viewer interaction hint'
-);
-
 app = app.replace(
   'title="Fit complete heater" onClick={() => cameraAction(\'fitHeater\')}',
   'title="Free explore complete heater" onClick={showFullHeater}'
