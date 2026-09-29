@@ -10,6 +10,7 @@ const requiredFiles = [
   'src/HeaterTypesPage.tsx',
   'src/OperationPage.tsx',
   'src/TroubleshootingPage.tsx',
+  'src/SimulatorPage.tsx',
   'src/PurgeAirPage.tsx',
   'src/purgeAirStudy.css',
   'src/readability.css',
@@ -62,6 +63,14 @@ forbidText('src/SimulatorPage.tsx', 'Representative causal model · Not a plant 
 forbidText('src/SimulatorPage.tsx', 'simulator-boundary-note', 'Simulator boundary card removed');
 forbidText('src/physicsCalibration.ts', 'physicsModelBoundary', 'Unused simulator boundary copy export removed');
 forbidText('src/navigationArchitecture.css', '.simulator-boundary-note', 'Simulator boundary card styles removed');
+requireText('src/SimulatorPage.tsx', "id: 'combustion'", 'Simulator combustion screen');
+requireText('src/SimulatorPage.tsx', "id: 'draft'", 'Simulator draft screen');
+requireText('src/SimulatorPage.tsx', "id: 'heatRecovery'", 'Simulator heat-recovery screen');
+requireText('src/SimulatorPage.tsx', "id: 'integrated'", 'Simulator integrated screen');
+requireText('src/SimulatorPage.tsx', "useState<SimulatorViewId>('integrated')", 'Simulator integrated default');
+requireText('src/SimulatorPage.tsx', "camera: 'draftPath'", 'Simulator draft camera');
+requireText('src/SimulatorPage.tsx', "camera: 'heatFlue'", 'Simulator heat-recovery camera');
+requireText('src/navigationArchitecture.css', '.simulator-screen-tabs', 'Simulator screen-tab styling');
 forbidText('src/index.css', '.context-state', 'Atlas context badge styles removed');
 forbidText('src/index.css', '.section-key', 'Atlas section badge styles removed');
 forbidText('src/App.tsx', 'Double tap: fit component', 'Atlas interaction instruction strip removed');
