@@ -49,3 +49,8 @@ Do not combine a structural refactor with new simulator physics in the same patc
 ## Maintenance
 
 See `docs/CODE_MAINTENANCE.md` for the current source-of-truth rules, checkpoint workflow and cleanup policy.
+
+
+## Simulator screen architecture
+
+The Simulator is one shared causal state presented through four views: **Combustion**, **Draft**, **Heat Recovery**, and **Integrated**. Screen changes preserve fuel, air-register and stack-damper state. Each screen reuses existing Heater3D study/camera modes and filters controls, scenarios and outputs for the system being studied. The Integrated screen is the default entry point.
