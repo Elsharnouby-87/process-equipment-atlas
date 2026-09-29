@@ -10,3 +10,44 @@
 @media(max-width:1180px){.simulator-workspace{grid-template-columns:minmax(0,1fr) 380px}.architecture-topbar{grid-template-columns:76px minmax(220px,1fr) auto}.architecture-topbar .primary-nav button{padding-left:8px;padding-right:8px;font-size:9px}}
 @media(max-width:980px){.architecture-page{overflow:auto}.architecture-topbar{height:92px;grid-template-columns:72px 1fr 54px;padding:0 14px;gap:10px}.architecture-topbar .brand-lockup strong{font-size:16px}.architecture-contextbar{height:auto;min-height:58px;padding:10px 15px;align-items:flex-start}.architecture-contextbar>div{display:block}.architecture-contextbar strong{display:block;margin-top:4px;white-space:normal;font-size:10px}.architecture-contextbar p{display:none}.components-hub-content{height:calc(100vh - 150px);padding:25px 14px 34px}.components-hub-intro{text-align:left;margin-bottom:19px}.components-hub-intro h1{font-size:31px}.components-hub-intro p{margin:0}.component-module-grid{grid-template-columns:1fr;gap:10px}.component-module-card{min-height:0;padding:19px}.component-module-card h2{font-size:22px}.component-module-card p{max-width:none}.simulator-workspace{height:calc(100vh - 150px);display:flex;flex-direction:column;overflow:auto}.simulator-viewer{height:52vh;min-height:430px;flex:0 0 auto;border-right:0;border-bottom:1px solid rgba(78,187,242,.14)}.simulator-console{overflow:visible;flex:0 0 auto}.simulator-flow-legend{top:54px;right:9px}.simulator-state-badge{top:94px;left:9px;max-width:calc(100% - 18px)}.simulator-camera-dock{left:9px;right:9px;bottom:10px;transform:none;justify-content:center;overflow-x:auto}.simulator-camera-dock button{padding:8px 7px;font-size:0}.simulator-camera-dock button svg{width:18px;height:18px}.simulator-output-grid{grid-template-columns:1fr 1fr}.simulator-presets>div{grid-template-columns:1fr 1fr}}
 @media(max-width:520px){.architecture-topbar{grid-template-columns:68px 1fr 48px;padding:0 10px}.architecture-topbar .back-atlas{font-size:0}.architecture-topbar .back-atlas svg{width:18px;height:18px}.architecture-topbar .brand-lockup span{font-size:7px;letter-spacing:.2em}.simulator-viewer{min-height:405px}.simulator-kicker span{display:none}.simulator-flow-legend span{font-size:6px;padding:4px 6px}.simulator-console{padding:15px 11px 22px}.simulator-console-head h1{font-size:21px}.simulator-output-grid{gap:6px}.simulator-output-grid>div{padding:8px}.simulator-output-grid strong{font-size:18px}}
+
+
+/* Simulator four-screen architecture */
+.simulator-contextbar{gap:14px}
+.simulator-contextbar>div{flex:1 1 auto}
+.simulator-screen-tabs{flex:0 0 auto;display:grid;grid-template-columns:repeat(4,minmax(104px,1fr));gap:5px}
+.simulator-screen-tabs button{min-width:0;border:1px solid rgba(77,184,241,.15);border-radius:8px;padding:6px 8px;background:rgba(4,22,34,.72);color:#7699a8;display:grid;grid-template-columns:auto 1fr;grid-template-areas:"num label" "num desc";column-gap:6px;text-align:left;cursor:pointer;transition:border-color .16s ease,background .16s ease,color .16s ease,box-shadow .16s ease}
+.simulator-screen-tabs button:hover{border-color:rgba(79,191,240,.34);color:#dceef5;background:rgba(7,31,45,.86)}
+.simulator-screen-tabs button.active{border-color:rgba(255,130,42,.66);background:rgba(130,57,17,.20);box-shadow:inset 0 -2px 0 #ff7a18;color:#f4fbff}
+.simulator-screen-tabs b{grid-area:num;align-self:center;color:#4eaed6;font:800 8px/1 'IBM Plex Mono',monospace;letter-spacing:.05em}
+.simulator-screen-tabs button.active b{color:#ff943f}
+.simulator-screen-tabs span{grid-area:label;font-size:8px;font-weight:800;line-height:1.1;white-space:nowrap}
+.simulator-screen-tabs small{grid-area:desc;margin-top:2px;color:#577d8d;font-size:6.5px;line-height:1.15;white-space:nowrap}
+.simulator-screen-tabs button.active small{color:#a37960}
+.simulator-page .simulator-console-head h1{max-width:390px}
+.simulator-page .simulator-console-head p{max-width:390px}
+.simulator-page .simulator-output-grid>div{min-height:66px}
+
+@media(max-width:1180px){
+  .simulator-screen-tabs{grid-template-columns:repeat(4,minmax(82px,1fr))}
+  .simulator-screen-tabs button{padding:6px}
+  .simulator-screen-tabs small{display:none}
+  .simulator-screen-tabs button{grid-template-areas:"num label";align-items:center}
+}
+
+@media(max-width:980px){
+  .simulator-contextbar{flex-wrap:wrap}
+  .simulator-contextbar>div{flex:1 1 100%}
+  .simulator-screen-tabs{width:100%;grid-template-columns:repeat(4,minmax(110px,1fr));overflow-x:auto;padding-bottom:1px}
+  .simulator-screen-tabs small{display:block}
+  .simulator-screen-tabs button{grid-template-areas:"num label" "num desc"}
+  .simulator-workspace{height:calc(100vh - 212px)}
+}
+
+@media(max-width:620px){
+  .simulator-screen-tabs{grid-template-columns:repeat(4,minmax(96px,1fr))}
+  .simulator-screen-tabs small{display:none}
+  .simulator-screen-tabs button{grid-template-areas:"num label";padding:7px 6px}
+  .simulator-screen-tabs span{font-size:7px}
+  .simulator-workspace{height:calc(100vh - 202px)}
+}
