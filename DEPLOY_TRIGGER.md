@@ -69,3 +69,6 @@ Production update: **Atlas viewer badge cleanup** — removes the `FREE EXPLORE 
 Production update: **Simulator declutter** — removes the top `Representative causal model` disclaimer and the bottom `Representative physics-based training model` card from the Simulator, plus their unused copy export and styles.
 
 Production update: **Four-screen Simulator architecture** — reorganizes the existing shared physics model into COMBUSTION, DRAFT, HEAT RECOVERY and INTEGRATED screens. Fuel / air / stack-damper state persists across screens; each screen reuses existing Heater3D cameras/study modes and filters controls, presets and live outputs. Default entry is INTEGRATED. Pre-change checkpoint: `checkpoint/pre-simulator-four-screen-2026-09-29`.
+
+
+Mobile header refresh — 2026-10-03: show PROCESS EQUIPMENT ATLAS and creator signature above/below the Fired Heater title on portrait mobile.
