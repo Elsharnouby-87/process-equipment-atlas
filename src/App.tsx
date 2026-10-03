@@ -329,9 +329,11 @@ function App() {
   return (
     <main className="app-shell">
       <header className="atlas-topbar">
-        <div className="brand-lockup">
+        <div className="brand-lockup atlas-brand-lockup">
+          <span className="brand-platform">PROCESS EQUIPMENT ATLAS</span>
           <strong>FIRED HEATER <em>ATLAS</em></strong>
-          <span>EXPLORE · LEARN · UNDERSTAND</span>
+          <span className="brand-tagline">EXPLORE · LEARN · UNDERSTAND</span>
+          <span className="brand-creator-mobile">Created by <b>Eng. Ahmed Elshrarnouby</b></span>
         </div>
         <label className="global-search">
           <Search size={17} />
